@@ -12,6 +12,8 @@ import { melimiCatConversation } from "./commands/melimi/melimi_cat";
 import { imageSizeConversation } from "./commands/imagesize";
 import { playomConversation } from "./commands/playom";
 import { anatol777Conversation } from "./commands/anatol777";
+import { createUser } from "./core/supabase";
+import { customMiddleware } from "./commands/helpers";
 
 interface SessionData {
   melimi00: {
@@ -33,6 +35,8 @@ bot.use(createConversation(melimiCatConversation));
 bot.use(createConversation(imageSizeConversation));
 bot.use(createConversation(playomConversation));
 bot.use(createConversation(anatol777Conversation));
+
+bot.use(customMiddleware);
 bot.use(commands);
 
 bot.catch((err) => {

@@ -4,10 +4,12 @@ import axios from "axios";
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
 import path from "path";
 import { openai } from "../core/openai";
-import { Step } from "../utils/types";
+import { MyContextWithSession, Step } from "../utils/types";
 import Replicate from "replicate";
 import { promises as fs } from "fs";
 import { getAspectRatio, incrementGeneratedImages } from "../core/supabase/ai";
+import { MiddlewareFn } from "grammy";
+import { createUser } from "../core/supabase";
 
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
@@ -945,4 +947,18 @@ export const generateImage = async (prompt: string, model_type: string, telegram
     console.error(error);
     throw new Error("Ошибка при генерации изображения");
   }
+};
+
+export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, next) => {
+  const username = ctx.from?.username || "";
+  const telegram_id = ctx.from?.id;
+
+  if (telegram_id) {
+    // Ваша логика здесь
+    console.log(username, telegram_id, "username, telegram_id");
+    await createUser(username, telegram_id.toString());
+  }
+
+  // Продолжаем выполнение следующих промежуточных обработчиков
+  await next();
 };

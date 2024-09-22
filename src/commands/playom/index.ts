@@ -18,7 +18,9 @@ async function playomConversation(conversation: Conversation<MyContext>, ctx: My
 
   if (!message || !ctx.from?.id) return;
 
+  const generatingMessage = await ctx.reply("Генерация изображения началась...");
   const image = await generateImage(`TOK ${message.text}` || "", "playom", ctx.from?.id.toString());
+  await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   await ctx.replyWithPhoto(image);
   const info = await getGeneratedImages(ctx.from?.id.toString() || "");
   const { count, limit } = info;
