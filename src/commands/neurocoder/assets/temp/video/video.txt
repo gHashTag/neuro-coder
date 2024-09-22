@@ -1,0 +1,4 @@
+file '/Users/sonata/neuro-coder/src/commands/neurocoder/assets/temp/video/scene0.mp4'
+file '/Users/sonata/neuro-coder/src/commands/neurocoder/assets/temp/video/scene1.mp4'
+file '/Users/sonata/neuro-coder/src/commands/neurocoder/assets/temp/video/scene2.mp4'
+file '/Users/sonata/neuro-coder/src/commands/neurocoder/assets/temp/video/scene3.mp4'

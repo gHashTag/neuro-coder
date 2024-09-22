@@ -1,0 +1,6 @@
+file '/Users/sonata/neuro-coder/src/commands/melimi/assets/temp/photo/photo0.png'
+file '/Users/sonata/neuro-coder/src/commands/melimi/assets/temp/photo/photo1.png'
+file '/Users/sonata/neuro-coder/src/commands/melimi/assets/temp/photo/photo2.png'
+file '/Users/sonata/neuro-coder/src/commands/melimi/assets/temp/photo/photo0.png'
+file '/Users/sonata/neuro-coder/src/commands/melimi/assets/temp/photo/photo1.png'
+file '/Users/sonata/neuro-coder/src/commands/melimi/assets/temp/photo/photo2.png'
