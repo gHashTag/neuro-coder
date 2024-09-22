@@ -29,6 +29,28 @@ const bot = new Bot<MyContextWithSession>(process.env.BOT_TOKEN || "");
 bot.api.config.use(hydrateFiles(bot.token));
 
 bot.use(session({ initial: () => ({}) }));
+bot.api.setMyCommands([
+  {
+    command: "start",
+    description: "👋 Начать использовать бота",
+  },
+  {
+    command: "imagesize",
+    description: "🖼️ Изменить размер генерируемого изображения",
+  },
+  {
+    command: "playom",
+    description: "🙍‍♀️ playom",
+  },
+  {
+    command: "anatol777",
+    description: "🙍‍♂️ anatol777",
+  },
+  {
+    command: "melimi_cat",
+    description: "🐱 melimi_cat",
+  },
+]);
 bot.use(conversations());
 bot.use(createConversation(melimiCatConversation));
 // bot.use(createConversation(neurocoderDjConversation));
