@@ -19,6 +19,7 @@ function runMiddleware(req: any, res: any, fn: any) {
 
 async function handler(req: any, res: any) {
     // Run the middleware
+    // @ts-ignore
     await runMiddleware(req, res, webhookCallback(bot, "std/http"));
 }
 
