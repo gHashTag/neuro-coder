@@ -102,7 +102,9 @@ const template01 = async (ctx: Context): Promise<void> => {
         .run();
     });
 
+    // @ts-ignore
     await ctx.replyWithVideo(new InputFile(`${outputFilePath}/final_video.mp4`));
+    // @ts-ignore
     await ctx.replyWithVideo(new InputFile(video.filePath));
     await ctx.reply("Video creation finished");
     const filePathToDelete = video.filePath || "";
