@@ -20,7 +20,9 @@ async function anatol777Conversation(conversation: Conversation<MyContext>, ctx:
 
   if (!message || !ctx.from?.id) return;
 
+  const generatingMessage = await ctx.reply("Генерация изображения началась...");
   const image = await generateImage(`TOK ${message.text}` || "", "anatol777", ctx.from?.id.toString());
+  await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   await ctx.replyWithPhoto(image);
   if (count < limit) {
     await ctx.reply(`У вас осталось ${limit - count} использований.`);

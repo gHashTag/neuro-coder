@@ -12,6 +12,8 @@ import { melimiCatConversation } from "./commands/melimi/melimi_cat";
 import { imageSizeConversation } from "./commands/imagesize";
 import { playomConversation } from "./commands/playom";
 import { anatol777Conversation } from "./commands/anatol777";
+import { createUser } from "./core/supabase";
+import { customMiddleware } from "./commands/helpers";
 
 interface SessionData {
   melimi00: {
@@ -27,12 +29,36 @@ const bot = new Bot<MyContextWithSession>(process.env.BOT_TOKEN || "");
 bot.api.config.use(hydrateFiles(bot.token));
 
 bot.use(session({ initial: () => ({}) }));
+bot.api.setMyCommands([
+  {
+    command: "start",
+    description: "👋 Начать использовать бота",
+  },
+  {
+    command: "imagesize",
+    description: "🖼️ Изменить размер генерируемого изображения",
+  },
+  {
+    command: "playom",
+    description: "🙍‍♀️ playom",
+  },
+  {
+    command: "anatol777",
+    description: "🙍‍♂️ anatol777",
+  },
+  {
+    command: "melimi_cat",
+    description: "🐱 melimi_cat",
+  },
+]);
 bot.use(conversations());
 bot.use(createConversation(melimiCatConversation));
 // bot.use(createConversation(neurocoderDjConversation));
 bot.use(createConversation(imageSizeConversation));
 bot.use(createConversation(playomConversation));
 bot.use(createConversation(anatol777Conversation));
+
+bot.use(customMiddleware);
 bot.use(commands);
 
 bot.catch((err) => {
