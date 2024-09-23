@@ -19,7 +19,6 @@ const development = async (bot: Bot<MyContextWithSession>): Promise<void> => {
     await bot.start();
   } catch (e) {
     console.error(e);
-    return;
   }
 };
 
