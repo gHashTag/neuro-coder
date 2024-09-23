@@ -44,6 +44,14 @@ composer.command("anatol777", async (ctx) => {
   await ctx.conversation.enter("anatol777Conversation");
 });
 
+composer.command("vesna", async (ctx) => {
+  await ctx.conversation.enter("vesnaConversation");
+});
+
+composer.command("vega_condominium", async (ctx) => {
+  await ctx.conversation.enter("vega_condominiumConversation");
+});
+
 // composer.command("neurocoder01", neurocoder01);
 // composer.command("neurocoder02", neurocoder02);
 // composer.command("neurocoder03", neurocoder03);

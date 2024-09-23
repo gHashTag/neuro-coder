@@ -6,12 +6,18 @@ import { getGeneratedImages } from "../../../core/supabase/ai";
 
 async function melimiCatConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const keyboard = new InlineKeyboard().text("Отмена", "cancel");
-  await ctx.reply("Привет! Напиши промпт для генерации изображения.", {
+  await ctx.reply("Привет! Напиши промпт на английском для генерации изображения.", {
     reply_markup: keyboard,
   });
   const { message, callbackQuery } = await conversation.wait();
   const info = await getGeneratedImages(ctx.from?.id.toString() || "");
   const { count, limit } = info;
+
+  if (count >= limit) {
+    await ctx.reply("У вас не осталось использований. Пожалуйста, оплатите генерацию изображений.");
+    return;
+  }
+
   if (callbackQuery?.data === "cancel") {
     await ctx.reply("Вы отменили генерацию изображения.");
     return;

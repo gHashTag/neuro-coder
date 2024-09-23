@@ -923,6 +923,9 @@ export const generateImage = async (prompt: string, model_type: string, telegram
       "neurocoder-dj": "ghashtag/neuro_coder_flux-dev-lora:5ff9ea5918427540563f09940bf95d6efc16b8ce9600e82bb17c2b188384e355",
       playom: "ghashtag/playom:9aa28ab0b406d4049f0fdf5226ef0d57bcc5722ca22895aaf74b8bd9a3e22389",
       anatol777: "ghashtag/anatol777:3d347a758606958d79afdd53d8a4a77025a2d85e9051274c2e110eb11a974db6",
+      vesna: "ghashtag/vesna:da4db2b3e788a7b7bdbb04f1c0dfa66255695ebddaa4bc8d40bdbf5ea5c6d5d6",
+      vega_condominium: "ghashtag/vega_condominium:19ba41aebd5e3bd920c08149c08cd1a72f74910587d9421ce2fbb5b118635347",
+      yellowshoess: "ghashtag/yellowshoess:f496e9339501d16a2ed83a57f49c1e888eae9b2e5073a296b28c33b01c052f0c",
     };
 
     const aspect_ratio = await getAspectRatio(telegram_id);

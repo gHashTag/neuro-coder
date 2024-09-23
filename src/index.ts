@@ -14,6 +14,9 @@ import { playomConversation } from "./commands/playom";
 import { anatol777Conversation } from "./commands/anatol777";
 import { createUser } from "./core/supabase";
 import { customMiddleware } from "./commands/helpers";
+import { vesnaConversation } from "./commands/vesna";
+import { vega_condominiumConversation } from "./commands/vega_condominium";
+import { yellowshoessConversation } from "./commands/yellowshoess";
 
 interface SessionData {
   melimi00: {
@@ -38,18 +41,6 @@ bot.api.setMyCommands([
     command: "imagesize",
     description: "🖼️ Изменить размер генерируемого изображения",
   },
-  {
-    command: "playom",
-    description: "🙍‍♀️ playom",
-  },
-  {
-    command: "anatol777",
-    description: "🙍‍♂️ anatol777",
-  },
-  {
-    command: "melimi_cat",
-    description: "🐱 melimi_cat",
-  },
 ]);
 bot.use(conversations());
 bot.use(createConversation(melimiCatConversation));
@@ -57,6 +48,9 @@ bot.use(createConversation(melimiCatConversation));
 bot.use(createConversation(imageSizeConversation));
 bot.use(createConversation(playomConversation));
 bot.use(createConversation(anatol777Conversation));
+bot.use(createConversation(vesnaConversation));
+bot.use(createConversation(vega_condominiumConversation));
+bot.use(createConversation(yellowshoessConversation));
 
 bot.use(customMiddleware);
 bot.use(commands);
