@@ -5,8 +5,10 @@ const production = async (bot: Bot<MyContextWithSession>): Promise<void> => {
   try {
     await bot.api.setWebhook(`${process.env.VERCEL_URL}/api/index`);
     console.log(`[SERVER] Bot starting webhook`);
+    return;
   } catch (e) {
-    console.error(e);
+    console.error(e, 'Error ot starting webhook');
+    return;
   }
 };
 
@@ -17,6 +19,7 @@ const development = async (bot: Bot<MyContextWithSession>): Promise<void> => {
     await bot.start();
   } catch (e) {
     console.error(e);
+    return;
   }
 };
 
