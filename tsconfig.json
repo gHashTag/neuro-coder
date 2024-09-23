@@ -2,9 +2,9 @@
   "compilerOptions": {
     "target": "ES2019",
     "module": "commonjs",
-    "lib": ["es2017", "es7", "es6"],
+    "lib": ["es2019"],
     "allowJs": true,
-    "outDir": "./public",
+    "outDir": "./dist",
     "strict": true,
     "baseUrl": ".",
     "esModuleInterop": true,
@@ -12,7 +12,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "src/*": ["src/*"]
+      "src/*": ["src/*"],
+      "api/*": ["api/*"]
     }
-  }
+  },
+  "include": ["src/**/*", "api/**/*"]
 }
