@@ -52,6 +52,14 @@ composer.command("vega_condominium", async (ctx) => {
   await ctx.conversation.enter("vega_condominiumConversation");
 });
 
+composer.command("neurocoder_dj", async (ctx) => {
+  await ctx.conversation.enter("neurocoderDjConversation");
+});
+
+composer.command("yellowshoess", async (ctx) => {
+  await ctx.conversation.enter("yellowshoessConversation");
+});
+
 // composer.command("neurocoder01", neurocoder01);
 // composer.command("neurocoder02", neurocoder02);
 // composer.command("neurocoder03", neurocoder03);

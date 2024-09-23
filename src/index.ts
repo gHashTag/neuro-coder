@@ -16,6 +16,7 @@ import { customMiddleware } from "./commands/helpers";
 import { vesnaConversation } from "./commands/vesna";
 import { vega_condominiumConversation } from "./commands/vega_condominium";
 import { yellowshoessConversation } from "./commands/yellowshoess";
+import { neurocoderDjConversation } from "./commands/neurocoder_dj";
 
 interface SessionData {
   melimi00: {
@@ -50,7 +51,7 @@ bot.use(createConversation(anatol777Conversation));
 bot.use(createConversation(vesnaConversation));
 bot.use(createConversation(vega_condominiumConversation));
 bot.use(createConversation(yellowshoessConversation));
-
+bot.use(createConversation(neurocoderDjConversation));
 bot.use(customMiddleware);
 bot.use(commands);
 
