@@ -12,7 +12,6 @@ import { melimiCatConversation } from "./commands/melimi/melimi_cat";
 import { imageSizeConversation } from "./commands/imagesize";
 import { playomConversation } from "./commands/playom";
 import { anatol777Conversation } from "./commands/anatol777";
-import { createUser } from "./core/supabase";
 import { customMiddleware } from "./commands/helpers";
 import { vesnaConversation } from "./commands/vesna";
 import { vega_condominiumConversation } from "./commands/vega_condominium";
@@ -64,7 +63,7 @@ bot.catch((err) => {
   });
 });
 
-console.log(process.env.NODE_ENV, 'process.env.NODE_ENV');
+console.log(process.env.NODE_ENV, "process.env.NODE_ENV");
 process.env.NODE_ENV === "development" ? development(bot) : production(bot);
 
 export { bot };
