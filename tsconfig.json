@@ -12,8 +12,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "src/*": ["src/*"]
+      "src/*": ["src/*"],
+      "api/*": ["api/*"]
     }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "api/**/*"]
 }
