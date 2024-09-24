@@ -6,7 +6,7 @@ import { getGeneratedImages } from "../../core/supabase/ai";
 
 async function neurocoderDjConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const keyboard = new InlineKeyboard().text("Отмена", "cancel");
-  await ctx.reply("Привет! Напиши промпт для генерации изображения.", {
+  await ctx.reply("Привет! Напиши промпт на английском для генерации изображения.", {
     reply_markup: keyboard,
   });
   const { message, callbackQuery } = await conversation.wait();
@@ -17,7 +17,6 @@ async function neurocoderDjConversation(conversation: Conversation<MyContext>, c
     await ctx.reply("У вас не осталось использований. Пожалуйста, оплатите генерацию изображений.");
     return;
   }
-
   if (callbackQuery?.data === "cancel") {
     await ctx.reply("Вы отменили генерацию изображения.");
     return;
@@ -25,7 +24,9 @@ async function neurocoderDjConversation(conversation: Conversation<MyContext>, c
 
   if (!message || !ctx.from?.id) return;
 
+  const generatingMessage = await ctx.reply("Генерация изображения началась...");
   const image = await generateImage(`NEUROCODER ${message.text}` || "", "neurocoder-dj", ctx.from?.id.toString());
+  await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   await ctx.replyWithPhoto(image);
   if (count < limit) {
     await ctx.reply(`У вас осталось ${limit - count} использований.`);
