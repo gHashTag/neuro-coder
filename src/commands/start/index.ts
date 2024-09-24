@@ -1,9 +1,8 @@
-import { InputFile, InlineKeyboard } from "grammy";
+import { InputFile } from "grammy";
 import { MyContext } from "../../utils/types";
-import path from "path";
 
 async function start(ctx: MyContext) {
-  const photoPath = path.resolve(__dirname, "../../../assets/neurocoder/neurocoder.png");
+  const photoPath = "assets/neurocoder/neurocoder.png";
 
   // const keyboard = new InlineKeyboard()
   //   .text("Узнать о наших курсах и тарифах", "courses")

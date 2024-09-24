@@ -44,7 +44,7 @@ composer.command("anatol777", async (ctx) => {
   await ctx.conversation.enter("anatol777Conversation");
 });
 
-composer.command("vesna", async (ctx) => {
+composer.command("anfi_vesna", async (ctx) => {
   await ctx.conversation.enter("vesnaConversation");
 });
 
