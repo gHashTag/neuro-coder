@@ -7,16 +7,9 @@ import { MyContext } from "./utils/types";
 import { hydrateFiles } from "@grammyjs/files";
 import { conversations, createConversation } from "@grammyjs/conversations";
 import { session, SessionFlavor } from "grammy";
-import { melimiCatConversation } from "./commands/melimi/melimi_cat";
-// import { neurocoderDjConversation } from "./commands/neurocoder/neurocoder_dj";
 import { imageSizeConversation } from "./commands/imagesize";
-import { playomConversation } from "./commands/playom";
-import { anatol777Conversation } from "./commands/anatol777";
 import { customMiddleware } from "./commands/helpers";
-import { vesnaConversation } from "./commands/vesna";
-import { vega_condominiumConversation } from "./commands/vega_condominium";
-import { yellowshoessConversation } from "./commands/yellowshoess";
-import { neurocoderDjConversation } from "./commands/neurocoder_dj";
+import { generateImageConversation } from "./commands/generateImage";
 
 interface SessionData {
   melimi00: {
@@ -43,15 +36,8 @@ bot.api.setMyCommands([
   },
 ]);
 bot.use(conversations());
-bot.use(createConversation(melimiCatConversation));
-// bot.use(createConversation(neurocoderDjConversation));
 bot.use(createConversation(imageSizeConversation));
-bot.use(createConversation(playomConversation));
-bot.use(createConversation(anatol777Conversation));
-bot.use(createConversation(vesnaConversation));
-bot.use(createConversation(vega_condominiumConversation));
-bot.use(createConversation(yellowshoessConversation));
-bot.use(createConversation(neurocoderDjConversation));
+bot.use(createConversation(generateImageConversation));
 bot.use(customMiddleware);
 bot.use(commands);
 

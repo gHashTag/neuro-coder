@@ -37,27 +37,31 @@ composer.command("imagesize", async (ctx) => {
 });
 
 composer.command("playom", async (ctx) => {
-  await ctx.conversation.enter("playomConversation");
+  await ctx.conversation.enter("generateImageConversation");
 });
 
 composer.command("anatol777", async (ctx) => {
-  await ctx.conversation.enter("anatol777Conversation");
+  await ctx.conversation.enter("generateImageConversation");
 });
 
 composer.command("anfi_vesna", async (ctx) => {
-  await ctx.conversation.enter("vesnaConversation");
+  await ctx.conversation.enter("generateImageConversation");
 });
 
 composer.command("vega_condominium", async (ctx) => {
-  await ctx.conversation.enter("vega_condominiumConversation");
+  await ctx.conversation.enter("generateImageConversation");
 });
 
-composer.command("neurocoder_dj", async (ctx) => {
-  await ctx.conversation.enter("neurocoderDjConversation");
+composer.command("neuro_coder", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation");
 });
 
 composer.command("yellowshoess", async (ctx) => {
-  await ctx.conversation.enter("yellowshoessConversation");
+  await ctx.conversation.enter("generateImageConversation");
+});
+
+composer.command("gimba", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation");
 });
 
 // composer.command("neurocoder01", neurocoder01);
