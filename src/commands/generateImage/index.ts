@@ -8,10 +8,13 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   const keyboard = new InlineKeyboard().text("Отменить генерацию", "cancel");
   const model_type = ctx.message?.text?.slice(1);
   console.log(model_type);
-  await ctx.reply("Привет! Напишите промпт на английском для генерации изображения.", {
-    reply_markup: keyboard,
-  });
-  // Если вы хотите использовать какой-то референс, то прикрепите изображение к сообщению.
+  await ctx.reply(
+    "Привет! Напишите промпт на английском для генерации изображения.",
+    // Если вы хотите использовать какой-то референс, то прикрепите изображение к сообщению.
+    {
+      reply_markup: keyboard,
+    },
+  );
   const { message, callbackQuery } = await conversation.wait();
   const info = await getGeneratedImages(ctx.from?.id.toString() || "");
   const { count, limit } = info;
@@ -35,10 +38,10 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
     file = await ctx.api.getFile(referenceFileId);
     console.log(file);
   }
-  // const fileUrl = message.photo ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : "";
-  // console.log(fileUrl);
+  const fileUrl = message.photo ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : "";
+  console.log(fileUrl);
   const generatingMessage = await ctx.reply("Генерация изображения началась...");
-  const image = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx);
+  const image = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl);
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   await ctx.replyWithPhoto(image);
   await pulse(ctx, image, text || "", `/${model_type}`);
