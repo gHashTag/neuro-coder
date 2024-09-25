@@ -964,7 +964,9 @@ export const generateImage = async (prompt: string, model_type: string, telegram
 export const pulse = async (ctx: MyContext, image: string, prompt: string, command: string) => {
   try {
     if (process.env.NODE_ENV === "development") return;
-    const caption = `@${ctx.from?.username} сгенерировал изображение с промптом: ${prompt} \n\n Команда: ${command}`;
+    const caption = `@${ctx.from?.username || "Пользователь без username"} Telegram ID: ${
+      ctx.from?.id
+    } сгенерировал изображение с промптом: ${prompt} \n\n Команда: ${command}`;
     await bot.api.sendPhoto("-4166575919", image, { caption });
   } catch (error) {
     console.error(error);

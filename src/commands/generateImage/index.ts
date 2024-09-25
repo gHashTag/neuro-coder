@@ -5,7 +5,7 @@ import { InlineKeyboard } from "grammy";
 import { getGeneratedImages } from "../../core/supabase/ai";
 
 async function generateImageConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
-  const keyboard = new InlineKeyboard().text("Отмена", "cancel");
+  const keyboard = new InlineKeyboard().text("Отменить генерацию", "cancel");
   const model_type = ctx.message?.text?.slice(1);
   console.log(model_type);
   await ctx.reply("Привет! Напишите промпт на английском для генерации изображения.", {
