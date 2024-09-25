@@ -920,20 +920,20 @@ export const generateImage = async (prompt: string, model_type: string, telegram
     await incrementGeneratedImages(telegram_id);
     console.log(prompt, "prompt");
     const models = {
-      melimi_cat: { key: "ghashtag/melimi-bengal-cat:120ac54399b2e27c1b34b014eeee9ab91465016c8d14cb5f1737a362bc27940c", word: "MELIMI" },
+      melimi_cat: { key: "ghashtag/melimi-bengal-cat:120ac54399b2e27c1b34b014eeee9ab91465016c8d14cb5f1737a362bc27940c", word: "MELIMI very fashionable cat " },
       neuro_coder: {
         key: "ghashtag/neuro_coder_flux-dev-lora:5ff9ea5918427540563f09940bf95d6efc16b8ce9600e82bb17c2b188384e355",
-        word: "NEUROCODER very fashionable man: ",
+        word: "NEUROCODER very fashionable man ",
       },
-      playom: { key: "ghashtag/playom:9aa28ab0b406d4049f0fdf5226ef0d57bcc5722ca22895aaf74b8bd9a3e22389", word: "TOK very fashionable girl: " },
-      anatol777: { key: "ghashtag/anatol777:3d347a758606958d79afdd53d8a4a77025a2d85e9051274c2e110eb11a974db6", word: "TOK very fashionable man: " },
-      anfi_vesna: { key: "ghashtag/vesna:da4db2b3e788a7b7bdbb04f1c0dfa66255695ebddaa4bc8d40bdbf5ea5c6d5d6", word: "TOK very fashionable girls: " },
+      playom: { key: "ghashtag/playom:9aa28ab0b406d4049f0fdf5226ef0d57bcc5722ca22895aaf74b8bd9a3e22389", word: "TOK very fashionable girl " },
+      anatol777: { key: "ghashtag/anatol777:3d347a758606958d79afdd53d8a4a77025a2d85e9051274c2e110eb11a974db6", word: "TOK very fashionable man " },
+      anfi_vesna: { key: "ghashtag/vesna:da4db2b3e788a7b7bdbb04f1c0dfa66255695ebddaa4bc8d40bdbf5ea5c6d5d6", word: "TOK very fashionable girls " },
       vega_condominium: {
         key: "ghashtag/vega_condominium:19ba41aebd5e3bd920c08149c08cd1a72f74910587d9421ce2fbb5b118635347",
         word: "TOK",
       },
-      yellowshoess: { key: "ghashtag/yellowshoess:f496e9339501d16a2ed83a57f49c1e888eae9b2e5073a296b28c33b01c052f0c", word: "TOK very fashionable man: " },
-      gimba: { key: "ghashtag/gimba:828b4a2cb2fb238c4034532e3e8e72a87c3ac4b7f6530ad1869e670f6d1b750b", word: "GIMBA very fashionable man: " },
+      yellowshoess: { key: "ghashtag/yellowshoess:f496e9339501d16a2ed83a57f49c1e888eae9b2e5073a296b28c33b01c052f0c", word: "TOK very fashionable man " },
+      gimba: { key: "ghashtag/gimba:828b4a2cb2fb238c4034532e3e8e72a87c3ac4b7f6530ad1869e670f6d1b750b", word: "GIMBA very fashionable man " },
     };
 
     const aspect_ratio = await getAspectRatio(telegram_id);
