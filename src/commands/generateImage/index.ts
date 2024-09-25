@@ -38,7 +38,7 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   // const fileUrl = message.photo ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : "";
   // console.log(fileUrl);
   const generatingMessage = await ctx.reply("Генерация изображения началась...");
-  const image = await generateImage(text || "", model_type || "", ctx.from?.id.toString());
+  const image = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx);
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   await ctx.replyWithPhoto(image);
   await pulse(ctx, image, text || "", `/${model_type}`);

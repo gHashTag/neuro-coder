@@ -915,13 +915,13 @@ export const generateVoice = async (text: string, voiceId: string) => {
   }
 };
 
-export const generateImage = async (prompt: string, model_type: string, telegram_id: string, reference?: string) => {
+export const generateImage = async (prompt: string, model_type: string, telegram_id: string, ctx: MyContext, reference?: string) => {
   try {
     await incrementGeneratedImages(telegram_id);
     console.log(prompt, "prompt");
     const models = {
       melimi_cat: { key: "ghashtag/melimi-bengal-cat:120ac54399b2e27c1b34b014eeee9ab91465016c8d14cb5f1737a362bc27940c", word: "MELIMI" },
-      neurocoder_dj: {
+      neuro_coder: {
         key: "ghashtag/neuro_coder_flux-dev-lora:5ff9ea5918427540563f09940bf95d6efc16b8ce9600e82bb17c2b188384e355",
         word: "NEUROCODER very fashionable man: ",
       },
@@ -957,6 +957,7 @@ export const generateImage = async (prompt: string, model_type: string, telegram
     return output[0];
   } catch (error) {
     console.error(error);
+    await pulse(ctx, "", `${prompt}\n\nОшибка при генерации изображения: ${error}`, `/${model_type}`);
     throw new Error("Ошибка при генерации изображения");
   }
 };
