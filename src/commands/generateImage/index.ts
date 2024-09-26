@@ -9,8 +9,7 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   const model_type = ctx.message?.text?.slice(1);
   console.log(model_type);
   await ctx.reply(
-    "Привет! Напишите промпт на английском для генерации изображения.",
-    // Если вы хотите использовать какой-то референс, то прикрепите изображение к сообщению.
+    "Привет! Напишите промпт на английском для генерации изображения. Если вы хотите использовать какой-то референс, то прикрепите изображение к сообщению.",
     {
       reply_markup: keyboard,
     },
@@ -36,7 +35,6 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   if (message.photo) {
     const referenceFileId = message.photo[0].file_id;
     file = await ctx.api.getFile(referenceFileId);
-    console.log(file);
   }
   const fileUrl = message.photo ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : "";
   console.log(fileUrl);
@@ -44,13 +42,30 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   const image = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl);
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   await ctx.replyWithPhoto(image);
+
+  // Добавление кнопки "Повторить генерацию" после отправки изображения
+  const retryKeyboard = new InlineKeyboard().text("Повторить генерацию", "retry");
+  await ctx.reply("Вы можете повторить генерацию изображения.", { reply_markup: retryKeyboard });
+
   await pulse(ctx, image, text || "", `/${model_type}`);
   if (count < limit) {
     await ctx.reply(`У вас осталось ${limit - count} использований.`);
-    return;
   } else if (count === limit) {
     await ctx.reply(`У вас не осталось использований. Пожалуйста, оплатите генерацию изображений.`);
-    return;
+  }
+
+  // Обработка нажатия кнопки "Повторить генерацию"
+  const { callbackQuery: retryCallback } = await conversation.wait();
+  if (retryCallback?.data === "retry") {
+    const retryGeneratingMessage = await ctx.reply("Повторная генерация изображения началась...");
+    await ctx.api.deleteMessage(ctx.chat?.id || "", retryGeneratingMessage.message_id);
+    await ctx.replyWithPhoto(image);
+    await pulse(ctx, image, text || "", `/${model_type}`);
+    if (count < limit) {
+      await ctx.reply(`У вас осталось ${limit - count} использований.`);
+    } else if (count === limit) {
+      await ctx.reply(`У вас не осталось использований. Пожалуйста, оплатите генерацию изображений.`);
+    }
   }
 }
 
