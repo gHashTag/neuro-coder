@@ -43,9 +43,9 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   await ctx.replyWithPhoto(image);
 
-  // Добавление кнопки "Повторить генерацию" после отправки изображения
-  const retryKeyboard = new InlineKeyboard().text("Повторить генерацию", "retry");
-  await ctx.reply("Вы можете повторить генерацию изображения.", { reply_markup: retryKeyboard });
+  // // Добавление кнопки "Повторить генерацию" после отправки изображения
+  // const retryKeyboard = new InlineKeyboard().text("Повторить генерацию", "retry");
+  // await ctx.reply("Вы можете повторить генерацию изображения.", { reply_markup: retryKeyboard });
 
   await pulse(ctx, image, text || "", `/${model_type}`);
   if (count < limit) {
@@ -55,18 +55,29 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   }
 
   // Обработка нажатия кнопки "Повторить генерацию"
-  const { callbackQuery: retryCallback } = await conversation.wait();
-  if (retryCallback?.data === "retry") {
-    const retryGeneratingMessage = await ctx.reply("Повторная генерация изображения началась...");
-    await ctx.api.deleteMessage(ctx.chat?.id || "", retryGeneratingMessage.message_id);
-    await ctx.replyWithPhoto(image);
-    await pulse(ctx, image, text || "", `/${model_type}`);
-    if (count < limit) {
-      await ctx.reply(`У вас осталось ${limit - count} использований.`);
-    } else if (count === limit) {
-      await ctx.reply(`У вас не осталось использований. Пожалуйста, оплатите генерацию изображений.`);
-    }
-  }
+  // const { callbackQuery: retryCallback } = await conversation.wait();
+  // if (retryCallback?.data === "retry") {
+  //   await ctx.reply("Сколько фото нужно сгенерировать?");
+  //   const { message: countMessage } = await conversation.wait();
+  //   const photoCount = parseInt(countMessage?.text || "", 10);
+
+  //   if (isNaN(photoCount) || photoCount <= 0) {
+  //     console.log(photoCount);
+  //     await ctx.reply("Пожалуйста, введите корректное количество.");
+  //     return;
+  //   }
+
+  //   for (let i = 0; i < photoCount; i++) {
+  //     const image = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl);
+  //     await ctx.replyWithPhoto(image);
+  //     await pulse(ctx, image, text || "", `/${model_type}`);
+  //   }
+  //   if (count < limit) {
+  //     await ctx.reply(`У вас осталось ${limit - count} использований.`);
+  //   } else if (count === limit) {
+  //     await ctx.reply(`У вас не осталось использований. Пожалуйста, оплатите генерацию изображений.`);
+  //   }
+  // }
 }
 
 export { generateImageConversation };
