@@ -64,6 +64,14 @@ composer.command("gimba", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation");
 });
 
+composer.command("karin", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation");
+});
+
+composer.command("svedovaya", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation");
+});
+
 // composer.command("neurocoder01", neurocoder01);
 // composer.command("neurocoder02", neurocoder02);
 // composer.command("neurocoder03", neurocoder03);

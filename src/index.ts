@@ -10,7 +10,7 @@ import { session, SessionFlavor } from "grammy";
 import { imageSizeConversation } from "./commands/imagesize";
 import { customMiddleware } from "./commands/helpers";
 import { generateImageConversation } from "./commands/generateImage";
-
+import { get100AnfiVesnaConversation } from "./commands/get100";
 interface SessionData {
   melimi00: {
     videos: string[];
@@ -38,6 +38,7 @@ bot.api.setMyCommands([
 bot.use(conversations());
 bot.use(createConversation(imageSizeConversation));
 bot.use(createConversation(generateImageConversation));
+bot.use(createConversation(get100AnfiVesnaConversation));
 bot.use(customMiddleware);
 bot.use(commands);
 

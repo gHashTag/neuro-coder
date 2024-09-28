@@ -934,6 +934,14 @@ export const generateImage = async (prompt: string, model_type: string, telegram
       },
       yellowshoess: { key: "ghashtag/yellowshoess:f496e9339501d16a2ed83a57f49c1e888eae9b2e5073a296b28c33b01c052f0c", word: "TOK very fashionable man " },
       gimba: { key: "ghashtag/gimba:828b4a2cb2fb238c4034532e3e8e72a87c3ac4b7f6530ad1869e670f6d1b750b", word: "GIMBA very fashionable man " },
+      karin: {
+        key: "ghashtag/karin_stepaniuk:fa17e4d54da672aca70cc70cfa367298158938ac894257cddf2296b96baa1a71",
+        word: "KARIN very fashionable girl ",
+      },
+      svedovaya: {
+        key: "ghashtag/natasha_svedovaya:99bfce235f6c38f7eb844f43f0b0cfe1fe1a664256bd9d94193659d16d61f5d2",
+        word: "SVEDOVAYA very fashionable girl ",
+      },
     };
 
     const aspect_ratio = await getAspectRatio(telegram_id);
