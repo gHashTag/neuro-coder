@@ -80,6 +80,10 @@ composer.command("soul", async (ctx) => {
   await ctx.conversation.enter("soulConversation");
 });
 
+composer.command("voice", async (ctx) => {
+  await ctx.conversation.enter("voiceConversation");
+});
+
 // composer.command("neurocoder01", neurocoder01);
 // composer.command("neurocoder02", neurocoder02);
 // composer.command("neurocoder03", neurocoder03);

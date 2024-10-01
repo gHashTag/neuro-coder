@@ -12,6 +12,7 @@ import { customMiddleware } from "./commands/helpers";
 import { generateImageConversation } from "./commands/generateImage";
 import { get100AnfiVesnaConversation } from "./commands/get100";
 import { soulConversation } from "./commands/soul";
+import { voiceConversation } from "./commands/voice";
 interface SessionData {
   melimi00: {
     videos: string[];
@@ -35,12 +36,21 @@ bot.api.setMyCommands([
     command: "imagesize",
     description: "🖼️ Изменить размер генерируемого изображения",
   },
+  {
+    command: "avatar",
+    description: "👤 Рассказать о себе аватару",
+  },
+  {
+    command: "voice",
+    description: "🎤 Добавить аватару голос",
+  },
 ]);
 bot.use(conversations());
 bot.use(createConversation(imageSizeConversation));
 bot.use(createConversation(generateImageConversation));
 bot.use(createConversation(get100AnfiVesnaConversation));
 bot.use(createConversation(soulConversation));
+bot.use(createConversation(voiceConversation));
 bot.use(customMiddleware);
 bot.use(commands);
 

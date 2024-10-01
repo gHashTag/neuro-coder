@@ -41,3 +41,10 @@ export const updateUserSoul = async (telegram_id: string, company: string, posit
     throw new Error(`Ошибка при обновлении пользователя: ${error.message}`);
   }
 };
+
+export const updateUserVoice = async (telegram_id: string, voice_id_synclabs: string) => {
+  const { error } = await supabase.from("users").update({ voice_id_synclabs }).eq("telegram_id", telegram_id);
+  if (error) {
+    throw new Error(`Ошибка при обновлении пользователя: ${error.message}`);
+  }
+};

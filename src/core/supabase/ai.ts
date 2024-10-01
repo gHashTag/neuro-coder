@@ -1,4 +1,28 @@
+import axios, { AxiosRequestConfig } from "axios";
 import { supabase } from "./index";
+
+// Удалите старый импорт
+// import fetch from "node-fetch";
+
+// Используйте динамический импорт внутри асинхронной функции
+async function fetchWithAxios(url: string, options: AxiosRequestConfig) {
+  try {
+    const response = await axios({
+      url,
+      method: options.method,
+      headers: options.headers,
+      data: options.data,
+    });
+    return {
+      ok: response.status >= 200 && response.status < 300,
+      status: response.status,
+      statusText: response.statusText,
+      json: async () => response.data,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
 
 export const getHistory = async (brand: string, command: string, type: string) => {
   const { data, error } = await supabase
@@ -103,3 +127,37 @@ export const setAspectRatio = async (telegram_id: string, aspect_ratio: string) 
   }
   return true;
 };
+
+// Пример использования fetchWithDynamicImport
+export async function createVoiceSyncLabs({ fileUrl, username }: { fileUrl: string; username: string }): Promise<string | null> {
+  const url = "https://api.synclabs.so/voices/create";
+  const body = JSON.stringify({
+    name: username,
+    description: `Voice created from Telegram voice message`,
+    inputSamples: [fileUrl],
+    webhookUrl: `${process.env.SUPABASE_URL}/functions/v1/synclabs-video`,
+  });
+
+  try {
+    const response = await fetchWithAxios(url, {
+      method: "POST",
+      headers: {
+        "x-api-key": process.env.SYNC_LABS_API_KEY as string,
+        "Content-Type": "application/json",
+      },
+      data: body,
+    });
+
+    if (response.ok) {
+      const result = (await response.json()) as { id: string };
+      console.log(result, "result");
+      return result.id;
+    } else {
+      console.error(`Error: ${response.status} ${response.statusText}`);
+      return null;
+    }
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
