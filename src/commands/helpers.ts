@@ -942,6 +942,10 @@ export const generateImage = async (prompt: string, model_type: string, telegram
         key: "ghashtag/natasha_svedovaya:99bfce235f6c38f7eb844f43f0b0cfe1fe1a664256bd9d94193659d16d61f5d2",
         word: "SVEDOVAYA very fashionable girl ",
       },
+      evi: {
+        key: "ghashtag/evi:e469c787c82a4bc7610374ecd20bb7901b8e448c4b725e4ea5cfe672b7c774ec",
+        word: "EVI very fashionable girl ",
+      },
     };
 
     const aspect_ratio = await getAspectRatio(telegram_id);
