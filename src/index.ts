@@ -11,6 +11,7 @@ import { imageSizeConversation } from "./commands/imagesize";
 import { customMiddleware } from "./commands/helpers";
 import { generateImageConversation } from "./commands/generateImage";
 import { get100AnfiVesnaConversation } from "./commands/get100";
+import { soulConversation } from "./commands/soul";
 interface SessionData {
   melimi00: {
     videos: string[];
@@ -39,6 +40,7 @@ bot.use(conversations());
 bot.use(createConversation(imageSizeConversation));
 bot.use(createConversation(generateImageConversation));
 bot.use(createConversation(get100AnfiVesnaConversation));
+bot.use(createConversation(soulConversation));
 bot.use(customMiddleware);
 bot.use(commands);
 

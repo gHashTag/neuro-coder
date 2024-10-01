@@ -34,3 +34,10 @@ export const createUser = async (username: string, telegram_id: string) => {
     }
   }
 };
+
+export const updateUserSoul = async (telegram_id: string, company: string, position: string, designation: string) => {
+  const { error } = await supabase.from("users").update({ company, position, designation }).eq("telegram_id", telegram_id);
+  if (error) {
+    throw new Error(`Ошибка при обновлении пользователя: ${error.message}`);
+  }
+};
