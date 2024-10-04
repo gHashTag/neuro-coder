@@ -951,7 +951,7 @@ export const generateImage = async (prompt: string, model_type: string, telegram
         word: "KATA ",
       },
       ledov: {
-        kay: "ghashtag/neuro_broker:7abc7b18d0ef212b979eebeb46577d3192c6280c88d876c52ba5a2300f9283a0",
+        key: "ghashtag/neuro_broker:7abc7b18d0ef212b979eebeb46577d3192c6280c88d876c52ba5a2300f9283a0",
         word: "LEDOV very fashionable man ",
       },
     };
