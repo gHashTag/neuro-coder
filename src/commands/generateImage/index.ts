@@ -40,9 +40,23 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   const fileUrl = message.photo ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : "";
   console.log(fileUrl);
   const generatingMessage = await ctx.reply("⏳ Генерация изображения началась...");
-  const image = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl);
+  const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl);
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   await ctx.replyWithPhoto(image);
+  await ctx.reply(`🤔 Сгенерировать еще?`, {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: "1", callback_data: `generate_1_${prompt_id}` },
+          { text: "2", callback_data: `generate_2_${prompt_id}` },
+        ],
+        [
+          { text: "3", callback_data: `generate_3_${prompt_id}` },
+          { text: "4", callback_data: `generate_4_${prompt_id}` },
+        ],
+      ],
+    },
+  });
 
   // // Добавление кнопки "Повторить генерацию" после отправки изображения
   // const retryKeyboard = new InlineKeyboard().text("🔄 Повторить генерацию", "retry");

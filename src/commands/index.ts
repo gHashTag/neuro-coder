@@ -76,6 +76,14 @@ composer.command("evi", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation");
 });
 
+composer.command("kata", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation");
+});
+
+composer.command("ledov", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation");
+});
+
 composer.command("soul", async (ctx) => {
   await ctx.conversation.enter("soulConversation");
 });

@@ -161,3 +161,43 @@ export async function createVoiceSyncLabs({ fileUrl, username }: { fileUrl: stri
     return null;
   }
 }
+
+export const savePrompt = async (prompt: string, model_type: string) => {
+  // Проверяем, существует ли уже такой промпт в таблице
+  const { data: existingPrompt, error: selectError } = await supabase.from("prompts_history").select("prompt_id").eq("prompt", prompt).maybeSingle();
+
+  if (selectError) {
+    console.error("Ошибка при проверке существующего промпта:", selectError);
+    return null;
+  }
+
+  if (existingPrompt) {
+    // Если промпт уже существует, возвращаем его prompt_id
+    return existingPrompt.prompt_id;
+  }
+
+  // Если промпт не существует, добавляем его в таблицу
+  const { error } = await supabase.from("prompts_history").insert({ prompt: prompt, model_type: model_type }).single();
+  if (error) {
+    console.error("Ошибка при сохранении промпта:", error);
+    return null;
+  }
+
+  const { data: newPrompt, error: newError } = await supabase.from("prompts_history").select("prompt_id").eq("prompt", prompt).maybeSingle();
+  if (newError || !newPrompt) {
+    console.error("Ошибка при получении prompt_id для нового промпта:", newError);
+    return null;
+  }
+  return newPrompt.prompt_id;
+};
+
+export const getPrompt = async (prompt_id: string) => {
+  const { data, error } = await supabase.from("prompts_history").select("*").eq("prompt_id", prompt_id).single();
+
+  if (error || !data) {
+    console.error("Ошибка при получении промпта по prompt_id:", error);
+    return null;
+  }
+
+  return data;
+};

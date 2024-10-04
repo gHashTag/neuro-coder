@@ -7,7 +7,7 @@ import { openai } from "../core/openai";
 import { MyContext, MyContextWithSession, Step } from "../utils/types";
 import Replicate from "replicate";
 import { promises as fs } from "fs";
-import { getAspectRatio, incrementGeneratedImages } from "../core/supabase/ai";
+import { getAspectRatio, incrementGeneratedImages, savePrompt } from "../core/supabase/ai";
 import { MiddlewareFn } from "grammy";
 import { createUser } from "../core/supabase";
 import { bot } from "..";
@@ -946,8 +946,17 @@ export const generateImage = async (prompt: string, model_type: string, telegram
         key: "ghashtag/evi:e469c787c82a4bc7610374ecd20bb7901b8e448c4b725e4ea5cfe672b7c774ec",
         word: "EVI very fashionable girl ",
       },
+      kata: {
+        key: "ghashtag/so_origin_kata:e82316f373dea8e2e97748d7dbfe269895a70e2891c18a2403a2080c942bb5b2",
+        word: "KATA ",
+      },
+      ledov: {
+        kay: "ghashtag/neuro_broker:7abc7b18d0ef212b979eebeb46577d3192c6280c88d876c52ba5a2300f9283a0",
+        word: "LEDOV very fashionable man ",
+      },
     };
 
+    const prompt_id = await savePrompt(prompt, model_type);
     const aspect_ratio = await getAspectRatio(telegram_id);
     const output = await replicate.run(models[model_type].key, {
       input: {
@@ -966,7 +975,7 @@ export const generateImage = async (prompt: string, model_type: string, telegram
       },
     });
     console.log(output);
-    return output[0];
+    return { image: output[0], prompt_id: prompt_id };
   } catch (error) {
     console.error(error);
     await pulse(ctx, "", `${prompt}\n\nОшибка при генерации изображения: ${error}`, `/${model_type}`);
