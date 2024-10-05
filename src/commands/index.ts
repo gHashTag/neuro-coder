@@ -17,6 +17,7 @@ import leela from "./leela";
 // import melimi05 from "./melimi/melimi05";
 // import melimi06 from "./melimi/melimi06";
 import { start } from "./start";
+import { model } from "./model";
 // import neurocoder02 from "./neurocoder/neurocoder02";
 // import neurocoder03 from "./neurocoder/neurocoder03";
 
@@ -92,6 +93,7 @@ composer.command("voice", async (ctx) => {
   await ctx.conversation.enter("voiceConversation");
 });
 
+composer.command("model", model);
 // composer.command("neurocoder01", neurocoder01);
 // composer.command("neurocoder02", neurocoder02);
 // composer.command("neurocoder03", neurocoder03);

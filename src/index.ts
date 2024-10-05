@@ -13,7 +13,7 @@ import { generateImageConversation } from "./commands/generateImage";
 import { get100AnfiVesnaConversation } from "./commands/get100";
 import { soulConversation } from "./commands/soul";
 import { voiceConversation } from "./commands/voice";
-import { getGeneratedImages, getPrompt } from "./core/supabase/ai";
+import { getGeneratedImages, getPrompt, setModel } from "./core/supabase/ai";
 import { InputMediaPhoto } from "grammy/types";
 import { inviterConversation } from "./commands/inviter";
 interface SessionData {
@@ -109,6 +109,13 @@ bot.on("callback_query:data", async (ctx) => {
       console.error("Ошибка при генерации изображений:", e);
       await ctx.reply("❌ Извините, произошла ошибка при генерации изображений. Пожалуйста, попробуйте позже.");
     }
+  } else if (callbackData.startsWith("model_")) {
+    const model = callbackData.split("_")[1];
+    const message_id = ctx.callbackQuery.message?.message_id;
+    await setModel(ctx.from?.id.toString() || "", model);
+    if (!message_id) return;
+    await ctx.api.deleteMessage(ctx.chat?.id || "", message_id);
+    await ctx.reply("🧠 Модель успешно изменена!");
   }
 });
 

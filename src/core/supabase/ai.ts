@@ -201,3 +201,22 @@ export const getPrompt = async (prompt_id: string) => {
 
   return data;
 };
+
+export async function getModel(telegram_id: string): Promise<string> {
+  try {
+    const { data, error } = await supabase.from("users").select("model").eq("telegram_id", telegram_id).single();
+
+    if (error || !data) throw new Error("Error getModel: " + error);
+    return data?.model;
+  } catch (error) {
+    throw new Error("Error getModel: " + error);
+  }
+}
+
+export async function setModel(telegram_id: string, model: string) {
+  try {
+    await supabase.from("users").update({ model }).eq("telegram_id", telegram_id).select("*");
+  } catch (error) {
+    throw new Error("Error setModel: " + error);
+  }
+}
