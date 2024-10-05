@@ -9,7 +9,7 @@ import Replicate from "replicate";
 import { promises as fs } from "fs";
 import { getAspectRatio, incrementGeneratedImages, savePrompt } from "../core/supabase/ai";
 import { MiddlewareFn } from "grammy";
-import { createUser } from "../core/supabase";
+import { createUser, supabase } from "../core/supabase";
 import { bot } from "..";
 
 const replicate = new Replicate({
@@ -1005,6 +1005,19 @@ export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, 
     // Ваша логика здесь
     console.log(username, telegram_id, "username, telegram_id");
     await createUser(username, telegram_id.toString());
+
+    // Проверка наличия инвайтера
+    const { data: user, error } = await supabase.from("users").select("inviter").eq("telegram_id", telegram_id).maybeSingle();
+
+    if (error) {
+      console.error(`Ошибка при проверке инвайтера: ${error.message}`);
+      throw new Error(`Ошибка при проверке инвайтера: ${error.message}`);
+    }
+
+    if (!user?.inviter) {
+      await ctx.conversation.enter("inviterConversation");
+      return;
+    }
   }
 
   // Продолжаем выполнение следующих промежуточных обработчиков

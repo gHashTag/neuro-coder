@@ -15,6 +15,7 @@ import { soulConversation } from "./commands/soul";
 import { voiceConversation } from "./commands/voice";
 import { getGeneratedImages, getPrompt } from "./core/supabase/ai";
 import { InputMediaPhoto } from "grammy/types";
+import { inviterConversation } from "./commands/inviter";
 interface SessionData {
   melimi00: {
     videos: string[];
@@ -53,6 +54,7 @@ bot.use(createConversation(generateImageConversation));
 bot.use(createConversation(get100AnfiVesnaConversation));
 bot.use(createConversation(soulConversation));
 bot.use(createConversation(voiceConversation));
+bot.use(createConversation(inviterConversation));
 bot.use(customMiddleware);
 bot.use(commands);
 
