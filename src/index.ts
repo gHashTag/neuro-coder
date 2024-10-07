@@ -8,7 +8,7 @@ import { hydrateFiles } from "@grammyjs/files";
 import { conversations, createConversation } from "@grammyjs/conversations";
 import { session, SessionFlavor } from "grammy";
 import { imageSizeConversation } from "./commands/imagesize";
-import { customMiddleware, generateImage } from "./commands/helpers";
+import { customMiddleware, generateImage, pulse } from "./commands/helpers";
 import { generateImageConversation } from "./commands/generateImage";
 import { get100AnfiVesnaConversation } from "./commands/get100";
 import { soulConversation } from "./commands/soul";
@@ -87,6 +87,7 @@ bot.on("callback_query:data", async (ctx) => {
         const { image } = await generateImage(prompt.prompt, prompt.model_type, ctx.from?.id.toString(), ctx, "");
         images.push({ type: "photo", media: image });
         await ctx.api.editMessageText(ctx.chat?.id || "", message.message_id, `⏳ Сгенерировано изображений ${i + 1}/${count}...`);
+        await pulse(ctx, image, prompt.prompt, `${prompt.model_type} (with callback)`);
       }
 
       await ctx.replyWithMediaGroup(images);
