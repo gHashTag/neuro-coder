@@ -60,6 +60,7 @@ bot.use(commands);
 
 bot.on("callback_query:data", async (ctx) => {
   const callbackData = ctx.callbackQuery.data;
+  const isRu = ctx.from?.language_code === "ru";
   if (callbackData.startsWith("generate_")) {
     try {
       const count = parseInt(callbackData.split("_")[1]);
@@ -68,10 +69,18 @@ bot.on("callback_query:data", async (ctx) => {
       const { count: generatedCount, limit } = info;
 
       if (generatedCount >= limit) {
-        await ctx.reply("⚠️ У вас не осталось использований. Пожалуйста, оплатите генерацию изображений.");
+        await ctx.reply(
+          isRu
+            ? "⚠️ У вас не осталось использований. Пожалуйста, оплатите генерацию изображений."
+            : "⚠️ You have no more uses left. Please pay for image generation.",
+        );
         return;
       } else if (generatedCount + count > limit) {
-        await ctx.reply(`⚠️ У вас осталось ${limit - generatedCount} использований. Пожалуйста, оплатите генерацию изображений.`);
+        await ctx.reply(
+          isRu
+            ? `⚠️ У вас осталось ${limit - generatedCount} использований. Пожалуйста, оплатите генерацию изображений.`
+            : `⚠️ You have ${limit - generatedCount} uses left. Please pay for image generation.`,
+        );
         return;
       }
 
@@ -80,19 +89,23 @@ bot.on("callback_query:data", async (ctx) => {
       }
 
       const prompt = await getPrompt(prompt_id);
-      const message = await ctx.reply("⏳ Генерация изображений началась...");
+      const message = await ctx.reply(isRu ? "⏳ Генерация изображений началась..." : "⏳ Image generation has started...");
 
       const images: InputMediaPhoto[] = [];
       for (let i = 0; i < count; i++) {
         const { image } = await generateImage(prompt.prompt, prompt.model_type, ctx.from?.id.toString(), ctx, "");
         images.push({ type: "photo", media: image });
-        await ctx.api.editMessageText(ctx.chat?.id || "", message.message_id, `⏳ Сгенерировано изображений ${i + 1}/${count}...`);
+        await ctx.api.editMessageText(
+          ctx.chat?.id || "",
+          message.message_id,
+          isRu ? `⏳ Сгенерировано изображений ${i + 1}/${count}...` : `⏳ Generated images ${i + 1}/${count}...`,
+        );
         await pulse(ctx, image, prompt.prompt, `${prompt.model_type} (with callback)`);
       }
 
       await ctx.replyWithMediaGroup(images);
       await ctx.api.deleteMessage(ctx.chat?.id || "", message.message_id);
-      await ctx.reply(`🤔 Сгенерировать еще?`, {
+      await ctx.reply(isRu ? `🤔 Сгенерировать еще?` : `🤔 Generate more?`, {
         reply_markup: {
           inline_keyboard: [
             [
@@ -108,7 +121,11 @@ bot.on("callback_query:data", async (ctx) => {
       });
     } catch (e) {
       console.error("Ошибка при генерации изображений:", e);
-      await ctx.reply("❌ Извините, произошла ошибка при генерации изображений. Пожалуйста, попробуйте позже.");
+      await ctx.reply(
+        isRu
+          ? "❌ Извините, произошла ошибка при генерации изображений. Пожалуйста, попробуйте позже."
+          : "❌ Sorry, an error occurred while generating images. Please try again later.",
+      );
     }
   } else if (callbackData.startsWith("model_")) {
     const model = callbackData.split("_")[1];
@@ -116,17 +133,24 @@ bot.on("callback_query:data", async (ctx) => {
     await setModel(ctx.from?.id.toString() || "", model);
     if (!message_id) return;
     await ctx.api.deleteMessage(ctx.chat?.id || "", message_id);
-    await ctx.reply("🧠 Модель успешно изменена!");
+    await ctx.reply(isRu ? "🧠 Модель успешно изменена!" : "🧠 Model successfully changed!");
   }
 });
 
 bot.catch((err) => {
   const ctx = err.ctx;
+  const isRu = ctx.from?.language_code === "ru";
   console.error(`Ошибка при обработке обновления ${ctx.update.update_id}:`);
   console.error(err.error);
-  ctx.reply("Извините, произошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте позже.").catch((e) => {
-    console.error("Ошибка отправки сообщения об ошибке пользователю:", e);
-  });
+  ctx
+    .reply(
+      isRu
+        ? "Извините, произошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте позже."
+        : "Sorry, an error occurred while processing your request. Please try again later.",
+    )
+    .catch((e) => {
+      console.error("Ошибка отправки сообщения об ошибке пользователю:", e);
+    });
 });
 
 console.log(process.env.NODE_ENV, "process.env.NODE_ENV");

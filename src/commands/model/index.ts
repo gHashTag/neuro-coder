@@ -1,6 +1,5 @@
 import { InlineKeyboard } from "grammy";
 import { MyContext } from "../../utils/types";
-import { supabase } from "../../core/supabase/";
 
 async function model(ctx: MyContext) {
   const lang = ctx.from?.language_code === "ru" ? true : false;
