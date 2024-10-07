@@ -81,7 +81,11 @@ composer.command("kata", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation");
 });
 
-composer.command("ledov", async (ctx) => {
+composer.command("neuro_broker_00", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation");
+});
+
+composer.command("neuro_broker_01", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation");
 });
 

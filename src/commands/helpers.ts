@@ -950,8 +950,12 @@ export const generateImage = async (prompt: string, model_type: string, telegram
         key: "ghashtag/so_origin_kata:e82316f373dea8e2e97748d7dbfe269895a70e2891c18a2403a2080c942bb5b2",
         word: "KATA ",
       },
-      ledov: {
+      neuro_broker_00: {
         key: "ghashtag/neuro_broker:7abc7b18d0ef212b979eebeb46577d3192c6280c88d876c52ba5a2300f9283a0",
+        word: "LEDOV very fashionable man ",
+      },
+      neuro_broker_01: {
+        key: "ghashtag/neuro_broker_01:c347dbe524c02f3f3b65f97e82e344e65236bbda040d0135a75e11d711f035f8",
         word: "LEDOV very fashionable man ",
       },
     };
