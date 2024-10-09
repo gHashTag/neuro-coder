@@ -97,6 +97,10 @@ composer.command("voice", async (ctx) => {
   await ctx.conversation.enter("voiceConversation");
 });
 
+composer.command("get100", async (ctx) => {
+  await ctx.conversation.enter("get100AnfiVesnaConversation");
+});
+
 composer.command("model", model);
 // composer.command("neurocoder01", neurocoder01);
 // composer.command("neurocoder02", neurocoder02);

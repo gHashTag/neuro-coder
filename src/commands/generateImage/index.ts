@@ -50,20 +50,6 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl);
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   await ctx.replyWithPhoto(image);
-  await ctx.reply(isRu ? `🤔 Сгенерировать еще?` : `🤔 Generate more?`, {
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: "1", callback_data: `generate_1_${prompt_id}` },
-          { text: "2", callback_data: `generate_2_${prompt_id}` },
-        ],
-        [
-          { text: "3", callback_data: `generate_3_${prompt_id}` },
-          { text: "4", callback_data: `generate_4_${prompt_id}` },
-        ],
-      ],
-    },
-  });
 
   // // Добавление кнопки "Повторить генерацию" после отправки изображения
   // const retryKeyboard = new InlineKeyboard().text("🔄 Повторить генерацию", "retry");
@@ -72,6 +58,21 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   await pulse(ctx, image, text || "", `/${model_type}`);
   if (count < limit) {
     await ctx.reply(isRu ? `ℹ️ У вас осталось ${limit - count} использований.` : `ℹ️ You have ${limit - count} uses left.`);
+    await ctx.reply(isRu ? `🤔 Сгенерировать еще?` : `🤔 Generate more?`, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: "1", callback_data: `generate_1_${prompt_id}` },
+            { text: "2", callback_data: `generate_2_${prompt_id}` },
+          ],
+          [
+            { text: "3", callback_data: `generate_3_${prompt_id}` },
+            { text: "4", callback_data: `generate_4_${prompt_id}` },
+          ],
+          [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${prompt_id}` }],
+        ],
+      },
+    });
   } else if (count === limit) {
     await ctx.reply(
       isRu

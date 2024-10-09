@@ -51,7 +51,6 @@ export const setHistory = async (brand: string, response: string, video_url: str
 
   const sanitizedResponse = sanitizeResponse(response);
 
-  console.log("Sanitized response:", sanitizedResponse, "!!!!!!!!!!end");
   const { error } = await supabase.from("clips").insert({
     brand: brand,
     response: sanitizedResponse, // Используем очищенный текст
@@ -164,7 +163,12 @@ export async function createVoiceSyncLabs({ fileUrl, username }: { fileUrl: stri
 
 export const savePrompt = async (prompt: string, model_type: string) => {
   // Проверяем, существует ли уже такой промпт в таблице
-  const { data: existingPrompt, error: selectError } = await supabase.from("prompts_history").select("prompt_id").eq("prompt", prompt).maybeSingle();
+  const { data: existingPrompt, error: selectError } = await supabase
+    .from("prompts_history")
+    .select("prompt_id")
+    .eq("prompt", prompt)
+    .eq("model_type", model_type)
+    .maybeSingle();
 
   if (selectError) {
     console.error("Ошибка при проверке существующего промпта:", selectError);
@@ -183,7 +187,12 @@ export const savePrompt = async (prompt: string, model_type: string) => {
     return null;
   }
 
-  const { data: newPrompt, error: newError } = await supabase.from("prompts_history").select("prompt_id").eq("prompt", prompt).maybeSingle();
+  const { data: newPrompt, error: newError } = await supabase
+    .from("prompts_history")
+    .select("prompt_id")
+    .eq("prompt", prompt)
+    .eq("model_type", model_type)
+    .maybeSingle();
   if (newError || !newPrompt) {
     console.error("Ошибка при получении prompt_id для нового промпта:", newError);
     return null;

@@ -31,9 +31,8 @@ async function get100AnfiVesnaConversation(conversation: Conversation<MyContext>
   const fileUrl = message.photo ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : "";
   console.log(fileUrl);
   const generatingMessage = await ctx.reply("Генерация изображения началась...");
-  let image;
   for (let i = 0; i < 100; i++) {
-    image = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl);
+    const { image } = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl);
     await ctx.replyWithPhoto(image);
   }
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);

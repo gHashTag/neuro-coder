@@ -8,14 +8,15 @@ import { hydrateFiles } from "@grammyjs/files";
 import { conversations, createConversation } from "@grammyjs/conversations";
 import { session, SessionFlavor } from "grammy";
 import { imageSizeConversation } from "./commands/imagesize";
-import { customMiddleware, generateImage, pulse } from "./commands/helpers";
+import { customMiddleware, generateImage, pulse, upgradePrompt } from "./commands/helpers";
 import { generateImageConversation } from "./commands/generateImage";
 import { get100AnfiVesnaConversation } from "./commands/get100";
 import { soulConversation } from "./commands/soul";
 import { voiceConversation } from "./commands/voice";
-import { getGeneratedImages, getPrompt, setModel } from "./core/supabase/ai";
+import { getGeneratedImages, getPrompt, savePrompt, setModel } from "./core/supabase/ai";
 import { InputMediaPhoto } from "grammy/types";
 import { inviterConversation } from "./commands/inviter";
+import { models } from "./commands/constants";
 interface SessionData {
   melimi00: {
     videos: string[];
@@ -116,6 +117,7 @@ bot.on("callback_query:data", async (ctx) => {
               { text: "3", callback_data: `generate_3_${prompt_id}` },
               { text: "4", callback_data: `generate_4_${prompt_id}` },
             ],
+            [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${prompt_id}` }],
           ],
         },
       });
@@ -134,6 +136,76 @@ bot.on("callback_query:data", async (ctx) => {
     if (!message_id) return;
     await ctx.api.deleteMessage(ctx.chat?.id || "", message_id);
     await ctx.reply(isRu ? "🧠 Модель успешно изменена!" : "🧠 Model successfully changed!");
+  } else if (callbackData.startsWith("improve_")) {
+    const prompt_id = callbackData.split("_")[callbackData.split("_").length - 1];
+    const prompt = await getPrompt(prompt_id);
+    console.log(prompt_id, "prompt_id");
+    console.log(callbackData, "callbackData");
+
+    if (callbackData.includes("accept")) {
+      await ctx.editMessageText(isRu ? `🤔 Сгенерировать еще с новым промптом?` : `🤔 Generate more with new prompt?`, {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: "1", callback_data: `generate_1_${prompt_id}` },
+              { text: "2", callback_data: `generate_2_${prompt_id}` },
+            ],
+            [
+              { text: "3", callback_data: `generate_3_${prompt_id}` },
+              { text: "4", callback_data: `generate_4_${prompt_id}` },
+            ],
+            [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${prompt_id}` }],
+          ],
+        },
+      });
+      return;
+    } else if (callbackData.includes("reject")) {
+      await ctx.editMessageText(isRu ? `🤔 Сгенерировать еще с изначальным промптом?` : `🤔 Generate more with initial prompt?`, {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: "1", callback_data: `generate_1_${prompt_id}` },
+              { text: "2", callback_data: `generate_2_${prompt_id}` },
+            ],
+            [
+              { text: "3", callback_data: `generate_3_${prompt_id}` },
+              { text: "4", callback_data: `generate_4_${prompt_id}` },
+            ],
+            [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${prompt_id}` }],
+          ],
+        },
+      });
+      return;
+    }
+    const systemMessage = await ctx.reply(isRu ? "🧠 Улучшение промпта..." : "🧠 Prompt upgrading...");
+    const upgradedPrompt = await upgradePrompt(`${models[prompt.model_type].word} ${prompt.prompt}`);
+
+    if (!upgradedPrompt) {
+      await ctx.reply(
+        isRu
+          ? "❌ Извините, произошла ошибка при улучшении промпта. Пожалуйста, попробуйте позже."
+          : "❌ Sorry, an error occurred while upgrading the prompt. Please try again later.",
+      );
+      await ctx.api.deleteMessage(ctx.chat?.id || "", systemMessage.message_id);
+      return;
+    }
+
+    const upgradedPromptId = await savePrompt(upgradedPrompt, prompt.model_type);
+    await ctx.api.deleteMessage(ctx.chat?.id || "", systemMessage.message_id);
+
+    console.log(upgradedPrompt, "upgradedPrompt");
+    await ctx.editMessageText(upgradedPrompt, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: "✅", callback_data: `improve_accept_${upgradedPromptId}` },
+            { text: "❌", callback_data: `improve_reject_${prompt_id}` },
+          ],
+          [{ text: "🔄", callback_data: `improve_${prompt_id}` }],
+        ],
+      },
+    });
+    return;
   }
 });
 
