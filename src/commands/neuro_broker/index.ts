@@ -1,11 +1,12 @@
 import { Context, InputFile } from "grammy";
 import { createSlideshow as createSlideshowVideo, SlideshowOptions } from 'slideshow-video';
 
-import { createAudioFileFromText, createRender, generateImageNeuroBroker, generateImagesForNeuroBroker, getMeditationSteps, getSellVillaSteps, mergeAudioFiles, translateText } from "../helpers";
+import { createAudioFileFromText, createRender, delay, deleteFileFromSupabase, generateImageNeuroBroker, generateImagesForNeuroBroker, getAudioDuration, getMeditationSteps, getSellVillaSteps, mergeAudioFiles, translateText } from "../helpers";
 import { Step } from "src/utils/types";
 import { InputMediaPhoto } from "grammy/types";
 import { getVideoUrl, uploadVideo } from "../../core/supabase/video";
-
+import path from "path";
+import fs from "fs";
 const triggerWord = "KATA";
 
 const type = "condominium";
@@ -62,7 +63,7 @@ const outdoorDescription = `
 const location = 'Phuket, Thailand'
 
 const description = `
-  We have recently launched 2 new condominium projects in ${location}. Project Highlights: 1. Origin Place centre phuket : - 400 m. to Central Phuket by walking - 900 m. to Head start international school - 2 km to Bangkok hospital - 3.8 km to Phuket old town 2. SO Origin Kata : - 800 m. to kata beach by walking - 350 m. to kata night plaza - 450 m. to Club beach - The biggest mixed used in Kata Beach - 1.2 km to karon beach. This is the best time for agents to come and select the units for your clients. Don't miss out on this fantastic opportunity to secure prime units in these highly desirable locations. Please note the following Foreigner Quota deposit conditions: - For SO Origin Kata Beach: 50,000 THB per unit - For Origin Place Centre Phuket: 50,000 THB per unit - exclusive stocks for 3 months - Minimum of 10 units required We believe these projects have great potential and would love to discuss how we can collaborate to make them a success. Please let us know your availability for a meeting or a call to explore this further.
+  Projects in ${location}.
 `;
 
 interface SlideshowResponse {
@@ -80,9 +81,9 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
     // Проверяем, есть ли информация о пользователе
     if (!ctx.from) throw new Error("User not found");
  
-    // // Получаем шаги медитации
+    // Получаем шаги медитации
     const sellVillaSteps = await getSellVillaSteps({
-      prompt: `Create a viral description in one paragraph 15 seconds long without numbers. At the end write: write in the comments ${triggerWord} and get direct access to the developer: ${description}. Create 5 coherent steps with very short one-sentence abstracts on the topic of creating a short video script to sell a luxury ${type}. Every description should be trigger word ${triggerWord}. Answer in json format. The structure should be as follows:
+      prompt: `Create a viral description in one paragraph 15 seconds long without numbers. Always answer with letters, without using numbers. At the end write: write in the comments ${triggerWord} and get direct access to the developer: ${description}. Create 5 coherent steps with very short one-sentence abstracts on the topic of creating a short video script to sell a luxury ${type}. Every description should be trigger word ${triggerWord}. Answer in json format. The structure should be as follows:
     
             {
               "activities": [
@@ -143,7 +144,7 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
 
     const ownerImage = await generateImageNeuroBroker("Photograph, man, model pose, minimalist, beard, profound gaze, solid white environment, studio lights setting");
     console.log(ownerImage, "ownerImage");
-    // // Создаем группу медиа для отправки изображений
+    // Создаем группу медиа для отправки изображений
     // const englishImages = [
     //   {
     //     imagePath: '/Users/playra/neuro-coder/src/images/output_step_Step 1.png',
@@ -164,14 +165,10 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
     //   {
     //     imagePath: '/Users/playra/neuro-coder/src/images/output_step_Step 5.png',
     //     text: ''
-    //   },
-    //   {
-    //     imagePath: '/Users/playra/neuro-coder/src/images/output_step_Step 6.png',
-    //     text: ''
-    //   },
+    //   }
     // ]
-
     const newArray = [...englishImages, ...ownerImage]
+    // const newArray = [...englishImages]
     console.log(newArray, "newArray");
 
     const englishMediaGroup: InputMediaPhoto[] = newArray.map((image) => ({
@@ -182,69 +179,110 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
     // Отправляем группу изображений пользователю
     await ctx.replyWithMediaGroup(englishMediaGroup);
 
-
-    
     
     const images = newArray.map((img) => img.imagePath)
     console.log(images,'images')
 
-    const options: SlideshowOptions = {
-      imageOptions: {
-          imageResizeDimensions: {
-              // width will be calculated according to the resulting aspect ratio
-              height: 630
-          },
-          lastImageExtraDuration: 1000
-      },
-      loopingOptions: {
-          loopImages: 'auto',
-          loopAudio: 'auto'
-      },
-      ffmpegOptions: {
-          streamCopyAudio: true
-      },
-      outputOptions: {
-          outputDir: 'src/videos'
-      }
-  };
+
 
   const audioFile1 = `../audio/audio${1}.mp3`;
   // const voices = await elevenlabs.voices.getAll();
   // console.log(voices, 'voices')
-  const audioStream2 = await createAudioFileFromText(stepsData[0].voiceOver.zh)
+  const audioStream2 = await createAudioFileFromText(stepsData[0].voiceOver.ru)
   console.log(audioStream2, 'audioStream2')
+  const audioPath = path.join(__dirname, `../${audioStream2}`);
+  console.log(audioPath, 'audioPath')
+  const audioDuration = await getAudioDuration(audioPath);
+  console.log(audioDuration, 'audioDuration')
+  console.log(`Длина аудио файла: ${audioDuration} секунд`);
+  // Количество изображений в слайд-шоу
+  const numberOfImages = 5;
+  const imageDuration = audioDuration / numberOfImages;
+  console.log(`Длина изображения: ${imageDuration} секунд`);
+  // const mergedAudioFile = 'src/audio/ledov/mergedAudioFile.mp3'
+  // await mergeAudioFiles(audioFile1, audioStream2, mergedAudioFile);
+  const options: SlideshowOptions = {
+    imageOptions: {
+        imageDuration: imageDuration * 1000, 
+    },
+    loopingOptions: {
+        loopImages: 'auto',
+        loopAudio: 'auto'
+    },
+    ffmpegOptions: {
+        streamCopyAudio: true
+    },
+    outputOptions: {
+        outputDir: 'src/videos'
+    }
+};
+console.log(options, 'options')
 
-  const mergedAudioFile = 'src/audio/ledov/mergedAudioFile.mp3'
-  await mergeAudioFiles(audioFile1, audioStream2, mergedAudioFile);
- 
     const englishOutput: Partial<SlideshowResponse> = await createSlideshowVideo(
       images,
-      mergedAudioFile,
+      audioPath,
       options
     );
     
     try {
       if (englishOutput && englishOutput.filePath) {
         console.log("File path:", englishOutput.filePath);
-        await ctx.replyWithVideo(new InputFile(englishOutput.filePath), {
-          caption: "Video EN NeuroBroker",
-        });
+     
         if (!ctx.from) throw new Error("No user");
         const fileName = `${ctx.from.id}_${Date.now()}.mp4`;
         await uploadVideo(englishOutput.filePath, ctx.from.id.toString(), "neuro_broker", fileName);
         const videoUrl = await getVideoUrl("neuro_broker", fileName);
+        
         if (!videoUrl) throw new Error("No video url");
+
         const render = await createRender({ template_id: "10f7cf9f-9c44-479b-ad65-ea8b9242ccb1", modifications: { "Video-1": videoUrl } });
         console.log(render, "render");
+        await ctx.replyWithVideo(render[0].url, {
+          caption: "Video EN NeuroBroker",
+        });
         //await setHistory("neuro_broker", "Video EN NeuroBroker", videoUrl, "neuro_broker", "video");
         await ctx.reply("Video creation finished");
-        return
-    
+        await deleteFileFromSupabase("neuro_broker", fileName);
+        return;
       } else {
         console.error("File path is undefined. Please check the input parameters and ensure the video was created successfully.");
       }
     } catch (error) {
       console.error("Error creating slideshow video:", error);
+    } finally {
+      // // Путь к директории, содержимое которой нужно удалить
+      // const directory = path.join(__dirname, '../../videos');
+      // const audio = path.join(__dirname, `../../audio/ledov`);
+
+      // // Проверяем, существует ли директория
+      // if (fs.existsSync(directory) && fs.existsSync(audio)) {
+      //   // Читаем содержимое директории
+      //   const files = fs.readdirSync(directory);
+      //   const audioFiles = fs.readdirSync(audio);
+
+      //   // Удаляем каждый файл и поддиректорию
+      //   for (const file of files) {
+      //     const filePath = path.join(directory, file);
+      //     const stat = fs.lstatSync(filePath);
+
+      //     if (stat.isDirectory()) {
+      //       // Если это директория, удаляем ее рекурсивно
+      //       fs.rmSync(filePath, { recursive: true, force: true });
+      //     } else {
+      //       // Если это файл, удаляем его
+      //       fs.unlinkSync(filePath);
+      //     }
+      //   }
+
+      //   for (const file of audioFiles) {
+      //     const filePath = path.join(audio, file);
+      //     fs.unlinkSync(filePath);
+      //   }
+
+      //   console.log('Содержимое директории успешно удалено');
+      // } else {
+      //   console.error('Директория не существует:', directory);
+      // }
     }
     // // Генерация испанской версии
     // const spanishImages = await generateImagesForMeditation(stepsData, "es");
@@ -271,16 +309,7 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
     //   caption: "Video ES meditation",
     // });
 
-    // Удаляем временные файлы
-    // await fs.unlink(englishOutputPath);
-    // await fs.unlink(spanishOutputPath);
-    // for (const image of englishImages) {
-    //   await fs.unlink(image.imagePath);
-    // }
-    // for (const image of spanishImages) {
-    //   await fs.unlink(image.imagePath);
-    // }
-    return;
+   
   } catch (error) {
     // В случае ошибки, пробрасываем её дальше
     throw error;

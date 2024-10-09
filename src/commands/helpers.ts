@@ -6,13 +6,20 @@ import path from "path";
 import { openai } from "../core/openai";
 import { MyContext, MyContextWithSession, Step } from "../utils/types";
 import Replicate from "replicate";
-import { promises as fs } from "fs";
+import { createWriteStream, promises as fs } from "fs";
 import { getAspectRatio, incrementGeneratedImages, savePrompt } from "../core/supabase/ai";
 import { MiddlewareFn } from "grammy";
 import { createUser, supabase } from "../core/supabase";
 import { bot } from "..";
 import { ElevenLabsClient, ElevenLabs } from "elevenlabs";
 import { v4 as uuid } from "uuid";
+import { models } from "./constants";
+const Creatomate = require('creatomate');
+
+if (!process.env.CREATOMATE_API_KEY) {
+  throw new Error("CREATOMATE_API_KEY is not set");
+}
+const client = new Creatomate.Client(process.env.CREATOMATE_API_KEY);
 
 if (!process.env.REPLICATE_API_TOKEN) {
   throw new Error("REPLICATE_API_TOKEN is not set");
@@ -1033,7 +1040,7 @@ export async function translateText(text: string, targetLang: string): Promise<s
       messages: [
         {
           role: "system",
-          content: `You are a professional translator. Translate the following text to ${targetLang}. Preserve the original meaning and tone as much as possible. ${targetLang === "ru" && "In Cyrillic all words"}`,
+          content: `You are a professional translator. Always answer with letters, without using numbers.Translate the following text to ${targetLang}. Preserve the original meaning and tone as much as possible. ${targetLang === "ru" && "In Cyrillic all words"}`,
         },
         {
           role: "user",
@@ -1288,19 +1295,59 @@ export const createAudioFileFromText = async (
 
 export const createRender = async ({ template_id, modifications }: { template_id: string, modifications: Record<string, string> }) => {
   try {
-    const response = await axios.post('https://api.creatomate.com/v1/renders', {
-      template_id,
-      modifications,
-    }, {
-      headers: {
-        'Authorization': `Bearer ${process.env.CREATOMATE_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
+    const source = new Creatomate.Source({
+      outputFormat: 'mp4',
+      elements: [
+        new Creatomate.Video({ source: modifications["Video-1"] }),
+      ],
     });
 
-    console.log('Render created:', response.data);
-    return response.data;
+    const options = {
+      templateId: template_id,
+      modifications: modifications,
+      
+    };
+ 
+  
+    const renders = await client.render(options);
+    console.log('Completed:', renders);
+
+    return renders;
   } catch (error) {
     console.error('Error creating render:', error);
   }
 };
+
+export function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function deleteFileFromSupabase(bucketName: string, fileName: string) {
+  try {
+    const { data, error } = await supabase
+      .storage
+    .from(bucketName)
+    .remove([fileName]);
+
+  if (error) {
+    console.error('Ошибка при удалении файла из Supabase:', error.message);
+  } else {
+    console.log('Файл успешно удален из Supabase:', data);
+  }
+} catch (error: any) {
+  console.error('Ошибка при удалении файла из Supabase:', error.message);
+}
+}
+
+export async function getAudioDuration(filePath: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(filePath, (err, metadata) => {
+      if (err) {
+        reject(err);
+      } else {
+        const duration = metadata.format.duration || 0;
+        resolve(duration);
+      }
+    });
+  });
+}

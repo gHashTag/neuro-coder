@@ -5,6 +5,7 @@ export async function uploadVideo(filePath: string, telegram_id: string, bucket:
   try {
     const file = fs.readFileSync(filePath);
     const { data, error } = await supabase.storage.from(bucket).upload(fileName, file, {
+      contentType: 'video/mp4',
       upsert: true,
     });
 
@@ -23,7 +24,7 @@ export async function uploadVideo(filePath: string, telegram_id: string, bucket:
 
 export async function getVideoUrl(bucket: string, fileName: string) {
   try {
-    const { data } = await supabase.storage.from(bucket).getPublicUrl(fileName);
+    const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
     return data.publicUrl;
   } catch (e) {
     console.error("Ошибка при получении видео URL:", e);
