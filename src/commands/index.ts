@@ -5,6 +5,8 @@ import circle from "./circle";
 import hello from "./hello";
 import clipmaker from "./clipmaker";
 import leela from "./leela";
+import { start } from "./start";
+import neuro_broker from "./neuro_broker";
 
 // import neurocoder_test from "./neurocoder/neurocoder_test";
 // import neurocoder01 from "./neurocoder/neurocoder01";
@@ -32,6 +34,8 @@ composer.command("clipmaker", clipmaker);
 composer.command("circle", circle);
 
 composer.command("leela", leela);
+
+composer.command("neuro_broker", neuro_broker);
 
 composer.command("imagesize", async (ctx) => {
   await ctx.conversation.enter("imageSizeConversation");

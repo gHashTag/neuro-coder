@@ -11,11 +11,28 @@ import { getAspectRatio, incrementGeneratedImages, savePrompt } from "../core/su
 import { MiddlewareFn } from "grammy";
 import { createUser, supabase } from "../core/supabase";
 import { bot } from "..";
-import { models } from "./constants";
+import { ElevenLabsClient, ElevenLabs } from "elevenlabs";
+import { v4 as uuid } from "uuid";
 
-const replicate = new Replicate({
+if (!process.env.REPLICATE_API_TOKEN) {
+  throw new Error("REPLICATE_API_TOKEN is not set");
+}
+
+if (!process.env.ELEVENLABS_API_KEY) {
+  throw new Error("ELEVENLABS_API_KEY is not set");
+}
+
+
+
+
+export const elevenlabs = new ElevenLabsClient({
+  apiKey:  process.env.ELEVENLABS_API_KEY
+})
+
+export const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
+
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
@@ -287,61 +304,7 @@ export async function toShortVideo(videoPath: string, outputPath: string, width 
   });
 }
 
-export async function createSlideshow(images: string[], audioPath: string, outputPath: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const command = ffmpeg();
 
-    images.forEach((image, index) => {
-      console.log(`Adding image ${index + 1}: ${image}`);
-      command.input(image).loop(1).duration(10);
-    });
-
-    // // Добавляем аудио файл
-    command.input(audioPath);
-
-    let filterComplex = "";
-    let overlayChain = "";
-
-    images.forEach((_, index) => {
-      if (index === 0) {
-        overlayChain = "[0]";
-      } else {
-        filterComplex += `[${index}]fade=d=1:t=in:alpha=1,setpts=PTS-STARTPTS+${index * 2}/TB[f${index - 1}]; `;
-        overlayChain += `[f${index - 1}]overlay`;
-        if (index < images.length - 1) {
-          overlayChain += `[bg${index}];[bg${index}]`;
-        }
-      }
-    });
-
-    // Добавляем crop фильтр для обрезки видео до 480x480 с центрированием
-    filterComplex += `${overlayChain},crop=1024:1792:in_w/2-240:in_h/2-240,format=yuv420p[v]`;
-
-    command
-      .outputOptions("-filter_complex", filterComplex)
-      .outputOptions("-map", "[v]")
-      .outputOptions("-map", `${images.length}:a`) // Мапим аудио из последнего входного файла
-      .outputOptions("-c:a", "aac") // Кодируем аудио в AAC
-      .outputOptions("-shortest") // Обрезаем видео до длины самого короткого входного потока
-      .outputOptions("-r", "25")
-      .output(outputPath)
-      .on("start", (commandLine) => {
-        console.log("FFmpeg process started:", commandLine);
-      })
-      .on("progress", (progress) => {
-        console.log("Processing: " + progress.percent + "% done");
-      })
-      .on("end", () => {
-        console.log("FFmpeg process completed");
-        resolve(outputPath);
-      })
-      .on("error", (err) => {
-        console.error("FFmpeg error:", err);
-        reject(err);
-      })
-      .run();
-  });
-}
 
 export function createYellowAndWhiteText(width: number, height: number, text: string) {
   const sentences = text.split(/(?<=[.!?])\s+/); // Разбиваем текст на предложения
@@ -625,6 +588,198 @@ export async function generateImagesForMeditation(steps: Step[], language: "en" 
   return imagesWithText;
 }
 
+async function downloadImage(url: string, outputPath: string): Promise<string> {
+  try {
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+    fs.writeFile(outputPath, response.data);
+    console.log('Image downloaded successfully:', outputPath);
+    return outputPath; // Возвращаем путь к загруженному изображению
+  } catch (error) {
+    console.error('Error downloading image:', error);
+    throw error; // Перебрасываем ошибку, чтобы обработать её выше
+  }
+}
+
+export async function generateImagesForNeuroBroker(steps: Step[], language: "en" | "zh" | "ru", isModelFlux: boolean = false) {
+  const imagesWithText: { imagePath: string; text: string }[] = [];
+  console.log(imagesWithText, "imagesWithText");
+  console.log("Начинаем генерацию изображений для медитации");
+  console.log(steps, "steps");
+
+  for (const step of steps) {
+    try {
+      const model = "ghashtag/so_origin_kata:e82316f373dea8e2e97748d7dbfe269895a70e2891c18a2403a2080c942bb5b2";
+      
+      console.log(model, "model");
+      const input = {
+        prompt: step.details.en,
+        model: "dev",
+        lora_scale: 1,
+        num_outputs: 1,
+        aspect_ratio: "9:16",
+        output_format: "png",
+        guidance_scale: 3.5,
+        output_quality: 90,
+        prompt_strength: 0.8,
+        extra_lora_scale: 1,
+        num_inference_steps: 28
+      };
+      console.log(input, "input");
+
+      let retries = 11;
+      let output;
+
+      while (retries > 0) {
+        try {
+          console.log(`Попытка генерации изображения для шага ${step.step} (осталось попыток: ${retries})`);
+          output = await replicate.run(model, { input });
+          console.log(output, "✅ выход output");
+          if (output && output[0]) {
+            console.log(`Изображение успешно сгенерировано для шага ${step.step}`);
+            break;
+          }
+        } catch (error: any) {
+          console.error(`Ошибка при генерации изображения для шага ${step.step}:`, error.message);
+          retries--;
+          if (retries === 0) {
+            throw error;
+          }
+        }
+      }
+
+      if (output) {
+        const imagePath = output;
+        console.log(imagePath, "imagePath");
+        // const text = step.details[language];
+        // console.log(text, "text");
+        console.log(step, "step");
+        try {
+          // const processedImage = await addTextOnImage({ imagePath, text, step: step.step });
+
+          // if (processedImage) {
+          //   imagesWithText.push({ imagePath: processedImage.outputPath, text });
+          //   console.log(`Изображение успешно обработано и сохранено для шага ${step.step}`);
+          // }
+          const outputFilePath = path.join(__dirname, `../images/output_step_${step.step}.png`);
+          console.log(outputFilePath, "outputFilePath");
+          const localImagePath = await downloadImage(imagePath, outputFilePath);
+      
+          // Добавляем локальный путь к изображению в массив
+          imagesWithText.push({ imagePath: localImagePath, text: "" }); // Оставьте текст пустым или удалите его
+      
+          console.log(`Изображение успешно обработано и сохранено для шага ${step.step}`);
+      
+        } catch (error: any) {
+          console.error(`шибка при обработке изображения для шага ${step.step}:`, error.message);
+          throw error; // Перебрасываем ошибку, чтобы использовать запасное изображение
+        }
+      } else {
+        throw new Error(`Не удалось сгенерировать изображение для шага ${step.step}`);
+      }
+    } catch (error: any) {
+      console.error(`Ошибка при работе с шагом ${step.step}:`, error.message);
+      // Используем запасное изображение только если не удалось сгенерировать или обработать изображение
+      // const fallbackImagePath = path.join(process.cwd(), "src/assets/fallback-image.jpg");
+      // const text = `${step.details}`;
+      // try {
+      //   const processedImage = await addTextOnImage({ imagePath: fallbackImagePath, text, step: step.step });
+      //   if (processedImage) {
+      //     imagesWithText.push({ imagePath: processedImage.outputPath, text });
+      //     console.log(`Использовано запасное изображение для шага ${step.step}`);
+      //   }
+      // } catch (fallbackError: any) {
+      //   console.error(`Ошибка при использовании запасного изображения для шага ${step.step}:`, fallbackError.message);
+      // }
+    }
+  }
+
+  console.log(`Генерация изображений завершена. Всего изображений: ${imagesWithText.length}`);
+  return imagesWithText;
+}
+
+export async function generateImageNeuroBroker(prompt: string) {
+  const imagesWithText: { imagePath: string; text: string }[] = [];
+  console.log(imagesWithText, "imagesWithText");
+  console.log("Начинаем генерацию изображений для медитации");
+
+
+    try {
+      const model = "ghashtag/neuro_broker:7abc7b18d0ef212b979eebeb46577d3192c6280c88d876c52ba5a2300f9283a0";
+      
+      console.log(model, "model");
+      const input = {
+        prompt,
+        model: "dev",
+        lora_scale: 1,
+        num_outputs: 1,
+        aspect_ratio: "9:16",
+        output_format: "png",
+        guidance_scale: 3.5,
+        output_quality: 90,
+        prompt_strength: 0.8,
+        extra_lora_scale: 1,
+        num_inference_steps: 28
+      };
+      console.log(input, "input");
+
+      let retries = 11;
+      let output;
+
+      while (retries > 0) {
+        try {
+          console.log(`Попытка генерации изображения (осталось попыток: ${retries})`);
+          output = await replicate.run(model, { input });
+          console.log(output, "✅ выход output");
+          if (output && output[0]) {
+            console.log(`Изображение успешно сгенерировано`);
+            break;
+          }
+        } catch (error: any) {
+          console.error(`Ошибка при генерации изображения:`, error.message);
+          retries--;
+          if (retries === 0) {
+            throw error;
+          }
+        }
+      }
+
+      if (output) {
+        const imagePath = output;
+        console.log(imagePath, "imagePath");
+        try {
+          // const processedImage = await addTextOnImage({ imagePath, text, step: step.step });
+
+          // if (processedImage) {
+          //   imagesWithText.push({ imagePath: processedImage.outputPath, text });
+          //   console.log(`Изображение успешно обработано и сохранено для шага ${step.step}`);
+          // }
+          const outputFilePath = path.join(__dirname, `../images/output_step_${uuid()}.png`);
+          console.log(outputFilePath, "outputFilePath");
+          const localImagePath = await downloadImage(imagePath, outputFilePath);
+      
+          // Добавляем локальный путь к изображению в массив
+          imagesWithText.push({ imagePath: localImagePath, text: "" }); // Оставьте текст пустым или удалите его
+      
+          console.log(`Изображение успешно обработано`);
+      
+        } catch (error: any) {
+          console.error(`шибка при обработке изображения:`, error.message);
+          throw error; // Перебрасываем ошибку, чтобы использовать запасное изображение
+        }
+      } else {
+        throw new Error(`Не удалось сгенерировать изображения}`);
+      }
+    } catch (error: any) {
+      console.error(`Ошибка при работе:`, error.message);
+      throw error;
+    }
+  
+
+  console.log(`Генерация изображений завершена`);
+  return imagesWithText;
+}
+
+
 // export async function generateImagesForMeditation(steps: Step[]) {
 //   const imagesWithText: { imagePath: string; text: string }[] = [];
 //   console.log(imagesWithText, "imagesWithText");
@@ -705,34 +860,34 @@ export async function getSlides({ prompt, scenesCount = 3, isDescription = false
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
       messages: [
-        {
-          role: "system",
-          content: isDescription
-            ? `DON'T USE EMOJI In onScreenTitle. don't use markdown syntax(DON'T USE * AND #). You need to use smiles(emoji) in videoDescription. You are a professional marketer who creates attractive and selling scenarios for Instagram videos.You need to write some interesting text for videos that will get a lot of views. For example, some life hacks for school, tips, motivation, and so on. This text will be posted in the comments to the video. Return it in json format. in videoDescription, you need to write useful information, and not describe what is happening in the video. The videoDescription cannot be longer than 4096 characters. Form the text beautifully, make indents. Example: {
-  "reels": {
-  "onScreenTitle": "onScreenTitle", //don't use emoji
-  "videoDescription": "videoDescription" //use emoji
-  }
-}`
-            : `DONT'T USE EMOJI. You are a professional marketer who creates attractive and selling video scripts for Instagram videos.You need to write a short text, maybe with some kind of plot for ${scenesCount} scenes. No need to mention any discounts or promotions. Create an array of scenes in json format. Example: {
-  "scenes": [
-    {
-      "number": 1,
-      "text": "text",
-      "onscreenText": "onscreenText",
-    },
-    {
-      "number": 2,
-      "text": "text",
-      "onscreenText": "onscreenText",
-    },
-    {
-      "number": 3,
-      "text": "text",
-      "onscreenText": "onscreenText"
-    }
-  ]
-}`,
+          {
+            role: "system",
+            content: isDescription
+              ? `DON'T USE EMOJI In onScreenTitle. don't use markdown syntax(DON'T USE * AND #). You need to use smiles(emoji) in videoDescription. You are a professional marketer who creates attractive and selling scenarios for Instagram videos.You need to write some interesting text for videos that will get a lot of views. For example, some life hacks for school, tips, motivation, and so on. This text will be posted in the comments to the video. Return it in json format. in videoDescription, you need to write useful information, and not describe what is happening in the video. The videoDescription cannot be longer than 4096 characters. Form the text beautifully, make indents. Example: {
+            "reels": {
+            "onScreenTitle": "onScreenTitle", //don't use emoji
+            "videoDescription": "videoDescription" //use emoji
+            }
+          }`
+                    : `DONT'T USE EMOJI. You are a professional marketer who creates attractive and selling video scripts for Instagram videos.You need to write a short text, maybe with some kind of plot for ${scenesCount} scenes. No need to mention any discounts or promotions. Create an array of scenes in json format. Example: {
+          "scenes": [
+            {
+              "number": 1,
+              "text": "text",
+              "onscreenText": "onscreenText",
+            },
+            {
+              "number": 2,
+              "text": "text",
+              "onscreenText": "onscreenText",
+            },
+            {
+              "number": 3,
+              "text": "text",
+              "onscreenText": "onscreenText"
+            }
+          ]
+        }`,
         },
         {
           role: "user",
@@ -802,6 +957,39 @@ export async function getSubtitles(prompt: string, videoDuration: number) {
   }
 }
 
+export async function getSellVillaSteps({ prompt, location, type }: { prompt: string, location: string, type: string }) {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a helpful assistant that creates steps for selling a ${type} in a tourist area in location: ${location}.`,
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+      response_format: { type: "json_object" },
+    });
+    console.log(completion, "completion");
+
+    const content = completion.choices[0].message.content;
+    if (content === null) {
+      throw new Error("Received null content from OpenAI");
+    }
+
+    console.log(content);
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Error:", error);
+    throw error; // Перебрасываем ошибку, чтобы она могла быть обработана выше
+  }
+}
+
+
 export async function getMeditationSteps({ prompt }: { prompt: string }) {
   try {
     const completion = await openai.chat.completions.create({
@@ -845,7 +1033,7 @@ export async function translateText(text: string, targetLang: string): Promise<s
       messages: [
         {
           role: "system",
-          content: `You are a professional translator. Translate the following text to ${targetLang}. Preserve the original meaning and tone as much as possible.`,
+          content: `You are a professional translator. Translate the following text to ${targetLang}. Preserve the original meaning and tone as much as possible. ${targetLang === "ru" && "In Cyrillic all words"}`,
         },
         {
           role: "user",
@@ -1007,4 +1195,112 @@ export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, 
 
   // Продолжаем выполнение следующих промежуточных обработчиков
   await next();
+};
+
+export async function createSlideshow(images: string[], audioPath: string, outputPath: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const command = ffmpeg();
+
+    images.forEach((image, index) => {
+      console.log(`Adding image ${index + 1}: ${image}`);
+      command.input(image).loop(1);
+    });
+
+    // Добавляем аудио файл
+    command.input(audioPath);
+
+    command
+      .outputOptions("-map", `${images.length}:a`) // Мапим аудио из последнего входного файла
+      .outputOptions("-c:a", "aac") // Кодируем аудио в AAC
+      .outputOptions("-shortest") // Обрезаем видео до длины самого короткого входного потока
+      .outputOptions("-r", "25")
+      .output(outputPath)
+      .on("start", (commandLine) => {
+        console.log("FFmpeg process started:", commandLine);
+      })
+      .on("progress", (progress) => {
+        console.log("Processing: " + JSON.stringify(progress) + progress.percent + "% done");
+      })
+      .on("end", () => {
+        console.log("FFmpeg process completed");
+        resolve(outputPath);
+      })
+      .on("error", (err) => {
+        console.error("FFmpeg error:", err);
+        reject(err);
+      })
+      .run();
+  });
+}
+
+
+export async function mergeAudioFiles(audioStream1: string, audioStream2: string, outputFile: string): Promise<void> {
+  const tempFile1 = path.join(__dirname, audioStream1);
+  const tempFile2 = path.join(__dirname, audioStream2);
+  return new Promise((resolve, reject) => {
+    ffmpeg()
+      .input(tempFile1)
+      .input(tempFile2)
+      .complexFilter([
+        '[0:a]volume=0.2[a1]',
+        '[1:a]volume=1.0[a2]',
+        {
+          filter: 'amix',
+          options: {
+            inputs: 2,
+            duration: 'shortest',
+            dropout_transition: 0
+          },
+          inputs: ['a1', 'a2']
+        }
+      ])
+      .on('end', () => resolve())
+      .on('error', (err) => reject(err))
+      .save(outputFile);
+  });
+}
+
+export const createAudioFileFromText = async (
+  text: string
+): Promise<string> => {
+  return new Promise<string>(async (resolve, reject) => {
+    try {
+      const audio = await elevenlabs.generate({
+        voice: "UXy6TRxPugHFxyZvJBB5",
+        model_id: "eleven_turbo_v2_5",
+        text,
+      });
+      const fileName = `../audio/ledov/${uuid()}.mp3`;
+      const tempFile1 = path.join(__dirname, fileName);
+      console.log(tempFile1, 'tempFile1')
+      const fileStream = createWriteStream(tempFile1);
+      console.log(fileStream, 'fileStream')
+
+      audio.pipe(fileStream);
+      fileStream.on("finish", () => resolve(fileName)); // Resolve with the fileName
+      fileStream.on("error", reject);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+
+export const createRender = async ({ template_id, modifications }: { template_id: string, modifications: Record<string, string> }) => {
+  try {
+    const response = await axios.post('https://api.creatomate.com/v1/renders', {
+      template_id,
+      modifications,
+    }, {
+      headers: {
+        'Authorization': `Bearer ${process.env.CREATOMATE_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log('Render created:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating render:', error);
+  }
 };

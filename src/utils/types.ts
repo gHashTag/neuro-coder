@@ -5,8 +5,12 @@ export interface Step {
   step: string;
   details: {
     en: string;
-    es: string;
   };
+  voiceOver: {
+    en: string;
+    ru: string;
+    zh: string;
+  },
 }
 
 export type MyContext = Context & ConversationFlavor;
