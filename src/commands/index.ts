@@ -122,7 +122,7 @@ composer.command("model", model);
 // composer.command("melimi06", melimi06);
 // composer.command("melimi_test", melimi_test);
 composer.command("melimi_cat", async (ctx) => {
-  await ctx.conversation.enter("melimiCatConversation");
+  await ctx.conversation.enter("generateImageConversation");
 });
 
 export default composer;
