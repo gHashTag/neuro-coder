@@ -25,6 +25,10 @@ export const models = {
     key: "ghashtag/evi:e469c787c82a4bc7610374ecd20bb7901b8e448c4b725e4ea5cfe672b7c774ec",
     word: "EVI very fashionable girl ",
   },
+  evii: {
+    key: "ghashtag/evii:0a859f3feb7026811fbf2579343194575824039ee86538fc30c70e684f6b3ed9",
+    word: "EVII very fashionable girl ",
+  },
   kata: {
     key: "ghashtag/so_origin_kata:e82316f373dea8e2e97748d7dbfe269895a70e2891c18a2403a2080c942bb5b2",
     word: "KATA ",

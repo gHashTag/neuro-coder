@@ -4,7 +4,7 @@ import { supabase } from "../../core/supabase";
 
 async function inviterConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru";
-  await ctx.reply(isRu ? "Пожалуйста, укажите вашего инвайтера. 😊" : "Please specify your inviter. 😊");
+  await ctx.reply(isRu ? "Пожалуйста, укажите вашего кодовое слово приглашения. 😊" : "Please specify your inviter. 😊");
   const telegram_id = ctx.from?.id.toString();
   const { message } = await conversation.wait();
 
@@ -13,8 +13,8 @@ async function inviterConversation(conversation: Conversation<MyContext>, ctx: M
     const { data: inviterUser, error: fetchError } = await supabase.from("users").select("telegram_id").eq("username", inviterUsername).maybeSingle();
 
     if (fetchError) {
-      console.error(isRu ? `Ошибка при проверке инвайтера: ${fetchError.message}` : `Error checking inviter: ${fetchError.message}`);
-      throw new Error(isRu ? `Ошибка при проверке инвайтера: ${fetchError.message}` : `Error checking inviter: ${fetchError.message}`);
+      console.error(isRu ? `Ошибка при проверке кодового слова приглашения: ${fetchError.message}` : `Error checking inviter code: ${fetchError.message}`);
+      throw new Error(isRu ? `Ошибка при проверке кодового слова приглашения: ${fetchError.message}` : `Error checking inviter code: ${fetchError.message}`);
     }
 
     if (!inviterUser) {
@@ -29,8 +29,10 @@ async function inviterConversation(conversation: Conversation<MyContext>, ctx: M
 
     await ctx.reply(isRu ? "Добро пожаловать! 🎉" : "Welcome! 🎉");
     if (updateError) {
-      console.error(isRu ? `Ошибка при обновлении инвайтера: ${updateError.message}` : `Error updating inviter: ${updateError.message}`);
-      throw new Error(isRu ? `Ошибка при обновлении инвайтера: ${updateError.message}` : `Error updating inviter: ${updateError.message}`);
+      console.error(isRu ? `Ошибка при обновлении кодового слова приглашения: ${updateError.message}` : `Error updating inviter code: ${updateError.message}`);
+      throw new Error(
+        isRu ? `Ошибка при обновлении кодового слова приглашения: ${updateError.message}` : `Error updating inviter code: ${updateError.message}`,
+      );
     }
   }
 }
