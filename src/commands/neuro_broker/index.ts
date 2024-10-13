@@ -7,7 +7,8 @@ import { InputMediaPhoto } from "grammy/types";
 import { getVideoUrl, uploadVideo } from "../../core/supabase/video";
 import path from "path";
 import fs from "fs";
-const triggerWord = "KATA";
+
+export const triggerWord = "KATA";
 
 const type = "condominium";
 
@@ -60,10 +61,31 @@ const outdoorDescription = `
   - Landscaped gardens with seating areas and fire pit
   - Outdoor kitchen and dining area
 `;
-const location = 'Phuket, Thailand'
+
+const officeDescription = `
+  The office in this luxury ${type} ${triggerWord} is a haven of productivity and style. It features a large desk with ergonomic chairs, a high-end printer, and a sleek filing cabinet. The room is furnished with plush, neutral-toned sofas and accented with contemporary art pieces. The design emphasizes clean lines and a seamless flow, creating an atmosphere of tranquility and elegance. High-resolution photography captures the exquisite details and the breathtaking view of the surrounding landscape.
+
+  Key Features:
+  - Large desk with ergonomic chairs
+  - High-end printer and filing cabinet
+  - Neutral-toned sofas and contemporary art
+  - Seamless integration of indoor and outdoor spaces
+`;
+
+const diningRoomDescription = `
+  The dining room in this luxury ${type} ${triggerWord} is a haven of productivity and style. It features a large desk with ergonomic chairs, a high-end printer, and a sleek filing cabinet. The room is furnished with plush, neutral-toned sofas and accented with contemporary art pieces. The design emphasizes clean lines and a seamless flow, creating an atmosphere of tranquility and elegance. High-resolution photography captures the exquisite details and the breathtaking view of the surrounding landscape.
+
+  Key Features:
+  - Large desk with ergonomic chairs
+  - High-end printer and filing cabinet
+  - Neutral-toned sofas and contemporary art
+  - Seamless integration of indoor and outdoor spaces
+`;
+
+export const location = 'Phuket, Thailand'
 
 const description = `
-  Projects in ${location}.
+  Immerse yourself in a world of unrivaled luxury in this magnificent condominium on the picturesque island of ${location}. This unique property combines contemporary design and refined elegance, creating the perfect space to relax and enjoy life. Spacious interiors, made using high-quality materials, open up to the endless sea views, giving a sense of peace and harmony. Every detail in this condominium has been thought out to ensure maximum comfort and satisfy the most discerning tastes. Relax by the pool overlooking the ocean or enjoy the evening breeze on your private terrace.
 `;
 
 interface SlideshowResponse {
@@ -83,7 +105,7 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
  
     // Получаем шаги медитации
     const sellVillaSteps = await getSellVillaSteps({
-      prompt: `Create a viral description in one paragraph 15 seconds long without numbers. Always answer with letters, without using numbers. At the end write: write in the comments ${triggerWord} and get direct access to the developer: ${description}. Create 5 coherent steps with very short one-sentence abstracts on the topic of creating a short video script to sell a luxury ${type}. Every description should be trigger word ${triggerWord}. Answer in json format. The structure should be as follows:
+      prompt: `Create a viral description for Instagram reels in one paragraph 40 seconds long without numbers. Always answer with letters, without using numbers. Create 7 coherent steps with very short one-sentence abstracts on the topic of creating a short video script to sell a luxury ${type}. Every description should be trigger word ${triggerWord}. Answer in json format. The structure should be as follows:
     
             {
               "activities": [
@@ -93,7 +115,7 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
                   "steps": [
                     {
                       "step": "Step 1",
-                      "details": ${livingRoomDescription},
+                      "details": ${outdoorDescription},
                     },
                     {
                       "step": "Step 2",
@@ -109,7 +131,15 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
                     },
                     {
                       "step": "Step 5",
-                      "details": ${outdoorDescription},
+                      "details": ${livingRoomDescription},
+                    },
+                    {
+                      "step": "Step 6",
+                      "details": ${officeDescription},
+                    },
+                    {
+                      "step": "Step 7",
+                      "details": ${diningRoomDescription},
                     }
                   ]
                 }
@@ -130,9 +160,9 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
           en: step.details,
         },
         voiceOver: {
-          en: sellVillaSteps.activities[0].description,
-          ru: await translateText(sellVillaSteps.activities[0].description, "ru"),
-          zh: await translateText(sellVillaSteps.activities[0].description, "zh"),
+          en: `${sellVillaSteps.activities[0].description} Write the word ${triggerWord} and get access directly to the developer.`,
+          ru: await translateText(`${sellVillaSteps.activities[0].description} Напишите комментарий слово ${triggerWord} и получите доступ напрямую к застройщику.`, "ru"),
+          zh: await translateText(`${sellVillaSteps.activities[0].description} 寫下單字 ${triggerWord} 並獲得開發人員的存取權。`, "zh"),
         },
       })),
     );
@@ -142,8 +172,8 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
     const englishImages = await generateImagesForNeuroBroker(stepsData, "en", false);
     console.log(englishImages, "englishImages");
 
-    const ownerImage = await generateImageNeuroBroker("Photograph, man, model pose, minimalist, beard, profound gaze, solid white environment, studio lights setting");
-    console.log(ownerImage, "ownerImage");
+    // const ownerImage = await generateImageNeuroBroker("Photograph, man, model pose, minimalist, beard, profound gaze, solid white environment, studio lights setting");
+    // console.log(ownerImage, "ownerImage");
     // Создаем группу медиа для отправки изображений
     // const englishImages = [
     //   {
@@ -165,10 +195,18 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
     //   {
     //     imagePath: '/Users/playra/neuro-coder/src/images/output_step_Step 5.png',
     //     text: ''
+    //   },
+    //   {
+    //     imagePath: '/Users/playra/neuro-coder/src/images/output_step_Step 6.png',
+    //     text: ''
+    //   },
+    //   {
+    //     imagePath: '/Users/playra/neuro-coder/src/images/output_step_Step 7.png',
+    //     text: ''
     //   }
     // ]
-    const newArray = [...englishImages, ...ownerImage]
-    // const newArray = [...englishImages]
+   
+    const newArray = [...englishImages]
     console.log(newArray, "newArray");
 
     const englishMediaGroup: InputMediaPhoto[] = newArray.map((image) => ({
@@ -183,8 +221,6 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
     const images = newArray.map((img) => img.imagePath)
     console.log(images,'images')
 
-
-
   const audioFile1 = `../audio/audio${1}.mp3`;
   // const voices = await elevenlabs.voices.getAll();
   // console.log(voices, 'voices')
@@ -196,18 +232,14 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
   console.log(audioDuration, 'audioDuration')
   console.log(`Длина аудио файла: ${audioDuration} секунд`);
   // Количество изображений в слайд-шоу
-  const numberOfImages = 5;
+  const numberOfImages = newArray.length;
   const imageDuration = audioDuration / numberOfImages;
   console.log(`Длина изображения: ${imageDuration} секунд`);
-  // const mergedAudioFile = 'src/audio/ledov/mergedAudioFile.mp3'
-  // await mergeAudioFiles(audioFile1, audioStream2, mergedAudioFile);
+  const mergedAudioFile = 'src/audio/ledov/mergedAudioFile.mp3'
+  await mergeAudioFiles(audioFile1, audioStream2, mergedAudioFile);
   const options: SlideshowOptions = {
     imageOptions: {
         imageDuration: imageDuration * 1000, 
-    },
-    loopingOptions: {
-        loopImages: 'auto',
-        loopAudio: 'auto'
     },
     ffmpegOptions: {
         streamCopyAudio: true
@@ -215,18 +247,18 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
     outputOptions: {
         outputDir: 'src/videos'
     }
-};
-console.log(options, 'options')
+  };
+  console.log(options, 'options')
 
     const englishOutput: Partial<SlideshowResponse> = await createSlideshowVideo(
       images,
-      audioPath,
+      mergedAudioFile,
       options
     );
     
     try {
       if (englishOutput && englishOutput.filePath) {
-        console.log("File path:", englishOutput.filePath);
+        // console.log("File path:", englishOutput.filePath);
      
         if (!ctx.from) throw new Error("No user");
         const fileName = `${ctx.from.id}_${Date.now()}.mp4`;
@@ -241,7 +273,6 @@ console.log(options, 'options')
           caption: "Video EN NeuroBroker",
         });
         //await setHistory("neuro_broker", "Video EN NeuroBroker", videoUrl, "neuro_broker", "video");
-        await ctx.reply("Video creation finished");
         await deleteFileFromSupabase("neuro_broker", fileName);
         return;
       } else {
@@ -250,39 +281,39 @@ console.log(options, 'options')
     } catch (error) {
       console.error("Error creating slideshow video:", error);
     } finally {
-      // // Путь к директории, содержимое которой нужно удалить
-      // const directory = path.join(__dirname, '../../videos');
-      // const audio = path.join(__dirname, `../../audio/ledov`);
+      // Путь к директории, содержимое которой нужно удалить
+      const directory = path.join(__dirname, '../../videos');
+      const audio = path.join(__dirname, `../../audio/ledov`);
 
-      // // Проверяем, существует ли директория
-      // if (fs.existsSync(directory) && fs.existsSync(audio)) {
-      //   // Читаем содержимое директории
-      //   const files = fs.readdirSync(directory);
-      //   const audioFiles = fs.readdirSync(audio);
+      // Проверяем, существует ли директория
+      if (fs.existsSync(directory) && fs.existsSync(audio)) {
+        // Читаем содержимое директории
+        const files = fs.readdirSync(directory);
+        const audioFiles = fs.readdirSync(audio);
 
-      //   // Удаляем каждый файл и поддиректорию
-      //   for (const file of files) {
-      //     const filePath = path.join(directory, file);
-      //     const stat = fs.lstatSync(filePath);
+        // Удаляем каждый файл и поддиректорию
+        for (const file of files) {
+          const filePath = path.join(directory, file);
+          const stat = fs.lstatSync(filePath);
 
-      //     if (stat.isDirectory()) {
-      //       // Если это директория, удаляем ее рекурсивно
-      //       fs.rmSync(filePath, { recursive: true, force: true });
-      //     } else {
-      //       // Если это файл, удаляем его
-      //       fs.unlinkSync(filePath);
-      //     }
-      //   }
+          if (stat.isDirectory()) {
+            // Если это директория, удаляем ее рекурсивно
+            fs.rmSync(filePath, { recursive: true, force: true });
+          } else {
+            // Если это файл, удаляем его
+            fs.unlinkSync(filePath);
+          }
+        }
 
-      //   for (const file of audioFiles) {
-      //     const filePath = path.join(audio, file);
-      //     fs.unlinkSync(filePath);
-      //   }
+        for (const file of audioFiles) {
+          const filePath = path.join(audio, file);
+          fs.unlinkSync(filePath);
+        }
 
-      //   console.log('Содержимое директории успешно удалено');
-      // } else {
-      //   console.error('Директория не существует:', directory);
-      // }
+        console.log('Содержимое директории успешно удалено');
+      } else {
+        console.error('Директория не существует:', directory);
+      }
     }
     // // Генерация испанской версии
     // const spanishImages = await generateImagesForMeditation(stepsData, "es");
