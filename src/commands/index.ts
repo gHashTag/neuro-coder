@@ -81,6 +81,10 @@ composer.command("evi", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation");
 });
 
+composer.command("evii", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation");
+});
+
 composer.command("kata", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation");
 });
@@ -122,7 +126,7 @@ composer.command("model", model);
 // composer.command("melimi06", melimi06);
 // composer.command("melimi_test", melimi_test);
 composer.command("melimi_cat", async (ctx) => {
-  await ctx.conversation.enter("melimiCatConversation");
+  await ctx.conversation.enter("generateImageConversation");
 });
 
 export default composer;
