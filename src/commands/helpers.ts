@@ -15,7 +15,7 @@ import { ElevenLabsClient, ElevenLabs } from "elevenlabs";
 import { v4 as uuid } from "uuid";
 import { models } from "./constants";
 import { triggerWord } from "./neuro_broker";
-const Creatomate = require('creatomate');
+const Creatomate = require("creatomate");
 
 if (!process.env.CREATOMATE_API_KEY) {
   throw new Error("CREATOMATE_API_KEY is not set");
@@ -1029,7 +1029,10 @@ export async function translateText(text: string, targetLang: string): Promise<s
       messages: [
         {
           role: "system",
-          content: `You are a professional translator. Don't translate the trigger **word ${triggerWord}** and leave it in English. Always answer with letters, without using numbers. Translate the following text to ${targetLang}. Preserve the original meaning and tone as much as possible. ${targetLang === "ru" && "In Cyrillic all words. Правильно писать **на острове Пхукет**. Это связано с тем, что острова, в том числе Пхукет, в русском языке чаще всего употребляются с предлогом «на»."}`,
+          content: `You are a professional translator. Don't translate the trigger **word ${triggerWord}** and leave it in English. Always answer with letters, without using numbers. Translate the following text to ${targetLang}. Preserve the original meaning and tone as much as possible. ${
+            targetLang === "ru" &&
+            "In Cyrillic all words. Правильно писать **на острове Пхукет**. Это связано с тем, что острова, в том числе Пхукет, в русском языке чаще всего употребляются с предлогом «на»."
+          }`,
         },
         {
           role: "user",

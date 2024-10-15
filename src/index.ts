@@ -59,6 +59,11 @@ bot.use(createConversation(inviterConversation));
 bot.use(customMiddleware);
 bot.use(commands);
 
+bot.on("message:text", async (ctx) => {
+  if (ctx.message.text.startsWith("/")) return;
+  if (ctx.message.text) {
+  }
+});
 bot.on("callback_query:data", async (ctx) => {
   const callbackData = ctx.callbackQuery.data;
   const isRu = ctx.from?.language_code === "ru";

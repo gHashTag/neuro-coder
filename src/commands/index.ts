@@ -97,6 +97,10 @@ composer.command("neuro_broker_01", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation");
 });
 
+composer.command("kirill_korolev", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation");
+});
+
 composer.command("soul", async (ctx) => {
   await ctx.conversation.enter("soulConversation");
 });

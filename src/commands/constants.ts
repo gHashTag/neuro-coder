@@ -41,4 +41,8 @@ export const models = {
     key: "ghashtag/neuro_broker_01:c347dbe524c02f3f3b65f97e82e344e65236bbda040d0135a75e11d711f035f8",
     word: "LEDOV very fashionable man ",
   },
+  kirill_korolev: {
+    key: "ghashtag/kirill_korolev:eb55046fbc7d2cb90a04f8f0fa0f102b79734511be167dc274d8ec47530a131c",
+    word: "KOROLEV very fashionable man ",
+  },
 };
