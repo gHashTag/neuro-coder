@@ -5,7 +5,7 @@ import { InlineKeyboard } from "grammy";
 
 async function get100AnfiVesnaConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const keyboard = new InlineKeyboard().text("Отменить генерацию", "cancel");
-  const model_type = "anfi_vesna";
+  const model_type = "kirill_korolev";
   console.log(model_type);
   await ctx.reply(
     "Привет! Напишите промпт на английском для генерации изображения. Если вы хотите использовать какой-то референс, то прикрепите изображение к сообщению.",
@@ -33,7 +33,7 @@ async function get100AnfiVesnaConversation(conversation: Conversation<MyContext>
   const generatingMessage = await ctx.reply("Генерация изображения началась...");
   for (let i = 0; i < 100; i++) {
     const { image } = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl);
-    await ctx.replyWithPhoto(image);
+    await ctx.replyWithPhoto(image, { caption: `Фото: ${i + 1} / 100` });
   }
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   return;

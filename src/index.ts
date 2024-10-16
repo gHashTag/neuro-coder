@@ -13,10 +13,11 @@ import { generateImageConversation } from "./commands/generateImage";
 import { get100AnfiVesnaConversation } from "./commands/get100";
 import { soulConversation } from "./commands/soul";
 import { voiceConversation } from "./commands/voice";
-import { getGeneratedImages, getPrompt, savePrompt, setModel } from "./core/supabase/ai";
+import { getGeneratedImages, getModel, getPrompt, savePrompt, setModel } from "./core/supabase/ai";
 import { InputMediaPhoto } from "grammy/types";
 import { inviterConversation } from "./commands/inviter";
 import { models } from "./commands/constants";
+import { answerAi } from "./core/openai/requests";
 interface SessionData {
   melimi00: {
     videos: string[];
@@ -62,6 +63,13 @@ bot.use(commands);
 bot.on("message:text", async (ctx) => {
   if (ctx.message.text.startsWith("/")) return;
   if (ctx.message.text) {
+    const model = await getModel(ctx.from?.id.toString() || "");
+    const answer = await answerAi(model, ctx.message.text, ctx.from?.language_code || "en");
+    if (!answer) {
+      await ctx.reply("❌ Извините, произошла ошибка при ответе на ваш запрос. Пожалуйста, попробуйте позже.");
+      return;
+    }
+    await ctx.reply(answer);
   }
 });
 bot.on("callback_query:data", async (ctx) => {

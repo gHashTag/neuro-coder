@@ -40,14 +40,15 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
 
   const text = message.photo ? message.caption : message.text;
   let file;
-  if (message.photo) {
-    const referenceFileId = message.photo[0].file_id;
+  console.log(message.document);
+  if (message.document) {
+    const referenceFileId = message.document.file_id;
     file = await ctx.api.getFile(referenceFileId);
   }
-  const fileUrl = message.photo ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : "";
+  const fileUrl = message.document ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : "";
   console.log(fileUrl);
   const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация изображения началась..." : "⏳ Image generation started...");
-  const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl);
+  const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, "https://shopsycdn.com/i/p/c3/13/c3139b3a395ca6a1f7b0bbb54495cefb_medium.jpg");
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
   await ctx.replyWithPhoto(image);
 
