@@ -14,7 +14,8 @@ import { bot } from "..";
 import { ElevenLabsClient, ElevenLabs } from "elevenlabs";
 import { v4 as uuid } from "uuid";
 import { models } from "./constants";
-import { triggerWord } from "./neuro_broker";
+import { triggerWord } from "./neuro_broker/mock";
+
 const Creatomate = require("creatomate");
 
 if (!process.env.CREATOMATE_API_KEY) {
@@ -1234,7 +1235,9 @@ export async function createSlideshow(images: string[], audioPath: string, outpu
 
 export async function mergeAudioFiles(audioStream1: string, audioStream2: string, outputFile: string): Promise<void> {
   const tempFile1 = path.join(__dirname, audioStream1);
+  console.log(tempFile1, 'tempFile1')
   const tempFile2 = path.join(__dirname, audioStream2);
+  console.log(tempFile2, 'tempFile2')
   return new Promise((resolve, reject) => {
     ffmpeg()
       .input(tempFile1)
@@ -1270,7 +1273,6 @@ export const createAudioFileFromText = async (text: string): Promise<string> => 
       const tempFile1 = path.join(__dirname, fileName);
       console.log(tempFile1, "tempFile1");
       const fileStream = createWriteStream(tempFile1);
-      console.log(fileStream, "fileStream");
 
       audio.pipe(fileStream);
       fileStream.on("finish", () => resolve(fileName)); // Resolve with the fileName
