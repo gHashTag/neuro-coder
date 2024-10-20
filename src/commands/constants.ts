@@ -45,4 +45,4 @@ export const models = {
     key: "ghashtag/kirill_korolev:eb55046fbc7d2cb90a04f8f0fa0f102b79734511be167dc274d8ec47530a131c",
     word: "KOROLEV very fashionable man ",
   },
-};
+}

@@ -4,9 +4,9 @@
 
 ## Features
 
--   Typescript support
--   Linting and formatting preconfigured
--   Development friendly environment with Nodemon
+- Typescript support
+- Linting and formatting preconfigured
+- Development friendly environment with Nodemon
 
 ## Development
 
@@ -53,19 +53,19 @@ $ npm install express
 And then edit the contents of `api/index.ts` to
 
 ```js
-require("../src/index");
+require("../src/index")
 
-import express from "express";
-import { webhookCallback } from "grammy";
+import express from "express"
+import { webhookCallback } from "grammy"
 
-import bot from "../src/core/bot";
+import bot from "../src/core/bot"
 
-const app = express();
+const app = express()
 
-app.use(express.json());
-app.use(`/api/index`, webhookCallback(bot));
+app.use(express.json())
+app.use(`/api/index`, webhookCallback(bot))
 
-export default app;
+export default app
 ```
 
 ## Contributing

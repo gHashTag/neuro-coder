@@ -1,18 +1,18 @@
-import { Context, InputFile } from "grammy";
+import { Context, InputFile } from "grammy"
 
-import { promises as fs } from "fs";
-import path from "path";
-import { createSlideshow, generateImagesForMeditation, getMeditationSteps, translateText } from "../helpers";
-import { Step } from "src/utils/types";
-import { InputMediaPhoto } from "grammy/types";
+import { promises as fs } from "fs"
+import path from "path"
+import { createSlideshow, generateImagesForMeditation, getMeditationSteps, translateText } from "../helpers"
+import { Step } from "src/utils/types"
+import { InputMediaPhoto } from "grammy/types"
 
 const clipmaker = async (ctx: Context): Promise<void> => {
   try {
     // Отправляем уведомление пользователю, что бот печатает
-    await ctx.replyWithChatAction("typing");
+    await ctx.replyWithChatAction("typing")
 
     // Проверяем, есть ли информация о пользователе
-    if (!ctx.from) throw new Error("User not found");
+    if (!ctx.from) throw new Error("User not found")
 
     // Получаем шаги медитации
     const meditationSteps = await getMeditationSteps({
@@ -46,8 +46,8 @@ const clipmaker = async (ctx: Context): Promise<void> => {
             }
   
             Ensure that the steps are coherent and flow logically from one to the next, incorporating the LeelaChakra application naturally into the meditation process.`,
-    });
-    console.log(meditationSteps, "meditationSteps");
+    })
+    console.log(meditationSteps, "meditationSteps")
 
     const stepsData: Step[] = await Promise.all(
       meditationSteps.activities[0].steps.map(async (step, index) => ({
@@ -57,80 +57,80 @@ const clipmaker = async (ctx: Context): Promise<void> => {
           es: await translateText(step.details, "es"),
         },
       })),
-    );
-    console.log(JSON.stringify(stepsData, null, 2), "stepsData");
+    )
+    console.log(JSON.stringify(stepsData, null, 2), "stepsData")
 
     // Генерация английской версии
-    const englishImages = await generateImagesForMeditation(stepsData, "en");
-    console.log(englishImages, "englishImages");
+    const englishImages = await generateImagesForMeditation(stepsData, "en")
+    console.log(englishImages, "englishImages")
 
     // Создаем группу медиа для отправки изображений
     const englishMediaGroup: InputMediaPhoto[] = englishImages.map((image) => ({
       type: "photo",
       media: new InputFile(image.imagePath),
       caption: image.text,
-    }));
+    }))
     // Отправляем группу изображений пользователю
-    await ctx.replyWithMediaGroup(englishMediaGroup);
+    await ctx.replyWithMediaGroup(englishMediaGroup)
 
-    const numberTrack = 10;
+    const numberTrack = 10
 
     const englishOutputPath = await createSlideshow(
       englishImages.map((img) => img.imagePath),
       `src/audio/audio${numberTrack}.mp3`,
       "output_en.mp4",
-    );
-    console.log(englishOutputPath, "englishOutputPath");
+    )
+    console.log(englishOutputPath, "englishOutputPath")
     // Ждем 1 секунду после создания слайд-шоу
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Отправляем видео пользователю
     await ctx.replyWithVideo(new InputFile(englishOutputPath), {
       caption: "Video EN meditation",
-    });
+    })
 
     // Генерация испанской версии
-    const spanishImages = await generateImagesForMeditation(stepsData, "es");
+    const spanishImages = await generateImagesForMeditation(stepsData, "es")
 
     // Создаем группу медиа для отправки изображений
     const spanishMediaGroup: InputMediaPhoto[] = spanishImages.map((image) => ({
       type: "photo",
       media: new InputFile(image.imagePath),
       caption: image.text,
-    }));
+    }))
 
-    await ctx.replyWithMediaGroup(spanishMediaGroup);
+    await ctx.replyWithMediaGroup(spanishMediaGroup)
 
     const spanishOutputPath = await createSlideshow(
       spanishImages.map((img) => img.imagePath),
       `src/audio/audio${numberTrack}.mp3`,
       "output_es.mp4",
-    );
+    )
 
     // Ждем 1 секунду после создания слайд-шоу
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     await ctx.replyWithVideo(new InputFile(spanishOutputPath), {
       caption: "Video ES meditation",
-    });
+    })
 
     // Удаляем временные файлы
-    await fs.unlink(englishOutputPath);
-    await fs.unlink(spanishOutputPath);
+    await fs.unlink(englishOutputPath)
+    await fs.unlink(spanishOutputPath)
     // for (const image of englishImages) {
     //   await fs.unlink(image.imagePath);
     // }
     // for (const image of spanishImages) {
     //   await fs.unlink(image.imagePath);
     // }
-    return;
+    return
   } catch (error) {
     // В случае ошибки, пробрасываем её дальше
-    throw error;
+    throw error
   }
-};
+}
 
-export default clipmaker;
+export default clipmaker
 
 // async function testSlideshow() {
 //     const imageDir = path.join(process.cwd(), "src", "images");

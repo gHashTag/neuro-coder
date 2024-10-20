@@ -1,54 +1,54 @@
-import ffmpeg from "fluent-ffmpeg";
-import sharp from "sharp";
-import axios from "axios";
-import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
-import path from "path";
-import { openai } from "../core/openai";
-import { MyContext, MyContextWithSession, Step } from "../utils/types";
-import Replicate from "replicate";
-import { createWriteStream, promises as fs } from "fs";
-import { getAspectRatio, incrementGeneratedImages, savePrompt } from "../core/supabase/ai";
-import { MiddlewareFn } from "grammy";
-import { createUser, supabase } from "../core/supabase";
-import { bot } from "..";
-import { ElevenLabsClient, ElevenLabs } from "elevenlabs";
-import { v4 as uuid } from "uuid";
-import { models } from "./constants";
-import { triggerWord } from "./neuro_broker/mock";
+import ffmpeg from "fluent-ffmpeg"
+import sharp from "sharp"
+import axios from "axios"
+import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
+import path from "path"
+import { openai } from "../core/openai"
+import { MyContext, MyContextWithSession, Step } from "../utils/types"
+import Replicate from "replicate"
+import { createWriteStream, promises as fs } from "fs"
+import { getAspectRatio, incrementGeneratedImages, savePrompt } from "../core/supabase/ai"
+import { MiddlewareFn } from "grammy"
+import { createUser, supabase } from "../core/supabase"
+import { bot } from ".."
+import { ElevenLabsClient, ElevenLabs } from "elevenlabs"
+import { v4 as uuid } from "uuid"
+import { models } from "./constants"
+import { triggerWord } from "./neuro_broker/mock"
 
-const Creatomate = require("creatomate");
+const Creatomate = require("creatomate")
 
 if (!process.env.CREATOMATE_API_KEY) {
-  throw new Error("CREATOMATE_API_KEY is not set");
+  throw new Error("CREATOMATE_API_KEY is not set")
 }
-const client = new Creatomate.Client(process.env.CREATOMATE_API_KEY);
+const client = new Creatomate.Client(process.env.CREATOMATE_API_KEY)
 
 if (!process.env.REPLICATE_API_TOKEN) {
-  throw new Error("REPLICATE_API_TOKEN is not set");
+  throw new Error("REPLICATE_API_TOKEN is not set")
 }
 
 if (!process.env.ELEVENLABS_API_KEY) {
-  throw new Error("ELEVENLABS_API_KEY is not set");
+  throw new Error("ELEVENLABS_API_KEY is not set")
 }
 
 export const elevenlabs = new ElevenLabsClient({
   apiKey: process.env.ELEVENLABS_API_KEY,
-});
+})
 
 export const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
-});
+})
 
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 
 export async function sizePhoto(photoPath: string, outputPath: string): Promise<string> {
   try {
-    const photo = sharp(photoPath);
-    await photo.resize(720, 1280).toFile(outputPath);
-    return outputPath;
+    const photo = sharp(photoPath)
+    await photo.resize(720, 1280).toFile(outputPath)
+    return outputPath
   } catch (error) {
-    console.error(`Ошибка в sizePhoto:`, error);
-    throw error;
+    console.error(`Ошибка в sizePhoto:`, error)
+    throw error
   }
 }
 
@@ -70,83 +70,83 @@ export async function overlayPhotoOnVideo(inputVideoPath: string, inputPhotoPath
       .outputOptions("-c:a", "copy")
       .save(outputVideoPath)
       .on("end", () => {
-        resolve();
+        resolve()
       })
       .on("error", (err) => {
-        reject(err);
-      });
-  });
+        reject(err)
+      })
+  })
 }
 
 export async function makePhotoOnPhoto(backgroundPath: string, overlayPath: string, outputPath: string): Promise<string> {
   try {
-    const background = sharp(backgroundPath);
-    const overlayBuffer = await sharp(overlayPath).toBuffer();
+    const background = sharp(backgroundPath)
+    const overlayBuffer = await sharp(overlayPath).toBuffer()
 
-    const output = await background.composite([{ input: overlayBuffer, blend: "over" }]);
-    await output.png().toFile(outputPath);
-    return outputPath;
+    const output = await background.composite([{ input: overlayBuffer, blend: "over" }])
+    await output.png().toFile(outputPath)
+    return outputPath
   } catch (error) {
-    console.error(`Ошибка в makePhotoOnPhoto:`, error);
-    throw error;
+    console.error(`Ошибка в makePhotoOnPhoto:`, error)
+    throw error
   }
 }
 
 export function createSVGWithWhiteText(width: number, height: number, text: string) {
-  const sentences = text.split(/(?<=[.!?])\s+/); // Разбиваем текст на предложения
-  const lines: string[] = [];
-  const maxWidth = width * 0.8; // 80% от ширины SVG
-  const fontSize = 40;
-  const lineHeight = 60;
-  const padding = 30; // Отступ от края
+  const sentences = text.split(/(?<=[.!?])\s+/) // Разбиваем текст на предложения
+  const lines: string[] = []
+  const maxWidth = width * 0.8 // 80% от ширины SVG
+  const fontSize = 40
+  const lineHeight = 60
+  const padding = 30 // Отступ от края
 
   // Функция для измерения ширины текста (приблизительно)
   function getTextWidth(text: string): number {
-    return text.length * (fontSize * 0.6); // Приблизительный расчет
+    return text.length * (fontSize * 0.6) // Приблизительный расчет
   }
 
   sentences.forEach((sentence) => {
-    const words = sentence.split(" ");
-    let currentLine = "";
+    const words = sentence.split(" ")
+    let currentLine = ""
 
     words.forEach((word) => {
-      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const testLine = currentLine ? `${currentLine} ${word}` : word
       if (getTextWidth(testLine) <= maxWidth) {
-        currentLine = testLine;
+        currentLine = testLine
       } else {
-        lines.push(currentLine);
-        currentLine = word;
+        lines.push(currentLine)
+        currentLine = word
       }
-    });
+    })
 
     if (currentLine) {
-      lines.push(currentLine);
+      lines.push(currentLine)
     }
-  });
+  })
 
   // Вычисляем начальную позицию Y для текста, чтобы он был центрирован
-  const startY = (height - lines.length * lineHeight) / 2;
+  const startY = (height - lines.length * lineHeight) / 2
 
   const textElements = lines
     .map((line, index) => {
-      const y = startY + index * lineHeight;
-      const parts = line.split(/(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu);
+      const y = startY + index * lineHeight
+      const parts = line.split(/(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu)
 
       return `
         <text x="50%" y="${y}" text-anchor="middle" dominant-baseline="middle" class="title">
           ${parts
             .map((part, i) => {
               if (i % 2 === 0) {
-                return escapeXml(part);
+                return escapeXml(part)
               } else {
-                return `<tspan class="emoji">${part}</tspan>`;
+                return `<tspan class="emoji">${part}</tspan>`
               }
             })
             .join("")}
         </text>
-      `;
+      `
     })
-    .join("");
+    .join("")
 
   return `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
@@ -165,7 +165,7 @@ export function createSVGWithWhiteText(width: number, height: number, text: stri
       </style>
       ${textElements}
     </svg>
-  `;
+  `
 }
 
 export async function makeTextLayers(
@@ -177,73 +177,73 @@ export async function makeTextLayers(
   logoTopPadding?: number,
 ): Promise<string> {
   try {
-    const width = 720;
-    const height = 1280;
-    const layersPath = path.resolve(__dirname, "../assets/layers/");
+    const width = 720
+    const height = 1280
+    const layersPath = path.resolve(__dirname, "../assets/layers/")
 
-    let svgBuffer: Buffer;
+    let svgBuffer: Buffer
     if (reelsType === "lifehack") {
-      svgBuffer = await fs.readFile(`${layersPath}/lifehack.png`);
+      svgBuffer = await fs.readFile(`${layersPath}/lifehack.png`)
     } else if (reelsType === "sciencepop") {
-      svgBuffer = await fs.readFile(`${layersPath}/sciencepop.png`);
+      svgBuffer = await fs.readFile(`${layersPath}/sciencepop.png`)
     } else if (reelsType === "didyouknow") {
-      svgBuffer = await fs.readFile(`${layersPath}/didyouknow.png`);
+      svgBuffer = await fs.readFile(`${layersPath}/didyouknow.png`)
     } else if (reelsType === "math") {
-      svgBuffer = await fs.readFile(`${layersPath}/math.png`);
+      svgBuffer = await fs.readFile(`${layersPath}/math.png`)
     } else if (reelsType === "english") {
-      svgBuffer = await fs.readFile(`${layersPath}/english.png`);
+      svgBuffer = await fs.readFile(`${layersPath}/english.png`)
     } else if (reelsType === "cheatsheet") {
-      svgBuffer = await fs.readFile(`${layersPath}/cheatsheet.png`);
+      svgBuffer = await fs.readFile(`${layersPath}/cheatsheet.png`)
     } else if (reelsType === "neuronews") {
-      svgBuffer = await fs.readFile(`${layersPath}/neuronews.png`);
+      svgBuffer = await fs.readFile(`${layersPath}/neuronews.png`)
     } else if (reelsType && reelsType.includes("neurotop")) {
-      const themeIndex = reelsType.split("_")[1];
-      svgBuffer = await fs.readFile(`${layersPath}/neurotop${themeIndex}.png`);
+      const themeIndex = reelsType.split("_")[1]
+      svgBuffer = await fs.readFile(`${layersPath}/neurotop${themeIndex}.png`)
     } else if (reelsType === "neurocoder") {
-      const svgImage = createYellowAndWhiteText(width, 700, escapeXml(text));
-      svgBuffer = Buffer.from(svgImage);
+      const svgImage = createYellowAndWhiteText(width, 700, escapeXml(text))
+      svgBuffer = Buffer.from(svgImage)
     } else {
-      const svgImage = createSVGWithWhiteText(width, 600, escapeXml(text));
-      svgBuffer = Buffer.from(svgImage);
+      const svgImage = createSVGWithWhiteText(width, 600, escapeXml(text))
+      svgBuffer = Buffer.from(svgImage)
     }
-    const outputFilePath = outputPath.endsWith(".png") ? outputPath : `${outputPath}.png`;
+    const outputFilePath = outputPath.endsWith(".png") ? outputPath : `${outputPath}.png`
 
     // Загружаем логотип
-    const logoBuffer = await fs.readFile(logoPath);
+    const logoBuffer = await fs.readFile(logoPath)
 
     // Загружаем изображение description
-    const descriptionPath = path.resolve(__dirname, "./melimi/assets/logo/");
-    const descriptionBuffer = await fs.readFile(`${descriptionPath}/description.png`);
+    const descriptionPath = path.resolve(__dirname, "./melimi/assets/logo/")
+    const descriptionBuffer = await fs.readFile(`${descriptionPath}/description.png`)
 
     // Изменяем размер логотипа
     const resizedLogoBuffer = await sharp(logoBuffer)
       .resize({ width: Math.floor(width * 0.7), height: Math.floor(height * 0.3), fit: "inside" })
-      .toBuffer();
+      .toBuffer()
 
     // Изменяем размер изображения description
     const resizedDescriptionBuffer = await sharp(descriptionBuffer)
       .resize({ width: Math.floor(width * 0.7), height: Math.floor(height * 0.1), fit: "inside" })
-      .toBuffer();
+      .toBuffer()
 
     // Получаем размеры измененного логотипа
-    const logoMetadata = await sharp(resizedLogoBuffer).metadata();
-    const logoWidth = logoMetadata.width || Math.floor(height * 0.2);
-    const logoHeight = logoMetadata.height || Math.floor(height * 0.2);
+    const logoMetadata = await sharp(resizedLogoBuffer).metadata()
+    const logoWidth = logoMetadata.width || Math.floor(height * 0.2)
+    const logoHeight = logoMetadata.height || Math.floor(height * 0.2)
 
     // Получаем размеры измененного изображения description
-    const descriptionMetadata = await sharp(resizedDescriptionBuffer).metadata();
-    const descriptionWidth = descriptionMetadata.width || Math.floor(height * 0.3);
+    const descriptionMetadata = await sharp(resizedDescriptionBuffer).metadata()
+    const descriptionWidth = descriptionMetadata.width || Math.floor(height * 0.3)
 
     // Вычисляем позицию логотипа (в верхнем центре)
-    const logoLeft = Math.floor((width - logoWidth) / 2);
-    const logoTop = logoTopPadding ? logoTopPadding : -20;
+    const logoLeft = Math.floor((width - logoWidth) / 2)
+    const logoTop = logoTopPadding ? logoTopPadding : -20
 
     // Вычисляем позицию основного текста (под логотипом)
-    const textTop = !reelsType ? logoTop + logoHeight + 290 : reelsType === "neurocoder" ? height / 2 - 200 : 0;
+    const textTop = !reelsType ? logoTop + logoHeight + 290 : reelsType === "neurocoder" ? height / 2 - 200 : 0
 
     // Вычисляем позицию изображения description (под основным текстом)
-    const descriptionLeft = Math.floor((width - descriptionWidth) / 2);
-    const descriptionTop = 1030;
+    const descriptionLeft = Math.floor((width - descriptionWidth) / 2)
+    const descriptionTop = 1030
 
     await sharp({
       create: {
@@ -275,12 +275,12 @@ export async function makeTextLayers(
           : []),
       ])
       .png()
-      .toFile(outputFilePath);
+      .toFile(outputFilePath)
 
-    return outputFilePath;
+    return outputFilePath
   } catch (error) {
-    console.error(`Ошибка в makeTextLayers:`, error);
-    throw error;
+    console.error(`Ошибка в makeTextLayers:`, error)
+    throw error
   }
 }
 
@@ -292,62 +292,62 @@ export async function toShortVideo(videoPath: string, outputPath: string, width 
       .duration(3)
       .output(outputPath)
       .on("start", (commandLine) => {
-        console.log("FFmpeg process started:", commandLine);
+        console.log("FFmpeg process started:", commandLine)
       })
       .on("progress", (progress) => {
-        console.log("Processing: " + Math.round(progress.percent || 0) + "% done");
+        console.log("Processing: " + Math.round(progress.percent || 0) + "% done")
       })
       .on("end", () => {
-        console.log("FFmpeg process completed");
-        resolve(outputPath);
+        console.log("FFmpeg process completed")
+        resolve(outputPath)
       })
       .on("error", (err) => {
-        console.error("FFmpeg error:", err);
-        reject(err);
+        console.error("FFmpeg error:", err)
+        reject(err)
       })
-      .run();
-  });
+      .run()
+  })
 }
 
 export function createYellowAndWhiteText(width: number, height: number, text: string) {
-  const sentences = text.split(/(?<=[.!?])\s+/); // Разбиваем текст на предложения
-  const lines: string[] = [];
-  const maxWidth = width * 0.85; // Увеличено до 95% от ширины SVG
-  const fontSize = 52; // Увеличен размер шрифта
-  const lineHeight = 50; // Увеличена высота строки
-  const padding = 30; // Отступ от края
+  const sentences = text.split(/(?<=[.!?])\s+/) // Разбиваем текст на предложения
+  const lines: string[] = []
+  const maxWidth = width * 0.85 // Увеличено до 95% от ширины SVG
+  const fontSize = 52 // Увеличен размер шрифта
+  const lineHeight = 50 // Увеличена высота строки
+  const padding = 30 // Отступ от края
 
   // Функция для измерения ширины текста (приблизительно)
   function getTextWidth(text: string): number {
-    return text.length * (fontSize * 0.6); // Приблизительный расчет
+    return text.length * (fontSize * 0.6) // Приблизительный расчет
   }
 
   sentences.forEach((sentence) => {
-    const words = sentence.split(" ");
-    let currentLine = "";
+    const words = sentence.split(" ")
+    let currentLine = ""
 
     words.forEach((word) => {
-      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const testLine = currentLine ? `${currentLine} ${word}` : word
       if (getTextWidth(testLine) <= maxWidth) {
-        currentLine = testLine;
+        currentLine = testLine
       } else {
-        lines.push(currentLine);
-        currentLine = word;
+        lines.push(currentLine)
+        currentLine = word
       }
-    });
+    })
 
     if (currentLine) {
-      lines.push(currentLine);
+      lines.push(currentLine)
     }
-  });
+  })
 
   // Вычисляем начальную позицию Y для текста, чтобы он был центрирован
-  const startY = (height - lines.length * lineHeight) / 2;
+  const startY = (height - lines.length * lineHeight) / 2
 
   const textElements = lines
     .map((line, index) => {
-      const y = startY + index * lineHeight;
-      const parts = line.split(/(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu);
+      const y = startY + index * lineHeight
+      const parts = line.split(/(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu)
 
       return `
         <text x="50%" y="${y}" text-anchor="middle" dominant-baseline="middle" class="title">
@@ -355,19 +355,19 @@ export function createYellowAndWhiteText(width: number, height: number, text: st
             .map((part, i) => {
               if (i % 2 === 0) {
                 if (index === 0) {
-                  return `<tspan fill="#FFFF00" font-weight="bold">${escapeXml(part)}</tspan>`; // Изменен цвет на более яркий желтый
+                  return `<tspan fill="#FFFF00" font-weight="bold">${escapeXml(part)}</tspan>` // Изменен цвет на более яркий желтый
                 } else {
-                  return `<tspan fill="#FFFFFF" font-weight="bold">${escapeXml(part)}</tspan>`; // Добавлен белый цвет для остальных строк
+                  return `<tspan fill="#FFFFFF" font-weight="bold">${escapeXml(part)}</tspan>` // Добавлен белый цвет для остальных строк
                 }
               } else {
-                return `<tspan class="emoji">${part}</tspan>`;
+                return `<tspan class="emoji">${part}</tspan>`
               }
             })
             .join("")}
         </text>
-      `;
+      `
     })
-    .join("");
+    .join("")
 
   return `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
@@ -386,59 +386,59 @@ export function createYellowAndWhiteText(width: number, height: number, text: st
       <rect width="100%" height="100%" fill="rgba(0,0,0,0)"/>
       ${textElements}
     </svg>
-  `;
+  `
 }
 
 export function createSVGWithHighlightedText(width: number, height: number, text: string) {
-  const words = text.split(" ");
-  const lines: string[] = [];
-  let currentLine = "";
-  const maxWidth = width * 0.9; // 90% от ширины SVG
-  const fontSize = 50;
-  const lineHeight = 80;
-  const paddingX = 10; // Горизонтальный отступ
-  const paddingY = 10; // Вертикальный отступ
+  const words = text.split(" ")
+  const lines: string[] = []
+  let currentLine = ""
+  const maxWidth = width * 0.9 // 90% от ширины SVG
+  const fontSize = 50
+  const lineHeight = 80
+  const paddingX = 10 // Горизонтальный отступ
+  const paddingY = 10 // Вертикальный отступ
 
   // Функция для измерения ширины текста (приблизительно)
   function getTextWidth(text: string): number {
-    return text.length * (fontSize * 0.6); // Приблизительный расчет
+    return text.length * (fontSize * 0.6) // Приблизительный расчет
   }
 
   words.forEach((word) => {
-    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    const testLine = currentLine ? `${currentLine} ${word}` : word
     if (getTextWidth(testLine) <= maxWidth) {
-      currentLine = testLine;
+      currentLine = testLine
     } else {
-      lines.push(currentLine);
-      currentLine = word;
+      lines.push(currentLine)
+      currentLine = word
     }
-  });
+  })
   if (currentLine) {
-    lines.push(currentLine);
+    lines.push(currentLine)
   }
 
-  const startY = (height - lines.length * lineHeight) / 2;
+  const startY = (height - lines.length * lineHeight) / 2
 
   const textElements = lines
     .map((line, index) => {
-      const lineWidth = getTextWidth(line);
-      const rectX = (width - lineWidth) / 2 - paddingX;
-      const rectY = startY + index * lineHeight - paddingY / 2;
-      const wordsInLine = line.split(" ");
+      const lineWidth = getTextWidth(line)
+      const rectX = (width - lineWidth) / 2 - paddingX
+      const rectY = startY + index * lineHeight - paddingY / 2
+      const wordsInLine = line.split(" ")
       const coloredWords = wordsInLine
         .map((word, wordIndex) => {
-          const colorClass = wordIndex % 2 === 0 ? "white-text" : "yellow-text";
-          return `<tspan class="${colorClass}">${word}</tspan>`;
+          const colorClass = wordIndex % 2 === 0 ? "white-text" : "yellow-text"
+          return `<tspan class="${colorClass}">${word}</tspan>`
         })
-        .join(" ");
+        .join(" ")
       return `
         <g transform="translate(0, ${startY + index * lineHeight})">
           <rect x="${rectX + 10}" y="${-lineHeight / 2 - 25}" width="${lineWidth + paddingX * 2}" height="${lineHeight}" fill="transparent" rx="10" ry="10"/>
           <text x="50%" y="0" text-anchor="middle" dominant-baseline="middle" class="title">${coloredWords}</text>
         </g>
-      `;
+      `
     })
-    .join("");
+    .join("")
 
   // <rect width="100%" height="100%" fill="rgba(0,0,0,0.5)"/> <!-- Полупрозрачный черный фон -->
   return `
@@ -459,38 +459,38 @@ export function createSVGWithHighlightedText(width: number, height: number, text
           </style>
           ${textElements}
         </svg>
-      `;
+      `
 }
 
 export async function addTextOnImage({ imagePath, text, step }: { imagePath: string; text: string; step: string }) {
   try {
-    let buffer: Buffer;
+    let buffer: Buffer
 
     try {
-      console.log(`Попытка загрузки изображения для шага ${step}: ${imagePath}`);
+      console.log(`Попытка загрузки изображения для шага ${step}: ${imagePath}`)
       const response = await axios.get(imagePath, {
         responseType: "arraybuffer",
         timeout: 15000, // Увеличим таймаут до 15 секунд
-      });
-      buffer = Buffer.from(response.data, "binary");
-      console.log(`Изображение успешно загружено для шага ${step}`);
+      })
+      buffer = Buffer.from(response.data, "binary")
+      console.log(`Изображение успешно загружено для шага ${step}`)
     } catch (downloadError: any) {
-      console.error(`Ошибка загрузки изображения для шага ${step}:`, downloadError.message);
+      console.error(`Ошибка загрузки изображения для шага ${step}:`, downloadError.message)
       if (downloadError.response) {
-        console.error(`Статус ответа: ${downloadError.response.status}`);
-        console.error(`Заголовки ответа:`, downloadError.response.headers);
+        console.error(`Статус ответа: ${downloadError.response.status}`)
+        console.error(`Заголовки ответа:`, downloadError.response.headers)
       }
-      throw downloadError;
+      throw downloadError
     }
 
-    const width = 1024;
-    const height = 1792;
+    const width = 1024
+    const height = 1792
 
-    const svgImage = createSVGWithHighlightedText(width, height, text);
-    const svgBuffer = Buffer.from(svgImage);
+    const svgImage = createSVGWithHighlightedText(width, height, text)
+    const svgBuffer = Buffer.from(svgImage)
 
-    const outputFileName = `src/images/slide-${step}.png`;
-    const outputPath = path.join(process.cwd(), outputFileName);
+    const outputFileName = `src/images/slide-${step}.png`
+    const outputPath = path.join(process.cwd(), outputFileName)
 
     const image = await sharp(buffer)
       .resize(width, height, { fit: "cover", position: "center" })
@@ -501,77 +501,77 @@ export async function addTextOnImage({ imagePath, text, step }: { imagePath: str
           left: 0,
         },
       ])
-      .toFile(outputPath);
-    return { image, outputPath };
+      .toFile(outputPath)
+    return { image, outputPath }
   } catch (error: any) {
-    console.error(`Ошибка в addTextOnImage для шага ${step}:`, error.message);
-    throw error;
+    console.error(`Ошибка в addTextOnImage для шага ${step}:`, error.message)
+    throw error
   }
 }
 export async function generateImagesForMeditation(steps: Step[], language: "en" | "es") {
-  const imagesWithText: { imagePath: string; text: string }[] = [];
-  console.log("Начинаем генерацию изображений для медитации");
-  console.log(steps, "steps");
+  const imagesWithText: { imagePath: string; text: string }[] = []
+  console.log("Начинаем генерацию изображений для медитации")
+  console.log(steps, "steps")
 
   for (const step of steps) {
     try {
-      const prompt = `Boosts cellular energy, enhancing your meditation experience. photorealism, bohemian style, pink and blue pastel color, hyper-realistic`;
+      const prompt = `Boosts cellular energy, enhancing your meditation experience. photorealism, bohemian style, pink and blue pastel color, hyper-realistic`
 
-      const isModelFlux = false;
+      const isModelFlux = false
       const model = isModelFlux
         ? "black-forest-labs/flux-pro"
-        : "stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf";
+        : "stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf"
       const input = {
         prompt,
         negative_prompt: "nsfw, erotic, violence, people, animals",
         guidance_scale: 7.5,
         num_inference_steps: 50,
         aspect_ratio: "9:16",
-      };
+      }
 
-      let retries = 11;
-      let output;
+      let retries = 11
+      let output
 
       while (retries > 0) {
         try {
-          console.log(`Попытка генерации изображения для шага ${step.step} (осталось попыток: ${retries})`);
-          output = await replicate.run(model, { input });
-          console.log(output, "✅ выход output");
+          console.log(`Попытка генерации изображения для шага ${step.step} (осталось попыток: ${retries})`)
+          output = await replicate.run(model, { input })
+          console.log(output, "✅ выход output")
           if (output && output[0]) {
-            console.log(`Изображение успешно сгенерировано для шага ${step.step}`);
-            break;
+            console.log(`Изображение успешно сгенерировано для шага ${step.step}`)
+            break
           }
         } catch (error: any) {
-          console.error(`Ошибка при генерации изображения для шага ${step.step}:`, error.message);
-          retries--;
+          console.error(`Ошибка при генерации изображения для шага ${step.step}:`, error.message)
+          retries--
           if (retries === 0) {
-            throw error;
+            throw error
           }
         }
       }
 
       if (output) {
-        const imagePath = output;
-        console.log(imagePath, "imagePath");
-        const text = step.details[language];
-        console.log(text, "text");
-        console.log(step, "step");
+        const imagePath = output
+        console.log(imagePath, "imagePath")
+        const text = step.details[language]
+        console.log(text, "text")
+        console.log(step, "step")
         try {
-          const processedImage = await addTextOnImage({ imagePath, text, step: step.step });
+          const processedImage = await addTextOnImage({ imagePath, text, step: step.step })
 
           if (processedImage) {
-            imagesWithText.push({ imagePath: processedImage.outputPath, text });
-            console.log(`Изображение успешно обработано и сохранено для шага ${step.step}`);
+            imagesWithText.push({ imagePath: processedImage.outputPath, text })
+            console.log(`Изображение успешно обработано и сохранено для шага ${step.step}`)
           }
         } catch (error: any) {
-          console.error(`шибка при обработке изображения для шага ${step.step}:`, error.message);
-          throw error; // Перебрасываем ошибку, чтобы использовать запасное изображение
+          console.error(`шибка при обработке изображения для шага ${step.step}:`, error.message)
+          throw error // Перебрасываем ошибку, чтобы использовать запасное изображение
         }
       } else {
-        throw new Error(`Не удалось сгенерировать изображение для шага ${step.step}`);
+        throw new Error(`Не удалось сгенерировать изображение для шага ${step.step}`)
       }
     } catch (error: any) {
-      console.error(`Ошибка при работе с шагом ${step.step}:`, error.message);
+      console.error(`Ошибка при работе с шагом ${step.step}:`, error.message)
       // Используем запасное изображение только если не удалось сгенерировать или обработать изображение
       // const fallbackImagePath = path.join(process.cwd(), "src/assets/fallback-image.jpg");
       // const text = `${step.details}`;
@@ -587,33 +587,33 @@ export async function generateImagesForMeditation(steps: Step[], language: "en" 
     }
   }
 
-  console.log(`Генерация изображений завершена. Всего изображений: ${imagesWithText.length}`);
-  return imagesWithText;
+  console.log(`Генерация изображений завершена. Всего изображений: ${imagesWithText.length}`)
+  return imagesWithText
 }
 
 async function downloadImage(url: string, outputPath: string): Promise<string> {
   try {
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    fs.writeFile(outputPath, response.data);
-    console.log("Image downloaded successfully:", outputPath);
-    return outputPath; // Возвращаем путь к загруженному изображению
+    const response = await axios.get(url, { responseType: "arraybuffer" })
+    fs.writeFile(outputPath, response.data)
+    console.log("Image downloaded successfully:", outputPath)
+    return outputPath // Возвращаем путь к загруженному изображению
   } catch (error) {
-    console.error("Error downloading image:", error);
-    throw error; // Перебрасываем ошибку, чтобы обработать её выше
+    console.error("Error downloading image:", error)
+    throw error // Перебрасываем ошибку, чтобы обработать её выше
   }
 }
 
 export async function generateImagesForNeuroBroker(steps: Step[], language: "en" | "zh" | "ru", isModelFlux = false) {
-  const imagesWithText: { imagePath: string; text: string }[] = [];
-  console.log(imagesWithText, "imagesWithText");
-  console.log("Начинаем генерацию изображений для медитации");
-  console.log(steps, "steps");
+  const imagesWithText: { imagePath: string; text: string }[] = []
+  console.log(imagesWithText, "imagesWithText")
+  console.log("Начинаем генерацию изображений для медитации")
+  console.log(steps, "steps")
 
   for (const step of steps) {
     try {
-      const model = "ghashtag/so_origin_kata:e82316f373dea8e2e97748d7dbfe269895a70e2891c18a2403a2080c942bb5b2";
+      const model = "ghashtag/so_origin_kata:e82316f373dea8e2e97748d7dbfe269895a70e2891c18a2403a2080c942bb5b2"
 
-      console.log(model, "model");
+      console.log(model, "model")
       const input = {
         prompt: step.details.en,
         model: "dev",
@@ -626,36 +626,36 @@ export async function generateImagesForNeuroBroker(steps: Step[], language: "en"
         prompt_strength: 0.8,
         extra_lora_scale: 1,
         num_inference_steps: 28,
-      };
-      console.log(input, "input");
+      }
+      console.log(input, "input")
 
-      let retries = 11;
-      let output;
+      let retries = 11
+      let output
 
       while (retries > 0) {
         try {
-          console.log(`Попытка генерации изображения для шага ${step.step} (осталось попыток: ${retries})`);
-          output = await replicate.run(model, { input });
-          console.log(output, "✅ выход output");
+          console.log(`Попытка генерации изображения для шага ${step.step} (осталось попыток: ${retries})`)
+          output = await replicate.run(model, { input })
+          console.log(output, "✅ выход output")
           if (output && output[0]) {
-            console.log(`Изображение успешно сгенерировано для шага ${step.step}`);
-            break;
+            console.log(`Изображение успешно сгенерировано для шага ${step.step}`)
+            break
           }
         } catch (error: any) {
-          console.error(`Ошибка при генерации изображения для шага ${step.step}:`, error.message);
-          retries--;
+          console.error(`Ошибка при генерации изображения для шага ${step.step}:`, error.message)
+          retries--
           if (retries === 0) {
-            throw error;
+            throw error
           }
         }
       }
 
       if (output) {
-        const imagePath = output;
-        console.log(imagePath, "imagePath");
+        const imagePath = output
+        console.log(imagePath, "imagePath")
         // const text = step.details[language];
         // console.log(text, "text");
-        console.log(step, "step");
+        console.log(step, "step")
         try {
           // const processedImage = await addTextOnImage({ imagePath, text, step: step.step });
 
@@ -663,23 +663,23 @@ export async function generateImagesForNeuroBroker(steps: Step[], language: "en"
           //   imagesWithText.push({ imagePath: processedImage.outputPath, text });
           //   console.log(`Изображение успешно обработано и сохранено для шага ${step.step}`);
           // }
-          const outputFilePath = path.join(__dirname, `../images/output_step_${step.step}.png`);
-          console.log(outputFilePath, "outputFilePath");
-          const localImagePath = await downloadImage(imagePath, outputFilePath);
+          const outputFilePath = path.join(__dirname, `../images/output_step_${step.step}.png`)
+          console.log(outputFilePath, "outputFilePath")
+          const localImagePath = await downloadImage(imagePath, outputFilePath)
 
           // Добавляем локальный путь к изображению в массив
-          imagesWithText.push({ imagePath: localImagePath, text: "" }); // Оставьте текст пустым или удалите его
+          imagesWithText.push({ imagePath: localImagePath, text: "" }) // Оставьте текст пустым или удалите его
 
-          console.log(`Изображение успешно обработано и сохранено для шага ${step.step}`);
+          console.log(`Изображение успешно обработано и сохранено для шага ${step.step}`)
         } catch (error: any) {
-          console.error(`шибка при обработке изображения для шага ${step.step}:`, error.message);
-          throw error; // Перебрасываем ошибку, чтобы использовать запасное изображение
+          console.error(`шибка при обработке изображения для шага ${step.step}:`, error.message)
+          throw error // Перебрасываем ошибку, чтобы использовать запасное изображение
         }
       } else {
-        throw new Error(`Не удалось сгенерировать изображение для шага ${step.step}`);
+        throw new Error(`Не удалось сгенерировать изображение для шага ${step.step}`)
       }
     } catch (error: any) {
-      console.error(`Ошибка при работе с шагом ${step.step}:`, error.message);
+      console.error(`Ошибка при работе с шагом ${step.step}:`, error.message)
       // Используем запасное изображение только если не удалось сгенерировать или обработать изображение
       // const fallbackImagePath = path.join(process.cwd(), "src/assets/fallback-image.jpg");
       // const text = `${step.details}`;
@@ -695,19 +695,19 @@ export async function generateImagesForNeuroBroker(steps: Step[], language: "en"
     }
   }
 
-  console.log(`Генерация изображений завершена. Всего изображений: ${imagesWithText.length}`);
-  return imagesWithText;
+  console.log(`Генерация изображений завершена. Всего изображений: ${imagesWithText.length}`)
+  return imagesWithText
 }
 
 export async function generateImageNeuroBroker(prompt: string) {
-  const imagesWithText: { imagePath: string; text: string }[] = [];
-  console.log(imagesWithText, "imagesWithText");
-  console.log("Начинаем генерацию изображений для медитации");
+  const imagesWithText: { imagePath: string; text: string }[] = []
+  console.log(imagesWithText, "imagesWithText")
+  console.log("Начинаем генерацию изображений для медитации")
 
   try {
-    const model = "ghashtag/neuro_broker:7abc7b18d0ef212b979eebeb46577d3192c6280c88d876c52ba5a2300f9283a0";
+    const model = "ghashtag/neuro_broker:7abc7b18d0ef212b979eebeb46577d3192c6280c88d876c52ba5a2300f9283a0"
 
-    console.log(model, "model");
+    console.log(model, "model")
     const input = {
       prompt,
       model: "dev",
@@ -720,33 +720,33 @@ export async function generateImageNeuroBroker(prompt: string) {
       prompt_strength: 0.8,
       extra_lora_scale: 1,
       num_inference_steps: 28,
-    };
-    console.log(input, "input");
+    }
+    console.log(input, "input")
 
-    let retries = 11;
-    let output;
+    let retries = 11
+    let output
 
     while (retries > 0) {
       try {
-        console.log(`Попытка генерации изображения (осталось попыток: ${retries})`);
-        output = await replicate.run(model, { input });
-        console.log(output, "✅ выход output");
+        console.log(`Попытка генерации изображения (осталось попыток: ${retries})`)
+        output = await replicate.run(model, { input })
+        console.log(output, "✅ выход output")
         if (output && output[0]) {
-          console.log(`Изображение успешно сгенерировано`);
-          break;
+          console.log(`Изображение успешно сгенерировано`)
+          break
         }
       } catch (error: any) {
-        console.error(`Ошибка при генерации изображения:`, error.message);
-        retries--;
+        console.error(`Ошибка при генерации изображения:`, error.message)
+        retries--
         if (retries === 0) {
-          throw error;
+          throw error
         }
       }
     }
 
     if (output) {
-      const imagePath = output;
-      console.log(imagePath, "imagePath");
+      const imagePath = output
+      console.log(imagePath, "imagePath")
       try {
         // const processedImage = await addTextOnImage({ imagePath, text, step: step.step });
 
@@ -754,28 +754,28 @@ export async function generateImageNeuroBroker(prompt: string) {
         //   imagesWithText.push({ imagePath: processedImage.outputPath, text });
         //   console.log(`Изображение успешно обработано и сохранено для шага ${step.step}`);
         // }
-        const outputFilePath = path.join(__dirname, `../images/output_step_${uuid()}.png`);
-        console.log(outputFilePath, "outputFilePath");
-        const localImagePath = await downloadImage(imagePath, outputFilePath);
+        const outputFilePath = path.join(__dirname, `../images/output_step_${uuid()}.png`)
+        console.log(outputFilePath, "outputFilePath")
+        const localImagePath = await downloadImage(imagePath, outputFilePath)
 
         // Добавляем локальный путь к изображению в массив
-        imagesWithText.push({ imagePath: localImagePath, text: "" }); // Оставьте текст пустым или удалите его
+        imagesWithText.push({ imagePath: localImagePath, text: "" }) // Оставьте текст пустым или удалите его
 
-        console.log(`Изображение успешно обработано`);
+        console.log(`Изображение успешно обработано`)
       } catch (error: any) {
-        console.error(`шибка при обработке изображения:`, error.message);
-        throw error; // Перебрасываем ошибку, чтобы использовать запасное изображение
+        console.error(`шибка при обработке изображения:`, error.message)
+        throw error // Перебрасываем ошибку, чтобы использовать запасное изображение
       }
     } else {
-      throw new Error(`Не удалось сгенерировать изображения}`);
+      throw new Error(`Не удалось сгенерировать изображения}`)
     }
   } catch (error: any) {
-    console.error(`Ошибка при работе:`, error.message);
-    throw error;
+    console.error(`Ошибка при работе:`, error.message)
+    throw error
   }
 
-  console.log(`Генерация изображений завершена`);
-  return imagesWithText;
+  console.log(`Генерация изображений завершена`)
+  return imagesWithText
 }
 
 // export async function generateImagesForMeditation(steps: Step[]) {
@@ -894,19 +894,19 @@ export async function getSlides({ prompt, scenesCount = 3, isDescription = false
       ],
       temperature: 0.7,
       response_format: { type: "json_object" },
-    });
-    console.log(completion, "completion");
+    })
+    console.log(completion, "completion")
 
-    const content = completion.choices[0].message.content;
+    const content = completion.choices[0].message.content
     if (content === null) {
-      throw new Error("Received null content from OpenAI");
+      throw new Error("Received null content from OpenAI")
     }
 
-    console.log(content);
-    return JSON.parse(content);
+    console.log(content)
+    return JSON.parse(content)
   } catch (error) {
-    console.error("Error:", error);
-    throw error; // Перебрасываем ошибку, чтобы она могла быть обработана выше
+    console.error("Error:", error)
+    throw error // Перебрасываем ошибку, чтобы она могла быть обработана выше
   }
 }
 
@@ -939,19 +939,19 @@ export async function getSubtitles(prompt: string, videoDuration: number) {
       ],
       temperature: 0.7,
       response_format: { type: "json_object" },
-    });
-    console.log(completion, "completion");
+    })
+    console.log(completion, "completion")
 
-    const content = completion.choices[0].message.content;
+    const content = completion.choices[0].message.content
     if (content === null) {
-      throw new Error("Received null content from OpenAI");
+      throw new Error("Received null content from OpenAI")
     }
 
-    console.log(content);
-    return JSON.parse(content);
+    console.log(content)
+    return JSON.parse(content)
   } catch (error) {
-    console.error("Error:", error);
-    throw error; // Перебрасываем ошибку, чтобы она могла быть обработана выше
+    console.error("Error:", error)
+    throw error // Перебрасываем ошибку, чтобы она могла быть обработана выше
   }
 }
 
@@ -971,19 +971,19 @@ export async function getSellVillaSteps({ prompt, location, type }: { prompt: st
       ],
       temperature: 0.9,
       response_format: { type: "json_object" },
-    });
-    console.log(completion, "completion");
+    })
+    console.log(completion, "completion")
 
-    const content = completion.choices[0].message.content;
+    const content = completion.choices[0].message.content
     if (content === null) {
-      throw new Error("Received null content from OpenAI");
+      throw new Error("Received null content from OpenAI")
     }
 
-    console.log(content);
-    return JSON.parse(content);
+    console.log(content)
+    return JSON.parse(content)
   } catch (error) {
-    console.error("Error:", error);
-    throw error; // Перебрасываем ошибку, чтобы она могла быть обработана выше
+    console.error("Error:", error)
+    throw error // Перебрасываем ошибку, чтобы она могла быть обработана выше
   }
 }
 
@@ -1003,24 +1003,24 @@ export async function getMeditationSteps({ prompt }: { prompt: string }) {
       ],
       temperature: 0.7,
       response_format: { type: "json_object" },
-    });
-    console.log(completion, "completion");
+    })
+    console.log(completion, "completion")
 
-    const content = completion.choices[0].message.content;
+    const content = completion.choices[0].message.content
     if (content === null) {
-      throw new Error("Received null content from OpenAI");
+      throw new Error("Received null content from OpenAI")
     }
 
-    console.log(content);
-    return JSON.parse(content);
+    console.log(content)
+    return JSON.parse(content)
   } catch (error) {
-    console.error("Error:", error);
-    throw error; // Перебрасываем ошибку, чтобы она могла быть обработана выше
+    console.error("Error:", error)
+    throw error // Перебрасываем ошибку, чтобы она могла быть обработана выше
   }
 }
 
 if (!process.env.OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY is not set");
+  throw new Error("OPENAI_API_KEY is not set")
 }
 
 export async function translateText(text: string, targetLang: string): Promise<string> {
@@ -1041,18 +1041,18 @@ export async function translateText(text: string, targetLang: string): Promise<s
         },
       ],
       temperature: 0.3,
-    });
+    })
 
-    const translatedText = completion.choices[0].message.content;
+    const translatedText = completion.choices[0].message.content
     // console.log(translatedText, "translatedText");
     if (translatedText === null) {
-      throw new Error("Received null content from OpenAI");
+      throw new Error("Received null content from OpenAI")
     }
 
-    return translatedText;
+    return translatedText
   } catch (error) {
-    console.error("Error in translation:", error);
-    throw error;
+    console.error("Error in translation:", error)
+    throw error
   }
 }
 
@@ -1060,22 +1060,22 @@ function escapeXml(unsafe: string): string {
   return unsafe.replace(/[<>&'"]/g, function (c) {
     switch (c) {
       case "<":
-        return "&lt;";
+        return "&lt;"
       case ">":
-        return "&gt;";
+        return "&gt;"
       case "&":
-        return "&amp;";
+        return "&amp;"
       case "'":
-        return "&apos;";
+        return "&apos;"
       case '"':
-        return "&quot;";
+        return "&quot;"
     }
-    return c;
-  });
+    return c
+  })
 }
 
 export const generateVoice = async (text: string, voiceId: string) => {
-  if (!process.env.SYNCLABS_API_KEY) throw new Error("SYNCLABS_API_KEY is not set");
+  if (!process.env.SYNCLABS_API_KEY) throw new Error("SYNCLABS_API_KEY is not set")
   try {
     const response = await axios.post(
       "https://api.synclabs.so/speak",
@@ -1091,26 +1091,26 @@ export const generateVoice = async (text: string, voiceId: string) => {
           "x-api-key": process.env.SYNCLABS_API_KEY,
         },
       },
-    );
+    )
 
     if (response.status !== 201) {
-      throw new Error("Ошибка при генерации голоса");
+      throw new Error("Ошибка при генерации голоса")
     }
 
-    return response.data;
+    return response.data
   } catch (error) {
-    console.error(error);
-    throw new Error("Ошибка при генерации голоса");
+    console.error(error)
+    throw new Error("Ошибка при генерации голоса")
   }
-};
+}
 
 export const generateImage = async (prompt: string, model_type: string, telegram_id: string, ctx: MyContext, reference?: string) => {
   try {
-    await incrementGeneratedImages(telegram_id);
-    console.log(prompt, "prompt");
+    await incrementGeneratedImages(telegram_id)
+    console.log(prompt, "prompt")
 
-    const prompt_id = await savePrompt(prompt, model_type);
-    const aspect_ratio = await getAspectRatio(telegram_id);
+    const prompt_id = await savePrompt(prompt, model_type)
+    const aspect_ratio = await getAspectRatio(telegram_id)
     const output = await replicate.run(models[model_type].key, {
       input: {
         prompt: `${models[model_type].word} ${prompt}`,
@@ -1126,29 +1126,29 @@ export const generateImage = async (prompt: string, model_type: string, telegram
         extra_lora_scale: 1,
         num_inference_steps: 28,
       },
-    });
-    console.log(output);
-    return { image: output[0], prompt_id: prompt_id };
+    })
+    console.log(output)
+    return { image: output[0], prompt_id: prompt_id }
   } catch (error) {
-    console.error(error);
-    await pulse(ctx, "", `${prompt}\n\nОшибка при генерации изображения: ${error}`, `/${model_type}`);
-    throw new Error("Ошибка при генерации изображения");
+    console.error(error)
+    await pulse(ctx, "", `${prompt}\n\nОшибка при генерации изображения: ${error}`, `/${model_type}`)
+    throw new Error("Ошибка при генерации изображения")
   }
-};
+}
 
 export const pulse = async (ctx: MyContext, image: string, prompt: string, command: string) => {
   try {
-    if (process.env.NODE_ENV === "development") return;
-    const truncatedPrompt = prompt.length > 800 ? prompt.slice(0, 800) : prompt;
+    if (process.env.NODE_ENV === "development") return
+    const truncatedPrompt = prompt.length > 800 ? prompt.slice(0, 800) : prompt
     const caption = `@${ctx.from?.username || "Пользователь без username"} Telegram ID: ${
       ctx.from?.id
-    } сгенерировал изображение с промптом: ${truncatedPrompt} \n\n Команда: ${command}`;
-    await bot.api.sendPhoto("-4166575919", image, { caption });
+    } сгенерировал изображение с промптом: ${truncatedPrompt} \n\n Команда: ${command}`
+    await bot.api.sendPhoto("-4166575919", image, { caption })
   } catch (error) {
-    console.error(error);
-    throw new Error("Ошибка при отправке пульса");
+    console.error(error)
+    throw new Error("Ошибка при отправке пульса")
   }
-};
+}
 
 export const upgradePrompt = async (prompt: string) => {
   const completion = await openai.chat.completions.create({
@@ -1165,49 +1165,49 @@ export const upgradePrompt = async (prompt: string) => {
     ],
     temperature: 0.7,
     max_tokens: 1000,
-  });
+  })
 
-  return completion.choices[0].message.content;
-};
+  return completion.choices[0].message.content
+}
 
 export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, next) => {
-  const username = ctx.from?.username || "";
-  const telegram_id = ctx.from?.id;
+  const username = ctx.from?.username || ""
+  const telegram_id = ctx.from?.id
 
   if (telegram_id) {
     // Ваша логика здесь
-    console.log(username, telegram_id, "username, telegram_id");
-    await createUser(username, telegram_id.toString());
+    console.log(username, telegram_id, "username, telegram_id")
+    await createUser(username, telegram_id.toString())
 
     // Проверка наличия инвайтера
-    const { data: user, error } = await supabase.from("users").select("inviter").eq("telegram_id", telegram_id).maybeSingle();
+    const { data: user, error } = await supabase.from("users").select("inviter").eq("telegram_id", telegram_id).maybeSingle()
 
     if (error) {
-      console.error(`Ошибка при проверке инвайтера: ${error.message}`);
-      throw new Error(`Ошибка при проверке инвайтера: ${error.message}`);
+      console.error(`Ошибка при проверке инвайтера: ${error.message}`)
+      throw new Error(`Ошибка при проверке инвайтера: ${error.message}`)
     }
 
     if (!user?.inviter) {
-      await ctx.conversation.enter("inviterConversation");
-      return;
+      await ctx.conversation.enter("inviterConversation")
+      return
     }
   }
 
   // Продолжаем выполнение следующих промежуточных обработчиков
-  await next();
-};
+  await next()
+}
 
 export async function createSlideshow(images: string[], audioPath: string, outputPath: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    const command = ffmpeg();
+    const command = ffmpeg()
 
     images.forEach((image, index) => {
-      console.log(`Adding image ${index + 1}: ${image}`);
-      command.input(image).loop(1);
-    });
+      console.log(`Adding image ${index + 1}: ${image}`)
+      command.input(image).loop(1)
+    })
 
     // Добавляем аудио файл
-    command.input(audioPath);
+    command.input(audioPath)
 
     command
       .outputOptions("-map", `${images.length}:a`) // Мапим аудио из последнего входного файла
@@ -1216,28 +1216,28 @@ export async function createSlideshow(images: string[], audioPath: string, outpu
       .outputOptions("-r", "25")
       .output(outputPath)
       .on("start", (commandLine) => {
-        console.log("FFmpeg process started:", commandLine);
+        console.log("FFmpeg process started:", commandLine)
       })
       .on("progress", (progress) => {
-        console.log("Processing: " + JSON.stringify(progress) + progress.percent + "% done");
+        console.log("Processing: " + JSON.stringify(progress) + progress.percent + "% done")
       })
       .on("end", () => {
-        console.log("FFmpeg process completed");
-        resolve(outputPath);
+        console.log("FFmpeg process completed")
+        resolve(outputPath)
       })
       .on("error", (err) => {
-        console.error("FFmpeg error:", err);
-        reject(err);
+        console.error("FFmpeg error:", err)
+        reject(err)
       })
-      .run();
-  });
+      .run()
+  })
 }
 
 export async function mergeAudioFiles(audioStream1: string, audioStream2: string, outputFile: string): Promise<void> {
-  const tempFile1 = path.join(__dirname, audioStream1);
-  console.log(tempFile1, "tempFile1");
-  const tempFile2 = path.join(__dirname, audioStream2);
-  console.log(tempFile2, "tempFile2");
+  const tempFile1 = path.join(__dirname, audioStream1)
+  console.log(tempFile1, "tempFile1")
+  const tempFile2 = path.join(__dirname, audioStream2)
+  console.log(tempFile2, "tempFile2")
   return new Promise((resolve, reject) => {
     ffmpeg()
       .input(tempFile1)
@@ -1257,8 +1257,8 @@ export async function mergeAudioFiles(audioStream1: string, audioStream2: string
       ])
       .on("end", () => resolve())
       .on("error", (err) => reject(err))
-      .save(outputFile);
-  });
+      .save(outputFile)
+  })
 }
 
 export const createAudioFileFromText = async ({ text, voice_id }: { text: string; voice_id: string }): Promise<string> => {
@@ -1268,57 +1268,57 @@ export const createAudioFileFromText = async ({ text, voice_id }: { text: string
         voice: voice_id,
         model_id: "eleven_turbo_v2_5",
         text,
-      });
-      const fileName = `../audio/ledov/${uuid()}.mp3`;
-      const tempFile1 = path.join(__dirname, fileName);
-      console.log(tempFile1, "tempFile1");
-      const fileStream = createWriteStream(tempFile1);
+      })
+      const fileName = `../audio/ledov/${uuid()}.mp3`
+      const tempFile1 = path.join(__dirname, fileName)
+      console.log(tempFile1, "tempFile1")
+      const fileStream = createWriteStream(tempFile1)
 
-      audio.pipe(fileStream);
-      fileStream.on("finish", () => resolve(fileName)); // Resolve with the fileName
-      fileStream.on("error", reject);
+      audio.pipe(fileStream)
+      fileStream.on("finish", () => resolve(fileName)) // Resolve with the fileName
+      fileStream.on("error", reject)
     } catch (error) {
-      reject(error);
+      reject(error)
     }
-  });
-};
+  })
+}
 
 export const createRender = async ({ template_id, modifications }: { template_id: string; modifications: Record<string, string> }) => {
   try {
     const source = new Creatomate.Source({
       outputFormat: "mp4",
       elements: [new Creatomate.Video({ source: modifications["Video-1"] })],
-    });
+    })
 
     const options = {
       templateId: template_id,
       modifications: modifications,
-    };
+    }
 
-    const renders = await client.render(options);
-    console.log("Completed:", renders);
+    const renders = await client.render(options)
+    console.log("Completed:", renders)
 
-    return renders;
+    return renders
   } catch (error) {
-    console.error("Error creating render:", error);
+    console.error("Error creating render:", error)
   }
-};
+}
 
 export function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export async function deleteFileFromSupabase(bucketName: string, fileName: string) {
   try {
-    const { data, error } = await supabase.storage.from(bucketName).remove([fileName]);
+    const { data, error } = await supabase.storage.from(bucketName).remove([fileName])
 
     if (error) {
-      console.error("Ошибка при удалении файла из Supabase:", error.message);
+      console.error("Ошибка при удалении файла из Supabase:", error.message)
     } else {
-      console.log("Файл успешно удален из Supabase:", data);
+      console.log("Файл успешно удален из Supabase:", data)
     }
   } catch (error: any) {
-    console.error("Ошибка при удалении файла из Supabase:", error.message);
+    console.error("Ошибка при удалении файла из Supabase:", error.message)
   }
 }
 
@@ -1326,11 +1326,11 @@ export async function getAudioDuration(filePath: string): Promise<number> {
   return new Promise((resolve, reject) => {
     ffmpeg.ffprobe(filePath, (err, metadata) => {
       if (err) {
-        reject(err);
+        reject(err)
       } else {
-        const duration = metadata.format.duration || 0;
-        resolve(duration);
+        const duration = metadata.format.duration || 0
+        resolve(duration)
       }
-    });
-  });
+    })
+  })
 }

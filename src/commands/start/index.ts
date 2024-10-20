@@ -1,9 +1,9 @@
-import { InputFile } from "grammy";
-import { MyContext } from "../../utils/types";
+import { InputFile } from "grammy"
+import { MyContext } from "../../utils/types"
 
 async function start(ctx: MyContext) {
-  const photoPath = "assets/neurocoder/neurocoder.png";
-  const isRu = ctx.from?.language_code === "ru";
+  const photoPath = "assets/neurocoder/neurocoder.png"
+  const isRu = ctx.from?.language_code === "ru"
 
   const captionRu =
     "👋 Привет!\n" +
@@ -14,7 +14,7 @@ async function start(ctx: MyContext) {
     "- Получить информацию о текущих акциях и скидках\n" +
     "- Задать вопрос о создании ботов\n\n" +
     "Просто выберите нужный пункт или напишите свой вопрос, и я с радостью помогу вам! 🤖\n\n" +
-    '<a href="https://www.instagram.com/neuro_coder">Instagram</a> | <a href="https://www.youtube.com/@neuro_coder_ai_bot">YouTube</a> | <a href="https://vk.com/neuro_coder">VK</a> | <a href="https://t.me/neuro_coder_ai">Channel</a> | <a href="http://t.me/neuro_coder_group">Group</a>';
+    '<a href="https://www.instagram.com/neuro_coder">Instagram</a> | <a href="https://www.youtube.com/@neuro_coder_ai_bot">YouTube</a> | <a href="https://vk.com/neuro_coder">VK</a> | <a href="https://t.me/neuro_coder_ai">Channel</a> | <a href="http://t.me/neuro_coder_group">Group</a>'
 
   const captionEn =
     "👋 Hello!\n" +
@@ -25,13 +25,13 @@ async function start(ctx: MyContext) {
     "- Get information about current promotions and discounts\n" +
     "- Ask a question about creating bots\n\n" +
     "Just choose the desired item or write your question, and I will be happy to help you! 🤖\n\n" +
-    '<a href="https://www.instagram.com/neuro_coder">Instagram</a> | <a href="https://www.youtube.com/@neuro_coder_ai_bot">YouTube</a> | <a href="https://vk.com/neuro_coder">VK</a> | <a href="https://t.me/neuro_coder_ai">Channel</a> | <a href="http://t.me/neuro_coder_group">Group</a>';
+    '<a href="https://www.instagram.com/neuro_coder">Instagram</a> | <a href="https://www.youtube.com/@neuro_coder_ai_bot">YouTube</a> | <a href="https://vk.com/neuro_coder">VK</a> | <a href="https://t.me/neuro_coder_ai">Channel</a> | <a href="http://t.me/neuro_coder_group">Group</a>'
 
   await ctx.replyWithPhoto(new InputFile(photoPath), {
     caption: isRu ? captionRu : captionEn,
     parse_mode: "HTML",
     // reply_markup: keyboard,
-  });
+  })
 }
 
-export { start };
+export { start }

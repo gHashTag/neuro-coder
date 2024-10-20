@@ -1,21 +1,21 @@
-require("../src/index");
+require("../src/index")
 
-import express from "express";
-import { webhookCallback } from "grammy";
+import express from "express"
+import { webhookCallback } from "grammy"
 
-import bot from "../src/core/bot";
+import bot from "../src/core/bot"
 
-const app = express();
+const app = express()
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000
 
-console.log(port, 'port');
+console.log(port, "port")
 
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+  console.log(`Server is running on port ${port}`)
+})
 
-app.use(express.json());
-app.use(`/api/index`, webhookCallback(bot, "express"));
+app.use(express.json())
+app.use(`/api/index`, webhookCallback(bot, "express"))
 
-export default app;
+export default app

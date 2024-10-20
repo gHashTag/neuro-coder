@@ -1,5 +1,5 @@
-import { Context, InputFile } from "grammy";
-import { createSlideshow as createSlideshowVideo, SlideshowOptions } from "slideshow-video";
+import { Context, InputFile } from "grammy"
+import { createSlideshow as createSlideshowVideo, SlideshowOptions } from "slideshow-video"
 
 import {
   createAudioFileFromText,
@@ -13,12 +13,12 @@ import {
   getSellVillaSteps,
   mergeAudioFiles,
   translateText,
-} from "../helpers";
-import { Step } from "src/utils/types";
-import { InputMediaPhoto } from "grammy/types";
-import { getVideoUrl, uploadVideo } from "../../core/supabase/video";
-import path from "path";
-import fs from "fs";
+} from "../helpers"
+import { Step } from "src/utils/types"
+import { InputMediaPhoto } from "grammy/types"
+import { getVideoUrl, uploadVideo } from "../../core/supabase/video"
+import path from "path"
+import fs from "fs"
 import {
   bathroomDescription,
   bedroomDescription,
@@ -32,21 +32,21 @@ import {
   stepsData,
   triggerWord,
   type,
-} from "./mock";
-import { setHistory } from "../../core/supabase/ai";
+} from "./mock"
+import { setHistory } from "../../core/supabase/ai"
 
 interface SlideshowResponse {
-  filePath: string;
-  numberTrack: number;
+  filePath: string
+  numberTrack: number
 }
 
 const neuro_broker = async (ctx: Context): Promise<void> => {
   try {
     // Отправляем уведомление пользователю, что бот печатает
-    await ctx.replyWithChatAction("typing");
+    await ctx.replyWithChatAction("typing")
 
     // Проверяем, есть ли информация о пользователе
-    if (!ctx.from) throw new Error("User not found");
+    if (!ctx.from) throw new Error("User not found")
 
     // // Получаем шаги медитации
     const sellVillaSteps = await getSellVillaSteps({
@@ -94,9 +94,9 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
             Ensure that the steps are coherent and flow logically from one to the next, creating an engaging narrative for the video.`,
       location,
       type,
-    });
+    })
 
-    console.log(sellVillaSteps, "sellVillaSteps");
+    console.log(sellVillaSteps, "sellVillaSteps")
 
     const stepsData: Step[] = await Promise.all(
       sellVillaSteps.activities[0].steps.map(async (step: { step: string; details: string }, index: number) => ({
@@ -114,41 +114,40 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
           ar: await translateText(`${sellVillaSteps.activities[0].description} اكتب الكلمة ${triggerWord} واحصل على وصول مباشر إلى المطور.`, "ar"),
         },
       })),
-    );
-    console.log(JSON.stringify(stepsData, null, 2), "stepsData");
+    )
+    console.log(JSON.stringify(stepsData, null, 2), "stepsData")
 
-    const englishImages = await generateImagesForNeuroBroker(stepsData, "en", false);
-    console.log(englishImages, "englishImages");
+    const englishImages = await generateImagesForNeuroBroker(stepsData, "en", false)
+    console.log(englishImages, "englishImages")
 
-    const ownerImage = await generateImageNeuroBroker(
-      "Photograph, man, model pose, minimalist, beard, profound gaze, solid white environment, studio lights setting",
-    );
-    console.log(ownerImage, "ownerImage");
+    // const ownerImage = await generateImageNeuroBroker(
+    //   "Photograph, man, model pose, minimalist, beard, profound gaze, solid white environment, studio lights setting",
+    // );
 
-    const newArray = [...englishImages];
+    const newArray = [...englishImages]
 
     const englishMediaGroup: InputMediaPhoto[] = newArray.map((image) => ({
       type: "photo",
       media: new InputFile(image.imagePath),
       caption: image.text,
-    }));
+    }))
     // Отправляем группу изображений пользователю
-    await ctx.replyWithMediaGroup(englishMediaGroup);
+    await ctx.replyWithMediaGroup(englishMediaGroup)
 
-    const images = newArray.map((img) => img.imagePath);
+    const images = newArray.map((img) => img.imagePath)
 
-    const languages = ["en", "ru", "zh", "ar"];
+    const languages = ["en", "ru", "zh", "ar"]
     for (const lang of languages) {
-      const voiceOver = stepsData[0].voiceOver[lang];
-      const audioFile1 = `../audio/audio${1}.mp3`;
-      const audioStream2 = await createAudioFileFromText({ text: voiceOver, voice_id: "PVKVligmzACf89A0Cegd" });
-      const audioPath = path.join(__dirname, `../${audioStream2}`);
-      const audioDuration = await getAudioDuration(audioPath);
-      const numberOfImages = newArray.length;
-      const imageDuration = audioDuration / numberOfImages;
-      const mergedAudioFile = `src/audio/mergedAudioFile_${lang}.mp3`;
+      const voiceOver = stepsData[0].voiceOver[lang]
+      const audioFile1 = `../audio/audio${1}.mp3`
+      const audioStream2 = await createAudioFileFromText({ text: voiceOver, voice_id: "PVKVligmzACf89A0Cegd" })
+      const audioPath = path.join(__dirname, `../${audioStream2}`)
+      const audioDuration = await getAudioDuration(audioPath)
+      const numberOfImages = newArray.length
+      const imageDuration = audioDuration / numberOfImages
+      const mergedAudioFile = `src/audio/mergedAudioFile_${lang}.mp3`
 
-      await mergeAudioFiles(audioFile1, audioStream2, mergedAudioFile);
+      await mergeAudioFiles(audioFile1, audioStream2, mergedAudioFile)
       const options: SlideshowOptions = {
         imageOptions: {
           imageDuration: imageDuration * 1000,
@@ -159,26 +158,26 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
         outputOptions: {
           outputDir: "src/videos",
         },
-      };
+      }
 
-      const videoOutput: Partial<SlideshowResponse> = await createSlideshowVideo(images, mergedAudioFile, options);
+      const videoOutput: Partial<SlideshowResponse> = await createSlideshowVideo(images, mergedAudioFile, options)
 
       try {
         if (videoOutput && videoOutput.filePath) {
-          console.log("File path:", videoOutput.filePath);
+          console.log("File path:", videoOutput.filePath)
 
-          if (!ctx.from) throw new Error("No user");
-          const fileName = `${ctx.from.id}_${Date.now()}.mp4`;
-          await uploadVideo(videoOutput.filePath, ctx.from.id.toString(), "neuro_broker", fileName);
-          const videoUrl = await getVideoUrl("neuro_broker", fileName);
+          if (!ctx.from) throw new Error("No user")
+          const fileName = `${ctx.from.id}_${Date.now()}.mp4`
+          await uploadVideo(videoOutput.filePath, ctx.from.id.toString(), "neuro_broker", fileName)
+          const videoUrl = await getVideoUrl("neuro_broker", fileName)
 
-          if (!videoUrl) throw new Error("No video url");
+          if (!videoUrl) throw new Error("No video url")
           if (lang !== "zh" && lang !== "ar") {
-            const render = await createRender({ template_id: "10f7cf9f-9c44-479b-ad65-ea8b9242ccb1", modifications: { "Video-1": videoUrl } });
-            console.log(render, "render");
+            const render = await createRender({ template_id: "10f7cf9f-9c44-479b-ad65-ea8b9242ccb1", modifications: { "Video-1": videoUrl } })
+            console.log(render, "render")
             await ctx.replyWithVideo(render[0].url, {
               caption: `Video ${lang.toUpperCase()} NeuroBroker`,
-            });
+            })
             await setHistory({
               brand: "neuro_broker",
               response: `Video ${lang.toUpperCase()} NeuroBroker`,
@@ -189,12 +188,12 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
               chat_id: ctx.from.id.toString(),
               lang: lang,
               trigger: triggerWord,
-            });
-            await deleteFileFromSupabase("neuro_broker", fileName);
+            })
+            await deleteFileFromSupabase("neuro_broker", fileName)
           } else {
             await ctx.replyWithVideo(new InputFile(videoOutput.filePath), {
               caption: `Video ${lang.toUpperCase()} NeuroBroker`,
-            });
+            })
             await setHistory({
               brand: "neuro_broker",
               response: `Video ${lang.toUpperCase()} NeuroBroker`,
@@ -205,54 +204,54 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
               chat_id: ctx.from.id.toString(),
               lang: lang,
               trigger: triggerWord,
-            });
+            })
           }
           // return;
         } else {
-          console.error("File path is undefined. Please check the input parameters and ensure the video was created successfully.");
+          console.error("File path is undefined. Please check the input parameters and ensure the video was created successfully.")
         }
       } catch (error) {
-        console.error("Error creating slideshow video:", error);
+        console.error("Error creating slideshow video:", error)
       } finally {
         // Путь к директории, содержимое которой нужно удалить
-        const directory = path.join(__dirname, "../../videos");
-        const audio = path.join(__dirname, `../../audio/ledov`);
+        const directory = path.join(__dirname, "../../videos")
+        const audio = path.join(__dirname, `../../audio/ledov`)
 
         // Проверяем, существует ли директория
         if (fs.existsSync(directory) && fs.existsSync(audio)) {
           // Читаем содержимое директории
-          const files = fs.readdirSync(directory);
-          const audioFiles = fs.readdirSync(audio);
+          const files = fs.readdirSync(directory)
+          const audioFiles = fs.readdirSync(audio)
 
           // Удаляем каждый файл и поддиректорию
           for (const file of files) {
-            const filePath = path.join(directory, file);
-            const stat = fs.lstatSync(filePath);
+            const filePath = path.join(directory, file)
+            const stat = fs.lstatSync(filePath)
 
             if (stat.isDirectory()) {
               // Если это директория, удаляем ее рекурсивно
-              fs.rmSync(filePath, { recursive: true, force: true });
+              fs.rmSync(filePath, { recursive: true, force: true })
             } else {
               // Если это файл, удаляем его
-              fs.unlinkSync(filePath);
+              fs.unlinkSync(filePath)
             }
           }
 
           for (const file of audioFiles) {
-            const filePath = path.join(audio, file);
-            fs.unlinkSync(filePath);
+            const filePath = path.join(audio, file)
+            fs.unlinkSync(filePath)
           }
 
-          console.log("Содержимое директории успешно удалено");
+          console.log("Содержимое директории успешно удалено")
         } else {
-          console.error("Директория не существует:", directory);
+          console.error("Директория не существует:", directory)
         }
       }
     }
   } catch (error) {
     // В случае ошибки, пробрасываем её дальше
-    throw error;
+    throw error
   }
-};
+}
 
-export default neuro_broker;
+export default neuro_broker

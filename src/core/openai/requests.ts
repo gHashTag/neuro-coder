@@ -1,7 +1,7 @@
-import { openai } from ".";
+import { openai } from "."
 
 export const answerAi = async (model: string, prompt: string, languageCode: string) => {
-  const systemPrompt = `Respond in the language: ${languageCode}`;
+  const systemPrompt = `Respond in the language: ${languageCode}`
   const response = await openai.chat.completions.create({
     model: model,
     messages: [
@@ -14,6 +14,6 @@ export const answerAi = async (model: string, prompt: string, languageCode: stri
         content: prompt,
       },
     ],
-  });
-  return response.choices[0].message.content;
-};
+  })
+  return response.choices[0].message.content
+}

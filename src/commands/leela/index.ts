@@ -1,21 +1,21 @@
-import { Context, InputFile } from "grammy";
+import { Context, InputFile } from "grammy"
 
-import ffmpeg from "fluent-ffmpeg";
-import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
-import { promises as fs } from "fs";
-import path from "path";
-import { createSlideshow, generateImagesForMeditation, getMeditationSteps } from "../helpers";
-import { InputMediaPhoto } from "grammy/types";
+import ffmpeg from "fluent-ffmpeg"
+import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
+import { promises as fs } from "fs"
+import path from "path"
+import { createSlideshow, generateImagesForMeditation, getMeditationSteps } from "../helpers"
+import { InputMediaPhoto } from "grammy/types"
 
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 
 const leela = async (ctx: Context): Promise<void> => {
   try {
     // Отправляем уведомление пользователю, что бот печатает
-    await ctx.replyWithChatAction("typing");
+    await ctx.replyWithChatAction("typing")
 
     // Проверяем, есть ли информация о пользователе
-    if (!ctx.from) throw new Error("User not found");
+    if (!ctx.from) throw new Error("User not found")
 
     // Получаем шаги медитации
     const meditationSteps = await getMeditationSteps({
@@ -49,54 +49,54 @@ const leela = async (ctx: Context): Promise<void> => {
               }
     
               Ensure that the steps are coherent and flow logically from one to the next, incorporating the Leela Chakra supplement naturally into the meditation process.`,
-    });
-    console.log(meditationSteps, "meditationSteps");
+    })
+    console.log(meditationSteps, "meditationSteps")
 
     // Генерируем изображения для шагов медитации
-    const images = await generateImagesForMeditation(meditationSteps.activities[0].steps, "en");
-    console.log(images, "images");
+    const images = await generateImagesForMeditation(meditationSteps.activities[0].steps, "en")
+    console.log(images, "images")
 
     // Проверяем, были ли сгенерированы изображения
-    if (images.length === 0) throw new Error("No images found");
+    if (images.length === 0) throw new Error("No images found")
 
     // Создаем группу медиа для отправки изображений
     const mediaGroup: InputMediaPhoto[] = images.map((image) => ({
       type: "photo",
       media: new InputFile(image.imagePath),
       caption: image.text,
-    }));
+    }))
 
     // Отправляем группу изображений пользователю
-    await ctx.replyWithMediaGroup(mediaGroup);
+    await ctx.replyWithMediaGroup(mediaGroup)
 
     // Получаем пути к изображениям
-    const imagePaths = images.map((img) => img.imagePath);
+    const imagePaths = images.map((img) => img.imagePath)
     // Определяем путь для выходного видеофайла
-    const outputPath = path.join(process.cwd(), "src", "images", "slideshow.mp4");
+    const outputPath = path.join(process.cwd(), "src", "images", "slideshow.mp4")
 
     // Создаем слайд-шоу из изображений
-    await createSlideshow(imagePaths, "src/audio/audio.mp3", outputPath);
+    await createSlideshow(imagePaths, "src/audio/audio.mp3", outputPath)
 
     // Ждем 1 секунду после создания слайд-шоу
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Отправляем видео пользователю
     await ctx.replyWithVideo(new InputFile(outputPath), {
       caption: "Video meditation",
-    });
+    })
 
     // Удаляем временные файлы
-    await fs.unlink(outputPath);
+    await fs.unlink(outputPath)
     for (const image of images) {
-      await fs.unlink(image.imagePath);
+      await fs.unlink(image.imagePath)
     }
   } catch (error) {
     // В случае ошибки, пробрасываем её дальше
-    throw error;
+    throw error
   }
-};
+}
 
-export default leela;
+export default leela
 // async function testSlideshow() {
 //   const imageDir = path.join(process.cwd(), "src", "images");
 //   const images = [

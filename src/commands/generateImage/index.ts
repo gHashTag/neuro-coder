@@ -1,14 +1,14 @@
-import { generateImage, pulse } from "../helpers";
-import { MyContext } from "../../utils/types";
-import { Conversation } from "@grammyjs/conversations";
-import { InlineKeyboard } from "grammy";
-import { getGeneratedImages } from "../../core/supabase/ai";
+import { generateImage, pulse } from "../helpers"
+import { MyContext } from "../../utils/types"
+import { Conversation } from "@grammyjs/conversations"
+import { InlineKeyboard } from "grammy"
+import { getGeneratedImages } from "../../core/supabase/ai"
 
 async function generateImageConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
-  const isRu = ctx.from?.language_code === "ru";
-  const keyboard = new InlineKeyboard().text(isRu ? "❌ Отменить генерацию" : "❌ Cancel generation", "cancel");
-  const model_type = ctx.message?.text?.slice(1);
-  console.log(model_type);
+  const isRu = ctx.from?.language_code === "ru"
+  const keyboard = new InlineKeyboard().text(isRu ? "❌ Отменить генерацию" : "❌ Cancel generation", "cancel")
+  const model_type = ctx.message?.text?.slice(1)
+  console.log(model_type)
   const greetingMessage = await ctx.reply(
     isRu
       ? "👋 Привет! Напишите промпт на английском для генерации изображения. Если вы хотите использовать какой-то референс, то прикрепите изображение к сообщению."
@@ -16,49 +16,55 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
     {
       reply_markup: keyboard,
     },
-  );
-  const { message, callbackQuery } = await conversation.wait();
-  const info = await getGeneratedImages(ctx.from?.id.toString() || "");
-  const { count, limit } = info;
+  )
+  const { message, callbackQuery } = await conversation.wait()
+  const info = await getGeneratedImages(ctx.from?.id.toString() || "")
+  const { count, limit } = info
 
   if (count >= limit) {
     await ctx.reply(
       isRu
         ? "⚠️ У вас не осталось использований. Пожалуйста, оплатите генерацию изображений."
         : "⚠️ You have no more uses left. Please pay for image generation.",
-    );
-    return;
+    )
+    return
   }
 
   if (callbackQuery?.data === "cancel") {
-    await ctx.api.deleteMessage(ctx.chat?.id || "", greetingMessage.message_id);
-    await ctx.reply(isRu ? "❌ Вы отменили генерацию изображения." : "❌ You canceled image generation.");
-    return;
+    await ctx.api.deleteMessage(ctx.chat?.id || "", greetingMessage.message_id)
+    await ctx.reply(isRu ? "❌ Вы отменили генерацию изображения." : "❌ You canceled image generation.")
+    return
   }
 
-  if (!message || !ctx.from?.id) return;
+  if (!message || !ctx.from?.id) return
 
-  const text = message.photo ? message.caption : message.text;
-  let file;
-  console.log(message.document);
+  const text = message.photo ? message.caption : message.text
+  let file
+  console.log(message.document)
   if (message.document) {
-    const referenceFileId = message.document.file_id;
-    file = await ctx.api.getFile(referenceFileId);
+    const referenceFileId = message.document.file_id
+    file = await ctx.api.getFile(referenceFileId)
   }
-  const fileUrl = message.document ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : "";
-  console.log(fileUrl);
-  const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация изображения началась..." : "⏳ Image generation started...");
-  const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, "https://shopsycdn.com/i/p/c3/13/c3139b3a395ca6a1f7b0bbb54495cefb_medium.jpg");
-  await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id);
-  await ctx.replyWithPhoto(image);
+  const fileUrl = message.document ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : ""
+  console.log(fileUrl)
+  const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация изображения началась..." : "⏳ Image generation started...")
+  const { image, prompt_id } = await generateImage(
+    text || "",
+    model_type || "",
+    ctx.from?.id.toString(),
+    ctx,
+    "https://shopsycdn.com/i/p/c3/13/c3139b3a395ca6a1f7b0bbb54495cefb_medium.jpg",
+  )
+  await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id)
+  await ctx.replyWithPhoto(image)
 
   // // Добавление кнопки "Повторить генерацию" после отправки изображения
   // const retryKeyboard = new InlineKeyboard().text("🔄 Повторить генерацию", "retry");
   // await ctx.reply("🔄 Вы можете повторить генерацию изображения.", { reply_markup: retryKeyboard });
 
-  await pulse(ctx, image, text || "", `/${model_type}`);
+  await pulse(ctx, image, text || "", `/${model_type}`)
   if (count < limit) {
-    await ctx.reply(isRu ? `ℹ️ У вас осталось ${limit - count} использований.` : `ℹ️ You have ${limit - count} uses left.`);
+    await ctx.reply(isRu ? `ℹ️ У вас осталось ${limit - count} использований.` : `ℹ️ You have ${limit - count} uses left.`)
     await ctx.reply(isRu ? `🤔 Сгенерировать еще?` : `🤔 Generate more?`, {
       reply_markup: {
         inline_keyboard: [
@@ -73,13 +79,13 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
           [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${prompt_id}` }],
         ],
       },
-    });
+    })
   } else if (count === limit) {
     await ctx.reply(
       isRu
         ? "⚠️ У вас не осталось использований. Пожалуйста, оплатите генерацию изображений."
         : "⚠️ You have no more uses left. Please pay for image generation.",
-    );
+    )
   }
 
   // Обработка нажатия кнопки "Повторить генерацию"
@@ -108,4 +114,4 @@ async function generateImageConversation(conversation: Conversation<MyContext>, 
   // }
 }
 
-export { generateImageConversation };
+export { generateImageConversation }

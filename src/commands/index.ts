@@ -1,12 +1,12 @@
-import { Composer } from "grammy";
-import { MyContext } from "../utils/types";
+import { Composer } from "grammy"
+import { MyContext } from "../utils/types"
 
-import circle from "./circle";
-import hello from "./hello";
-import clipmaker from "./clipmaker";
-import leela from "./leela";
+import circle from "./circle"
+import hello from "./hello"
+import clipmaker from "./clipmaker"
+import leela from "./leela"
 
-import neuro_broker from "./neuro_broker";
+import neuro_broker from "./neuro_broker"
 
 // import neurocoder_test from "./neurocoder/neurocoder_test";
 // import neurocoder01 from "./neurocoder/neurocoder01";
@@ -18,102 +18,102 @@ import neuro_broker from "./neuro_broker";
 // import melimi04 from "./melimi/melimi04";
 // import melimi05 from "./melimi/melimi05";
 // import melimi06 from "./melimi/melimi06";
-import { start } from "./start";
-import { model } from "./model";
+import { start } from "./start"
+import { model } from "./model"
 // import neurocoder02 from "./neurocoder/neurocoder02";
 // import neurocoder03 from "./neurocoder/neurocoder03";
 
-const composer = new Composer<MyContext>();
+const composer = new Composer<MyContext>()
 
-composer.command("start", start);
+composer.command("start", start)
 
-composer.command("hello", hello);
+composer.command("hello", hello)
 
-composer.command("clipmaker", clipmaker);
+composer.command("clipmaker", clipmaker)
 
-composer.command("circle", circle);
+composer.command("circle", circle)
 
-composer.command("leela", leela);
+composer.command("leela", leela)
 
-composer.command("neuro_broker", neuro_broker);
+composer.command("neuro_broker", neuro_broker)
 
 composer.command("imagesize", async (ctx) => {
-  await ctx.conversation.enter("imageSizeConversation");
-});
+  await ctx.conversation.enter("imageSizeConversation")
+})
 
 composer.command("playom", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("anatol777", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("anfi_vesna", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("vega_condominium", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("neuro_coder", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("yellowshoess", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("gimba", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("karin", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("svedovaya", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("evi", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("evii", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("kata", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("neuro_broker_00", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("neuro_broker_01", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("kirill_korolev", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
 composer.command("soul", async (ctx) => {
-  await ctx.conversation.enter("soulConversation");
-});
+  await ctx.conversation.enter("soulConversation")
+})
 
 composer.command("voice", async (ctx) => {
-  await ctx.conversation.enter("voiceConversation");
-});
+  await ctx.conversation.enter("voiceConversation")
+})
 
 // composer.command("get100", async (ctx) => {
 //   await ctx.conversation.enter("get100AnfiVesnaConversation");
 // });
 
-composer.command("model", model);
+composer.command("model", model)
 // composer.command("neurocoder01", neurocoder01);
 // composer.command("neurocoder02", neurocoder02);
 // composer.command("neurocoder03", neurocoder03);
@@ -130,7 +130,7 @@ composer.command("model", model);
 // composer.command("melimi06", melimi06);
 // composer.command("melimi_test", melimi_test);
 composer.command("melimi_cat", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation");
-});
+  await ctx.conversation.enter("generateImageConversation")
+})
 
-export default composer;
+export default composer
