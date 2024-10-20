@@ -186,5 +186,5 @@ export const diningRoomDescription = `
 export const location = 'Phuket, Thailand'
 
 export const description = `
-  Immerse yourself in a world of unrivaled luxury in this magnificent condominium on the picturesque island of ${location}. This unique property combines contemporary design and refined elegance, creating the perfect space to relax and enjoy life. Spacious interiors, made using high-quality materials, open up to the endless sea views, giving a sense of peace and harmony. Every detail in this condominium has been thought out to ensure maximum comfort and satisfy the most discerning tastes. Relax by the pool overlooking the ocean or enjoy the evening breeze on your private terrace.
+  Write your sales text here
 `;

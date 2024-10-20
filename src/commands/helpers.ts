@@ -958,18 +958,18 @@ export async function getSubtitles(prompt: string, videoDuration: number) {
 export async function getSellVillaSteps({ prompt, location, type }: { prompt: string; location: string; type: string }) {
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content: `You are a helpful assistant that creates steps for selling a ${type} in a tourist area in location: ${location}.`,
+          content: `You are a helpful assistant that creates steps for selling a ${type} in a tourist area in location: ${location}. Create a creative sales description every time`,
         },
         {
           role: "user",
           content: prompt,
         },
       ],
-      temperature: 0.7,
+      temperature: 0.9,
       response_format: { type: "json_object" },
     });
     console.log(completion, "completion");
@@ -990,7 +990,7 @@ export async function getSellVillaSteps({ prompt, location, type }: { prompt: st
 export async function getMeditationSteps({ prompt }: { prompt: string }) {
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -1261,11 +1261,11 @@ export async function mergeAudioFiles(audioStream1: string, audioStream2: string
   });
 }
 
-export const createAudioFileFromText = async (text: string): Promise<string> => {
+export const createAudioFileFromText = async ({text, voice_id}: {text: string, voice_id: string}): Promise<string> => {
   return new Promise<string>(async (resolve, reject) => {
     try {
       const audio = await elevenlabs.generate({
-        voice: "UXy6TRxPugHFxyZvJBB5",
+        voice: voice_id,
         model_id: "eleven_turbo_v2_5",
         text,
       });

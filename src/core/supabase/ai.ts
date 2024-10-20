@@ -43,7 +43,9 @@ export const getHistory = async (brand: string, command: string, type: string) =
   return data;
 };
 
-export const setHistory = async (brand: string, response: string, video_url: string, command: string, type: string, voice_id = "", chat_id = "") => {
+type setHistoryProps = { brand: string, response: string, video_url: string, command: string, type: string, voice_id: string, chat_id: string, lang: string, trigger: string }
+
+export const setHistory = async ({ brand, response, video_url, command, type, voice_id = "", chat_id = "", lang = "", trigger }: setHistoryProps) => {
   // Удаление символов # и *
   const sanitizeResponse = (text: string) => {
     return text.replace(/[#*]/g, "");
@@ -53,12 +55,14 @@ export const setHistory = async (brand: string, response: string, video_url: str
 
   const { error } = await supabase.from("clips").insert({
     brand: brand,
-    response: sanitizedResponse, // Используем очищенный текст
+    response: sanitizedResponse,
     video_url: video_url,
     command: command,
     type: type,
     voice_id: voice_id,
     chat_id: chat_id,
+    lang: lang,
+    trigger,
   });
 
   if (error) {
