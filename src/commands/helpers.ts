@@ -603,7 +603,7 @@ async function downloadImage(url: string, outputPath: string): Promise<string> {
   }
 }
 
-export async function generateImagesForNeuroBroker(steps: Step[], language: "en" | "zh" | "ru", isModelFlux: boolean = false) {
+export async function generateImagesForNeuroBroker(steps: Step[], language: "en" | "zh" | "ru", isModelFlux = false) {
   const imagesWithText: { imagePath: string; text: string }[] = [];
   console.log(imagesWithText, "imagesWithText");
   console.log("Начинаем генерацию изображений для медитации");
@@ -1235,9 +1235,9 @@ export async function createSlideshow(images: string[], audioPath: string, outpu
 
 export async function mergeAudioFiles(audioStream1: string, audioStream2: string, outputFile: string): Promise<void> {
   const tempFile1 = path.join(__dirname, audioStream1);
-  console.log(tempFile1, 'tempFile1')
+  console.log(tempFile1, "tempFile1");
   const tempFile2 = path.join(__dirname, audioStream2);
-  console.log(tempFile2, 'tempFile2')
+  console.log(tempFile2, "tempFile2");
   return new Promise((resolve, reject) => {
     ffmpeg()
       .input(tempFile1)
@@ -1261,7 +1261,7 @@ export async function mergeAudioFiles(audioStream1: string, audioStream2: string
   });
 }
 
-export const createAudioFileFromText = async ({text, voice_id}: {text: string, voice_id: string}): Promise<string> => {
+export const createAudioFileFromText = async ({ text, voice_id }: { text: string; voice_id: string }): Promise<string> => {
   return new Promise<string>(async (resolve, reject) => {
     try {
       const audio = await elevenlabs.generate({
