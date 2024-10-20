@@ -101,6 +101,14 @@ composer.command("kirill_korolev", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
 
+composer.command("zavarikin", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("lekomtsev", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
 composer.command("soul", async (ctx) => {
   await ctx.conversation.enter("soulConversation")
 })

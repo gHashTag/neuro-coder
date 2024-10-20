@@ -45,4 +45,12 @@ export const models = {
     key: "ghashtag/kirill_korolev:eb55046fbc7d2cb90a04f8f0fa0f102b79734511be167dc274d8ec47530a131c",
     word: "KOROLEV very fashionable man ",
   },
+  lekomtsev: {
+    key: "ghashtag/lekomtsev:89e7d83f44cead9fd6a9662e3b9a204bbae9e07d1abb7e1baa5e6a3cbf297ece",
+    word: "LEKOMTSEV very fashionable man ",
+  },
+  zavarikin: {
+    key: "ghashtag/zavarikin:990a7d40bb7ced48256a88dca2a2bc9c21e846bb2c42897f7362225e1300b661",
+    word: "ZAVARIKIN very fashionable man ",
+  },
 }
