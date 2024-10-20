@@ -82,7 +82,7 @@ const melimi05 = async (ctx: Context): Promise<void> => {
     await uploadVideo(`${outputFilePath}/final_video.mp4`, ctx.from.id.toString(), "melimi", fileName);
     const videoUrl = await getVideoUrl("melimi", fileName);
     if (!videoUrl) throw new Error("No video url");
-    await setHistory("melimi", slides.reels.videoDescription, videoUrl, "melimi05", "reels");
+    //await setHistory("melimi", slides.reels.videoDescription, videoUrl, "melimi05", "reels");
     await ctx.reply("Video creation finished");
     return;
   } catch (error) {
