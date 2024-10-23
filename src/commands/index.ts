@@ -146,4 +146,8 @@ composer.command("melimi_cat", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
 
+composer.command("melimi_cat", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
 export default composer

@@ -611,8 +611,9 @@ export async function generateImagesForNeuroBroker(steps: Step[], language: "en"
 
   for (const step of steps) {
     try {
-      const model = "ghashtag/so_origin_kata:e82316f373dea8e2e97748d7dbfe269895a70e2891c18a2403a2080c942bb5b2"
-
+      // const model = "ghashtag/so_origin_kata:e82316f373dea8e2e97748d7dbfe269895a70e2891c18a2403a2080c942bb5b2"
+      // const model = "ghashtag/artrio:46074c6d3a8074f6564be098ec32b4e1c9e03e661d9386b4e66a898fb535d702"
+      const model = "ghashtag/modeva:c37189f6adde9084209e850c631d88a5d8de1e94f226e7c7ed2a9446f46897aa"
       console.log(model, "model")
       const input = {
         prompt: step.details.en,
@@ -672,7 +673,7 @@ export async function generateImagesForNeuroBroker(steps: Step[], language: "en"
 
           console.log(`Изображение успешно обработано и сохранено для шага ${step.step}`)
         } catch (error: any) {
-          console.error(`шибка при обработке изображения для шага ${step.step}:`, error.message)
+          console.error(`Oшибка при обработке изображения для шага ${step.step}:`, error.message)
           throw error // Перебрасываем ошибку, чтобы использовать запасное изображение
         }
       } else {

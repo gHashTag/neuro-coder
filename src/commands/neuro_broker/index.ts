@@ -40,7 +40,7 @@ interface SlideshowResponse {
   numberTrack: number
 }
 
-const neuro_broker = async (ctx: Context): Promise<void> => {
+const createReels = async (ctx: Context): Promise<void> => {
   try {
     // Отправляем уведомление пользователю, что бот печатает
     await ctx.replyWithChatAction("typing")
@@ -126,20 +126,20 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
 
     const newArray = [...englishImages]
 
-    const englishMediaGroup: InputMediaPhoto[] = newArray.map((image) => ({
+    const mediaGroup: InputMediaPhoto[] = newArray.map((image) => ({
       type: "photo",
       media: new InputFile(image.imagePath),
       caption: image.text,
     }))
     // Отправляем группу изображений пользователю
-    await ctx.replyWithMediaGroup(englishMediaGroup)
+    await ctx.replyWithMediaGroup(mediaGroup)
 
     const images = newArray.map((img) => img.imagePath)
 
     const languages = ["en", "ru", "zh", "ar"]
     for (const lang of languages) {
       const voiceOver = stepsData[0].voiceOver[lang]
-      const audioFile1 = `../audio/audio${1}.mp3`
+      const audioFile1 = `../audio/audio${3}.mp3`
       const audioStream2 = await createAudioFileFromText({ text: voiceOver, voice_id: "PVKVligmzACf89A0Cegd" })
       const audioPath = path.join(__dirname, `../${audioStream2}`)
       const audioDuration = await getAudioDuration(audioPath)
@@ -251,6 +251,13 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
   } catch (error) {
     // В случае ошибки, пробрасываем её дальше
     throw error
+  }
+}
+
+const neuro_broker = async (ctx: Context): Promise<void> => {
+  const count = 7
+  for (let i = 0; i < count; i++) {
+    await createReels(ctx)
   }
 }
 

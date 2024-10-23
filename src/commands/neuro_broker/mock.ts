@@ -2,7 +2,7 @@ export const stepsData = [
   {
     step: "Step 1",
     details: {
-      en: "Very fashionable girls in outdoor area of this luxury condominium KATA is an oasis of leisure and entertainment. It features an infinity pool that seamlessly blends with the horizon, surrounded by a spacious deck with sun loungers and a shaded lounge area. The landscaped gardens are meticulously maintained, offering a variety of seating areas and a fire pit for evening gatherings. An outdoor kitchen and dining area provide the perfect setting for alfresco meals, with views of the surrounding landscape enhancing the experience. This outdoor space is designed for both relaxation and socializing, making it an ideal retreat. The presence of beautiful models adds a touch of glamour and sophistication to the ambiance.",
+      en: "Very fashionable girls in outdoor area of this luxury condominium is an oasis of leisure and entertainment. It features an infinity pool that seamlessly blends with the horizon, surrounded by a spacious deck with sun loungers and a shaded lounge area. The landscaped gardens are meticulously maintained, offering a variety of seating areas and a fire pit for evening gatherings. An outdoor kitchen and dining area provide the perfect setting for alfresco meals, with views of the surrounding landscape enhancing the experience. This outdoor space is designed for both relaxation and socializing, making it an ideal retreat. The presence of beautiful models adds a touch of glamour and sophistication to the ambiance.",
     },
     voiceOver: {
       en: "Immerse yourself in a world of unrivaled luxury in this magnificent condominium on the picturesque island of Phuket, Thailand. This unique property combines contemporary design and refined elegance, creating the perfect space to relax and enjoy life. Spacious interiors, made using high-quality materials, open up to the endless sea views, giving a sense of peace and harmony. Every detail in this condominium has been thought out to ensure maximum comfort and satisfy the most discerning tastes. Relax by the pool overlooking the ocean or enjoy the evening breeze on your private terrace. Write the word KATA and get access directly to the developer.",
@@ -109,9 +109,9 @@ export const englishImages = [
   },
 ]
 
-export const triggerWord = "KATA"
+export const triggerWord = "MODEVA"
 
-export const type = "condominium"
+export const type = "apartments"
 
 export const livingRoomDescription = `
   The living room of this luxury ${type} ${triggerWord} is a masterpiece of modern minimalist design. It features a spacious open-plan layout with floor-to-ceiling windows that flood the space with natural light. The centerpiece is a sleek TV unit wall in a sophisticated grey and beige color palette, complemented by LED lights under the shelf of the TV cabinet. The room is furnished with plush, neutral-toned sofas and accented with contemporary art pieces. The design emphasizes clean lines and a seamless flow, creating an atmosphere of tranquility and elegance. High-resolution photography captures the exquisite details and the breathtaking view of the surrounding landscape.
@@ -183,7 +183,7 @@ export const diningRoomDescription = `
   - Seamless integration of indoor and outdoor spaces
 `
 
-export const location = "Phuket, Thailand"
+export const location = "Bang Tao Beach,Phuket, Thailand"
 
 export const description = `
   Write your sales text here
