@@ -7,6 +7,7 @@ import clipmaker from "./clipmaker"
 import leela from "./leela"
 
 import neuro_broker from "./neuro_broker"
+import textToSpeech from "./textToSpeech"
 
 // import neurocoder_test from "./neurocoder/neurocoder_test";
 // import neurocoder01 from "./neurocoder/neurocoder01";
@@ -36,6 +37,10 @@ composer.command("circle", circle)
 composer.command("leela", leela)
 
 composer.command("neuro_broker", neuro_broker)
+
+composer.command("text_to_speech", async (ctx) => {
+  await ctx.conversation.enter("textToSpeech")
+})
 
 composer.command("imagesize", async (ctx) => {
   await ctx.conversation.enter("imageSizeConversation")

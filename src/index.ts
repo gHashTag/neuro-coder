@@ -18,6 +18,7 @@ import { InputMediaPhoto } from "grammy/types"
 import { inviterConversation } from "./commands/inviter"
 import { models } from "./commands/constants"
 import { answerAi } from "./core/openai/requests"
+import textToSpeech from "./commands/textToSpeech"
 interface SessionData {
   melimi00: {
     videos: string[]
@@ -52,6 +53,7 @@ bot.api.setMyCommands([
 ])
 bot.use(conversations())
 bot.use(createConversation(imageSizeConversation))
+bot.use(createConversation(textToSpeech))
 bot.use(createConversation(generateImageConversation))
 bot.use(createConversation(get100AnfiVesnaConversation))
 bot.use(createConversation(soulConversation))
