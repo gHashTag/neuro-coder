@@ -53,4 +53,8 @@ export const models = {
     key: "ghashtag/zavarikin:990a7d40bb7ced48256a88dca2a2bc9c21e846bb2c42897f7362225e1300b661",
     word: "ZAVARIKIN very fashionable man ",
   },
+  chuklinov: {
+    key: "ghashtag/chuklinov:e4f971f50893132ba33f9275449d6aa8754b465c6073b1e38b3053d485ed4512",
+    word: "CHUKLINOV very fashionable man ",
+  },
 }
