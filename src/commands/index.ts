@@ -118,6 +118,10 @@ composer.command("chuklinov", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
 
+composer.command("lee_solar", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
 composer.command("soul", async (ctx) => {
   await ctx.conversation.enter("soulConversation")
 })
