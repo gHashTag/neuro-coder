@@ -61,4 +61,8 @@ export const models = {
     key: "ghashtag/lee_solar:7b7e9744c88e23c0eeccb9874c36336f73fce9d3d17992c8acabb04e67ee03b4",
     word: "SOLAR very fashionable man ",
   },
+  muse_nataly: {
+    key: "ghashtag/muse_nataly:3fa7b4ac8687f4f0fa96ebe19fbcf4847ccbc44024dd859eaac9d352ea66d3cf",
+    word: "METAMUSE very fashionable girl ",
+  },
 }
