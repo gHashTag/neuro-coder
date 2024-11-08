@@ -4,7 +4,7 @@ import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard } from "grammy"
 import { getGeneratedImages } from "../../core/supabase/ai"
 
-async function generateImageConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
+const generateImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
   const keyboard = new InlineKeyboard().text(isRu ? "❌ Отменить генерацию" : "❌ Cancel generation", "cancel")
   const model_type = ctx.message?.text?.slice(1)

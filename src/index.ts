@@ -10,6 +10,8 @@ import { session, SessionFlavor } from "grammy"
 import { imageSizeConversation } from "./commands/imagesize"
 import { customMiddleware, generateImage, pulse, upgradePrompt } from "./commands/helpers"
 import { generateImageConversation } from "./commands/generateImage"
+import createTriggerReel from "./commands/trigger_reel"
+import createCaptionForNews from "./commands/сaptionForNews"
 import { get100AnfiVesnaConversation } from "./commands/get100"
 import { soulConversation } from "./commands/soul"
 import { voiceConversation } from "./commands/voice"
@@ -55,6 +57,8 @@ bot.use(conversations())
 bot.use(createConversation(imageSizeConversation))
 bot.use(createConversation(textToSpeech))
 bot.use(createConversation(generateImageConversation))
+bot.use(createConversation(createTriggerReel))
+bot.use(createConversation(createCaptionForNews))
 bot.use(createConversation(get100AnfiVesnaConversation))
 bot.use(createConversation(soulConversation))
 bot.use(createConversation(voiceConversation))

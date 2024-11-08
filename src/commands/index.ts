@@ -5,6 +5,8 @@ import circle from "./circle"
 import hello from "./hello"
 import clipmaker from "./clipmaker"
 import leela from "./leela"
+import createTriggerReel from "./trigger_reel"
+import createCaptionForNews from "./сaptionForNews"
 
 import neuro_broker from "./neuro_broker"
 import textToSpeech from "./textToSpeech"
@@ -38,6 +40,10 @@ composer.command("leela", leela)
 
 composer.command("neuro_broker", neuro_broker)
 
+composer.command("caption_for_ai_news", async (ctx) => {
+  await ctx.conversation.enter("createCaptionForNews")
+})
+
 composer.command("text_to_speech", async (ctx) => {
   await ctx.conversation.enter("textToSpeech")
 })
@@ -48,6 +54,10 @@ composer.command("imagesize", async (ctx) => {
 
 composer.command("playom", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("trigger_reel", async (ctx) => {
+  await ctx.conversation.enter("createTriggerReel")
 })
 
 composer.command("anatol777", async (ctx) => {
