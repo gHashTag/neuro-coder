@@ -4,7 +4,7 @@ import express from "express"
 import { webhookCallback } from "grammy"
 
 import bot from "../src/core/bot"
-import { supabase } from "src/core/supabase"
+import { supabase } from "../src/core/supabase"
 
 const app = express()
 
