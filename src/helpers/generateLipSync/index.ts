@@ -6,10 +6,6 @@ if (!process.env.SYNC_LABS_API_KEY) {
   throw new Error("SYNC_LABS_API_KEY is not set")
 }
 
-if (!process.env.ELESTIO_URL) {
-  throw new Error("VERCEL_URL is not set")
-}
-
 if (!process.env.NGROK) {
   throw new Error("NGROK is not set")
 }
