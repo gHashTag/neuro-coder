@@ -4,6 +4,7 @@ import os from "os"
 import axios from "axios"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import path from "path"
+import RunwayML from "@runwayml/sdk"
 import { openai } from "../core/openai"
 import { MyContext, MyContextWithSession, Step } from "../utils/types"
 import Replicate from "replicate"
@@ -17,15 +18,9 @@ import { v4 as uuid } from "uuid"
 import { models } from "./constants"
 import { triggerWord } from "./neuro_broker/mock"
 
-const Creatomate = require("creatomate")
-import RunwayML from "@runwayml/sdk"
-
-const clientRunway = new RunwayML({ apiKey: process.env.RUNWAY_API_KEY })
-
 if (!process.env.CREATOMATE_API_KEY) {
   throw new Error("CREATOMATE_API_KEY is not set")
 }
-const client = new Creatomate.Client(process.env.CREATOMATE_API_KEY)
 
 if (!process.env.REPLICATE_API_TOKEN) {
   throw new Error("REPLICATE_API_TOKEN is not set")
@@ -34,6 +29,24 @@ if (!process.env.REPLICATE_API_TOKEN) {
 if (!process.env.ELEVENLABS_API_KEY) {
   throw new Error("ELEVENLABS_API_KEY is not set")
 }
+
+if (!process.env.PIXEL_API_KEY) {
+  throw new Error("PIXEL_API_KEY is not set")
+}
+
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error("OPENAI_API_KEY is not set")
+}
+
+if (!process.env.RUNWAY_API_KEY) {
+  throw new Error("RUNWAY_API_KEY is not set")
+}
+
+const Creatomate = require("creatomate")
+
+const clientRunway = new RunwayML({ apiKey: process.env.RUNWAY_API_KEY })
+
+const client = new Creatomate.Client(process.env.CREATOMATE_API_KEY)
 
 export const elevenlabs = new ElevenLabsClient({
   apiKey: process.env.ELEVENLABS_API_KEY,

@@ -1,12 +1,17 @@
 import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
 import { createClient } from "pexels"
-import { exec } from "child_process"
-import ffmpeg from "fluent-ffmpeg"
 import axios from "axios"
 import fs from "fs"
 import path from "path"
 import { InputFile } from "grammy"
+import ffmpeg from "fluent-ffmpeg"
+import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
+import ffprobeInstaller from "@ffprobe-installer/ffprobe"
+
+// Настраиваем пути к ffmpeg и ffprobe
+ffmpeg.setFfmpegPath(ffmpegInstaller.path)
+ffmpeg.setFfprobePath(ffprobeInstaller.path)
 
 async function downloadVideo(url: string, outputPath: string): Promise<string> {
   const response = await axios({
@@ -99,37 +104,19 @@ async function getBRollVideo(query: string): Promise<string[]> {
 }
 
 const resizeVideo = async (inputPath: string, outputPath: string): Promise<void> => {
-  try {
-    // Получаем размеры исходного видео
-    const inputDimensions = await getVideoDimensions(inputPath)
-    console.log("Исходные размеры видео:", inputDimensions)
-
-    await new Promise((resolve, reject) => {
-      exec(`ffmpeg -i "${inputPath}" -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2" "${outputPath}"`, (error) => {
-        if (error) reject(error)
-        resolve("ok")
-      })
-    })
-
-    // Получаем размеры обработанного видео
-    const outputDimensions = await getVideoDimensions(outputPath)
-    console.log("Размеры видео после обработки:", outputDimensions)
-  } catch (error) {
-    console.error("Ошибка при обработке видео:", error)
-    throw error
-  }
-}
-
-const getVideoDimensions = async (filePath: string): Promise<{ width: number; height: number }> => {
   return new Promise((resolve, reject) => {
-    exec(`ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of json "${filePath}"`, (error, stdout) => {
-      if (error) reject(error)
-      const data = JSON.parse(stdout)
-      resolve({
-        width: data.streams[0].width,
-        height: data.streams[0].height,
+    ffmpeg(inputPath)
+      .videoFilter("scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2")
+      .output(outputPath)
+      .on("end", () => {
+        console.log("Видео успешно обработано")
+        resolve()
       })
-    })
+      .on("error", (err) => {
+        console.error("Ошибка при обработке видео:", err)
+        reject(err)
+      })
+      .run()
   })
 }
 
@@ -151,7 +138,7 @@ export async function createBackgroundVideo(conversation: Conversation<MyContext
     }
 
     const videoUrls = await getBRollVideo(query)
-    console.log(videoUrls, "videoUrls")
+
     if (videoUrls.length === 0) {
       await ctx.reply(isRu ? "Не удалось найти подходящие видео" : "Could not find suitable videos")
       return
