@@ -17,6 +17,9 @@ importers:
       '@ffmpeg/ffmpeg':
         specifier: ^0.12.10
         version: 0.12.10
+      '@ffprobe-installer/ffprobe':
+        specifier: ^2.1.2
+        version: 2.1.2
       '@grammyjs/conversations':
         specifier: ^1.2.0
         version: 1.2.0(grammy@1.28.0)

@@ -1,13 +1,17 @@
 import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
 import { createClient } from "pexels"
-import { exec } from "child_process"
-import ffmpeg from "fluent-ffmpeg"
 import axios from "axios"
 import fs from "fs"
 import path from "path"
 import { InputFile } from "grammy"
-import { isDev } from "../helpers"
+import ffmpeg from "fluent-ffmpeg"
+import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
+import ffprobeInstaller from "@ffprobe-installer/ffprobe"
+
+// Настраиваем пути к ffmpeg и ffprobe
+ffmpeg.setFfmpegPath(ffmpegInstaller.path)
+ffmpeg.setFfprobePath(ffprobeInstaller.path)
 
 async function downloadVideo(url: string, outputPath: string): Promise<string> {
   const response = await axios({
@@ -99,92 +103,21 @@ async function getBRollVideo(query: string): Promise<string[]> {
   }
 }
 
-const getVideoDimensions = async (filePath: string): Promise<{ width: number; height: number }> => {
-  return new Promise((resolve, reject) => {
-    exec(`ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of json "${filePath}"`, (error, stdout, stderr) => {
-      if (error) {
-        console.error("Ошибка ffprobe:", error)
-        console.error("stderr:", stderr)
-        reject(error)
-        return
-      }
-
-      try {
-        if (!stdout || stdout.trim() === "") {
-          throw new Error("Пустой вывод ffprobe")
-        }
-
-        const data = JSON.parse(stdout)
-
-        if (!data.streams || !data.streams[0]) {
-          throw new Error("Не найдены данные потока видео")
-        }
-
-        const dimensions = {
-          width: data.streams[0].width,
-          height: data.streams[0].height,
-        }
-
-        console.log("Получены размеры видео:", dimensions)
-        resolve(dimensions)
-      } catch (parseError) {
-        console.error("Ошибка парсинга JSON:", parseError)
-        console.error("Полученный stdout:", stdout)
-        reject(parseError)
-      }
-    })
-  })
-}
-
 const resizeVideo = async (inputPath: string, outputPath: string): Promise<void> => {
-  try {
-    // Проверяем существование входного файла
-    if (!fs.existsSync(inputPath)) {
-      throw new Error(`Входной файл не найден: ${inputPath}`)
-    }
-
-    console.log("Начало обработки видео:", inputPath)
-
-    // Получаем размеры исходного видео
-    try {
-      const inputDimensions = isDev ? await getVideoDimensions(inputPath) : { width: 1080, height: 1920 }
-      console.log("Исходные размеры видео:", inputDimensions)
-    } catch (error) {
-      console.error("Ошибка при получении размеров входного видео:", error)
-      // Продолжаем выполнение даже если не удалось получить размеры
-    }
-
-    await new Promise((resolve, reject) => {
-      exec(
-        `ffmpeg -i "${inputPath}" -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2" "${outputPath}"`,
-        (error, stdout, stderr) => {
-          if (error) {
-            console.error("Ошибка ffmpeg:", error)
-            console.error("stderr:", stderr)
-            reject(error)
-            return
-          }
-          resolve(null)
-        },
-      )
-    })
-
-    // Проверяем существование выходного файла
-    if (!fs.existsSync(outputPath)) {
-      throw new Error(`Выходной файл не создан: ${outputPath}`)
-    }
-
-    // Получаем размеры обработанного видео
-    try {
-      const outputDimensions = isDev ? await getVideoDimensions(outputPath) : { width: 1080, height: 1920 }
-      console.log("Размеры видео после обработки:", outputDimensions)
-    } catch (error) {
-      console.error("Ошибка при получении размеров выходного видео:", error)
-    }
-  } catch (error) {
-    console.error("Ошибка при обработке видео:", error)
-    throw error
-  }
+  return new Promise((resolve, reject) => {
+    ffmpeg(inputPath)
+      .videoFilter("scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2")
+      .output(outputPath)
+      .on("end", () => {
+        console.log("Видео успешно обработано")
+        resolve()
+      })
+      .on("error", (err) => {
+        console.error("Ошибка при обработке видео:", err)
+        reject(err)
+      })
+      .run()
+  })
 }
 
 export async function createBackgroundVideo(conversation: Conversation<MyContext>, ctx: MyContext) {
@@ -205,7 +138,7 @@ export async function createBackgroundVideo(conversation: Conversation<MyContext
     }
 
     const videoUrls = await getBRollVideo(query)
-    console.log(videoUrls, "videoUrls")
+
     if (videoUrls.length === 0) {
       await ctx.reply(isRu ? "Не удалось найти подходящие видео" : "Could not find suitable videos")
       return
