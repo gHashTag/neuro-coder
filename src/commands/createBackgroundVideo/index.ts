@@ -76,7 +76,7 @@ async function getBRollVideo(query: string): Promise<string[]> {
   try {
     const response = await client.videos.search({
       query,
-      per_page: 9,
+      per_page: 10,
       orientation: "portrait",
     })
 
@@ -181,6 +181,7 @@ export async function createBackgroundVideo(conversation: Conversation<MyContext
 
         // Удаляем только временный файл
         fs.unlinkSync(tempFile)
+        fs.unlinkSync(bgVideoPath)
         // Оставляем bg-videoXX.mp4 в папке
       } catch (error) {
         console.error("Ошибка при отправке видео:", error)
