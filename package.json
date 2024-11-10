@@ -8,6 +8,7 @@
     "build": "tsc",
     "dev": "nodemon src/index.ts",
     "lint": "eslint . --cache --ext .ts,.js",
+    "dev:server": "nodemon src/server.ts",
     "format": "prettier --write 'src/**/*.ts'"
   },
   "repository": {
@@ -42,6 +43,7 @@
     "grammy": "^1.6.1",
     "node-fetch": "^3.3.2",
     "openai": "^4.55.1",
+    "pexels": "^1.4.0",
     "replicate": "^0.32.0",
     "sharp": "^0.33.4",
     "slideshow-video": "^1.0.2",

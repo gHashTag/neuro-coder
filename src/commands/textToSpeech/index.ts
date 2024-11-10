@@ -9,9 +9,9 @@ const textToSpeech = async (conversation: Conversation<MyContext>, ctx: MyContex
   const { message } = await conversation.wait()
   if (!message?.text) throw new Error("message is not found")
   const audioStream = await createAudioFileFromText({ text: message.text, voice_id: "cGc22WcHfLX5EU1aKiRP" }) //lekomtsev - APeqOF6ti2CVArlqq6Yq, Заварыкин - APeqOF6ti2CVArlqq6Yq, НейроКодер - cGc22WcHfLX5EU1aKiRP
-  console.log(audioStream, "audioStream")
+
   const audioPath = path.join(__dirname, `../${audioStream}`)
-  console.log(audioPath, "audioPath")
+
   await ctx.replyWithAudio(new InputFile(audioPath, "audio.mp3"))
 }
 

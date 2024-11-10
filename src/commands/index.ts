@@ -38,6 +38,14 @@ composer.command("leela", leela)
 
 composer.command("neuro_broker", neuro_broker)
 
+composer.command("lipsync", async (ctx) => {
+  await ctx.conversation.enter("lipSyncConversation")
+})
+
+composer.command("b_roll", async (ctx) => {
+  await ctx.conversation.enter("createBackgroundVideo")
+})
+
 composer.command("text_to_speech", async (ctx) => {
   await ctx.conversation.enter("textToSpeech")
 })

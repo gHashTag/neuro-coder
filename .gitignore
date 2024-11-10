@@ -108,3 +108,7 @@ dist
 .vercel
 public/
 .DS_Store
+
+src/commands/createBackgroundVideo/temp/
+
+*.mp4

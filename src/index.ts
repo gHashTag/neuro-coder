@@ -19,6 +19,9 @@ import { inviterConversation } from "./commands/inviter"
 import { models } from "./commands/constants"
 import { answerAi } from "./core/openai/requests"
 import textToSpeech from "./commands/textToSpeech"
+import { lipSyncConversation } from "./commands/lipSyncConversation"
+import { createBackgroundVideo } from "./commands/createBackgroundVideo"
+
 interface SessionData {
   melimi00: {
     videos: string[]
@@ -59,6 +62,8 @@ bot.use(createConversation(get100AnfiVesnaConversation))
 bot.use(createConversation(soulConversation))
 bot.use(createConversation(voiceConversation))
 bot.use(createConversation(inviterConversation))
+bot.use(createConversation(lipSyncConversation))
+bot.use(createConversation(createBackgroundVideo))
 bot.use(customMiddleware)
 bot.use(commands)
 
@@ -74,6 +79,7 @@ bot.on("message:text", async (ctx) => {
     await ctx.reply(answer)
   }
 })
+
 bot.on("callback_query:data", async (ctx) => {
   const callbackData = ctx.callbackQuery.data
   const isRu = ctx.from?.language_code === "ru"

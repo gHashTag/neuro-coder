@@ -39,6 +39,8 @@ export const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 })
 
+export const isDev = process.env.NODE_ENV === "development"
+
 ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 
 export async function sizePhoto(photoPath: string, outputPath: string): Promise<string> {
