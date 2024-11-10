@@ -2,17 +2,24 @@ import { InputFile } from "grammy"
 import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
 import { createAudioFileFromText } from "../helpers"
-import path from "path"
+import fs from "fs"
+import { getVoiceId } from "../../core/supabase"
 
 const textToSpeech = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
-  await ctx.reply("Отправьте текст, для преобразования его в голос")
+  const lang = ctx.from?.language_code === "ru"
+  const requestText = await ctx.reply(lang ? "✍️ Отправьте текст, для преобразования его в голос" : "✍️ Send text, to convert it to voice")
   const { message } = await conversation.wait()
   if (!message?.text) throw new Error("message is not found")
-  const audioStream = await createAudioFileFromText({ text: message.text, voice_id: "cGc22WcHfLX5EU1aKiRP" }) //lekomtsev - APeqOF6ti2CVArlqq6Yq, Заварыкин - APeqOF6ti2CVArlqq6Yq, НейроКодер - cGc22WcHfLX5EU1aKiRP
-
-  const audioPath = path.join(__dirname, `../${audioStream}`)
-
-  await ctx.replyWithAudio(new InputFile(audioPath, "audio.mp3"))
+  await ctx.api.deleteMessage(ctx.chat?.id || "", requestText.message_id)
+  const voice_id = await getVoiceId(ctx.from?.id?.toString() || "")
+  if (!voice_id) {
+    await ctx.reply(lang ? "🎯 Для корректной работы пропишите команду /voice" : "🎯 For correct operation, write the /voice command")
+  }
+  const audioStream = await createAudioFileFromText({ text: message.text, voice_id })
+  console.log(audioStream, "audioStream")
+  await ctx.replyWithVoice(new InputFile(audioStream, "audio.mp3"))
+  await ctx.replyWithAudio(new InputFile(audioStream, "audio.mp3"))
+  await fs.unlinkSync(audioStream)
 }
 
 export default textToSpeech

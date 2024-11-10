@@ -42,9 +42,17 @@ export const updateUserSoul = async (telegram_id: string, company: string, posit
   }
 }
 
-export const updateUserVoice = async (telegram_id: string, voice_id_synclabs: string) => {
-  const { error } = await supabase.from("users").update({ voice_id_synclabs }).eq("telegram_id", telegram_id)
+export const updateUserVoice = async (telegram_id: string, voice_id_elevenlabs: string) => {
+  const { error } = await supabase.from("users").update({ voice_id_elevenlabs }).eq("telegram_id", telegram_id)
   if (error) {
     throw new Error(`Ошибка при обновлении пользователя: ${error.message}`)
   }
+}
+
+export const getVoiceId = async (telegram_id: string) => {
+  const { data, error } = await supabase.from("users").select("voice_id_elevenlabs").eq("telegram_id", telegram_id).maybeSingle()
+  if (error) {
+    throw new Error(`Ошибка при получении voice_id_elevenlabs: ${error.message}`)
+  }
+  return data?.voice_id_elevenlabs
 }
