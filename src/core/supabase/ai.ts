@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios"
 import { supabase } from "./index"
 import fs from "fs"
+import os from "os"
 import path from "path"
 import { v4 as uuidv4 } from "uuid"
 import FormData from "form-data"
@@ -163,7 +164,7 @@ async function downloadVoiceMessage(fileUrl: string, downloadPath: string) {
 
 export async function createVoiceElevenLabs({ fileUrl, username }: { fileUrl: string; username: string }): Promise<string | null> {
   const uniqueFileName = `${uuidv4()}.oga`
-  const downloadPath = path.join(__dirname, "tempFiles", uniqueFileName)
+  const downloadPath = path.join(os.tmpdir(), uniqueFileName)
 
   try {
     // Скачиваем файл

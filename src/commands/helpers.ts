@@ -1,5 +1,6 @@
 import ffmpeg from "fluent-ffmpeg"
 import sharp from "sharp"
+import os from "os"
 import axios from "axios"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import path from "path"
@@ -1386,7 +1387,7 @@ export const createAudioFileFromText = async ({ text, voice_id }: { text: string
       })
 
       // Создаем временный файл для сохранения аудио
-      const outputPath = path.join(__dirname, `../temp/audio_${Date.now()}.mp3`)
+      const outputPath = path.join(os.tmpdir(), `audio_${Date.now()}.mp3`)
       const writeStream = createWriteStream(outputPath)
 
       audioStream.pipe(writeStream)
