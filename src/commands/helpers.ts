@@ -11,12 +11,15 @@ import { getAspectRatio, incrementGeneratedImages, savePrompt } from "../core/su
 import { MiddlewareFn } from "grammy"
 import { createUser, supabase } from "../core/supabase"
 import { bot } from ".."
-import { ElevenLabsClient, ElevenLabs } from "elevenlabs"
+import { ElevenLabsClient } from "elevenlabs"
 import { v4 as uuid } from "uuid"
 import { models } from "./constants"
 import { triggerWord } from "./neuro_broker/mock"
 
 const Creatomate = require("creatomate")
+import RunwayML from "@runwayml/sdk"
+
+const clientRunway = new RunwayML({ apiKey: process.env.RUNWAY_API_KEY })
 
 if (!process.env.CREATOMATE_API_KEY) {
   throw new Error("CREATOMATE_API_KEY is not set")
@@ -1220,7 +1223,6 @@ export const generateImage = async (prompt: string, model_type: string, telegram
     await incrementGeneratedImages(telegram_id)
     console.log(prompt, "prompt")
 
-    const prompt_id = await savePrompt(prompt, model_type)
     const aspect_ratio = await getAspectRatio(telegram_id)
     const output = await replicate.run(models[model_type].key, {
       input: {
@@ -1239,6 +1241,7 @@ export const generateImage = async (prompt: string, model_type: string, telegram
       },
     })
     console.log(output)
+    const prompt_id = await savePrompt(prompt, model_type, output[0])
     return { image: output[0], prompt_id: prompt_id }
   } catch (error) {
     console.error(error)
@@ -1372,22 +1375,29 @@ export async function mergeAudioFiles(audioStream1: string, audioStream2: string
   })
 }
 
+// Start of Selection
 export const createAudioFileFromText = async ({ text, voice_id }: { text: string; voice_id: string }): Promise<string> => {
   return new Promise<string>(async (resolve, reject) => {
     try {
-      const audio = await elevenlabs.generate({
+      const audioStream = await elevenlabs.generate({
         voice: voice_id,
         model_id: "eleven_turbo_v2_5",
         text,
       })
-      const fileName = `../audio/ledov/${uuid()}.mp3`
-      const tempFile1 = path.join(__dirname, fileName)
-      console.log(tempFile1, "tempFile1")
-      const fileStream = createWriteStream(tempFile1)
 
-      audio.pipe(fileStream)
-      fileStream.on("finish", () => resolve(fileName)) // Resolve with the fileName
-      fileStream.on("error", reject)
+      // Создаем временный файл для сохранения аудио
+      const outputPath = path.join(__dirname, `../temp/audio_${Date.now()}.mp3`)
+      const writeStream = createWriteStream(outputPath)
+
+      audioStream.pipe(writeStream)
+
+      writeStream.on("finish", () => {
+        resolve(outputPath)
+      })
+
+      writeStream.on("error", (error) => {
+        reject(error)
+      })
     } catch (error) {
       reject(error)
     }
@@ -1444,4 +1454,35 @@ export async function getAudioDuration(filePath: string): Promise<number> {
       }
     })
   })
+}
+
+export async function imageToVideo(promptImage: string, promptText: string): Promise<void> {
+  try {
+    // Создаем задачу для генерации видео из изображения
+    const imageToVideoTask = await clientRunway.imageToVideo.create({
+      model: "gen3a_turbo",
+      promptImage: promptImage,
+      promptText: promptText,
+    })
+
+    const taskId = imageToVideoTask.id
+    console.log(`Задача создана с ID: ${taskId}`)
+
+    // Ожидаем завершения задачи
+    let task
+    do {
+      await new Promise((resolve) => setTimeout(resolve, 10000)) // Ждем 10 секунд перед повторной проверкой
+      task = await clientRunway.tasks.retrieve(taskId)
+      console.log(`Статус задачи: ${task.status}`)
+    } while (!["SUCCEEDED", "FAILED"].includes(task.status))
+
+    if (task.status === "SUCCEEDED") {
+      console.log("Задача успешно завершена:", task.output)
+      return task.output
+    } else {
+      console.error("Задача завершилась с ошибкой.")
+    }
+  } catch (error) {
+    console.error("Ошибка при создании видео из изображения:", error)
+  }
 }

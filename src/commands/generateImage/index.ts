@@ -65,6 +65,7 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
   await pulse(ctx, image, text || "", `/${model_type}`)
   if (count < limit) {
     await ctx.reply(isRu ? `ℹ️ У вас осталось ${limit - count} использований.` : `ℹ️ You have ${limit - count} uses left.`)
+    console.log(`video_${prompt_id}_${image}`)
     await ctx.reply(isRu ? `🤔 Сгенерировать еще?` : `🤔 Generate more?`, {
       reply_markup: {
         inline_keyboard: [
@@ -77,6 +78,7 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
             { text: "4", callback_data: `generate_4_${prompt_id}` },
           ],
           [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${prompt_id}` }],
+          // [{ text: isRu ? "🎥 Сгенерировать видео" : "🎥 Generate video", callback_data: `improve_toVideo_${prompt_id}` }],
         ],
       },
     })

@@ -8,7 +8,7 @@ import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
 import { session, SessionFlavor } from "grammy"
 import { imageSizeConversation } from "./commands/imagesize"
-import { customMiddleware, generateImage, pulse, upgradePrompt } from "./commands/helpers"
+import { customMiddleware, generateImage, pulse, imageToVideo, upgradePrompt } from "./commands/helpers"
 import { generateImageConversation } from "./commands/generateImage"
 import createTriggerReel from "./commands/trigger_reel"
 import createCaptionForNews from "./commands/сaptionForNews"
@@ -143,6 +143,7 @@ bot.on("callback_query:data", async (ctx) => {
               { text: "4", callback_data: `generate_4_${prompt_id}` },
             ],
             [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${prompt_id}` }],
+            [{ text: isRu ? "🎥 Сгенерировать видео" : "🎥 Generate video", callback_data: `video_${prompt_id}` }],
           ],
         },
       })
@@ -167,6 +168,11 @@ bot.on("callback_query:data", async (ctx) => {
     console.log(prompt_id, "prompt_id")
     console.log(callbackData, "callbackData")
 
+    if (callbackData.includes("toVideo")) {
+      console.log(prompt.prompt, prompt.image_url, "prompt.prompt, prompt.image_url")
+      await imageToVideo(prompt.image_url, prompt.prompt)
+      return
+    }
     if (callbackData.includes("accept")) {
       await ctx.editMessageText(isRu ? `🤔 Сгенерировать еще с новым промптом?` : `🤔 Generate more with new prompt?`, {
         reply_markup: {

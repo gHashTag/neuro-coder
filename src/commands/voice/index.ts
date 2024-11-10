@@ -1,4 +1,4 @@
-import { createVoiceSyncLabs } from "../../core/supabase/ai"
+import { createVoiceElevenLabs } from "../../core/supabase/ai"
 import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
 import { updateUserVoice } from "../../core/supabase"
@@ -25,7 +25,7 @@ export async function voiceConversation(conversation: Conversation<MyContext>, c
   if (userId) {
     const file = await ctx.api.getFile(fileId)
     const fileUrl = `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}`
-    const voiceId = await createVoiceSyncLabs({
+    const voiceId = await createVoiceElevenLabs({
       fileUrl,
       username,
     })
