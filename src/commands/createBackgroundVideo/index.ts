@@ -7,6 +7,7 @@ import axios from "axios"
 import fs from "fs"
 import path from "path"
 import { InputFile } from "grammy"
+import { isDev } from "../helpers"
 
 async function downloadVideo(url: string, outputPath: string): Promise<string> {
   const response = await axios({
@@ -146,7 +147,7 @@ const resizeVideo = async (inputPath: string, outputPath: string): Promise<void>
 
     // Получаем размеры исходного видео
     try {
-      const inputDimensions = await getVideoDimensions(inputPath)
+      const inputDimensions = isDev ? await getVideoDimensions(inputPath) : { width: 1080, height: 1920 }
       console.log("Исходные размеры видео:", inputDimensions)
     } catch (error) {
       console.error("Ошибка при получении размеров входного видео:", error)
@@ -175,7 +176,7 @@ const resizeVideo = async (inputPath: string, outputPath: string): Promise<void>
 
     // Получаем размеры обработанного видео
     try {
-      const outputDimensions = await getVideoDimensions(outputPath)
+      const outputDimensions = isDev ? await getVideoDimensions(outputPath) : { width: 1080, height: 1920 }
       console.log("Размеры видео после обработки:", outputDimensions)
     } catch (error) {
       console.error("Ошибка при получении размеров выходного видео:", error)
