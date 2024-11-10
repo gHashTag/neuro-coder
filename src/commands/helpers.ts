@@ -11,7 +11,7 @@ import { getAspectRatio, incrementGeneratedImages, savePrompt } from "../core/su
 import { MiddlewareFn } from "grammy"
 import { createUser, supabase } from "../core/supabase"
 import { bot } from ".."
-import { ElevenLabsClient, ElevenLabs } from "elevenlabs"
+import { ElevenLabsClient } from "elevenlabs"
 import { v4 as uuid } from "uuid"
 import { models } from "./constants"
 import { triggerWord } from "./neuro_broker/mock"
