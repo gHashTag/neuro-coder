@@ -10,6 +10,8 @@ import { session, SessionFlavor } from "grammy"
 import { imageSizeConversation } from "./commands/imagesize"
 import { customMiddleware, generateImage, pulse, upgradePrompt } from "./commands/helpers"
 import { generateImageConversation } from "./commands/generateImage"
+import createTriggerReel from "./commands/trigger_reel"
+import createCaptionForNews from "./commands/сaptionForNews"
 import { get100AnfiVesnaConversation } from "./commands/get100"
 import { soulConversation } from "./commands/soul"
 import { voiceConversation } from "./commands/voice"
@@ -19,6 +21,9 @@ import { inviterConversation } from "./commands/inviter"
 import { models } from "./commands/constants"
 import { answerAi } from "./core/openai/requests"
 import textToSpeech from "./commands/textToSpeech"
+import { lipSyncConversation } from "./commands/lipSyncConversation"
+import { createBackgroundVideo } from "./commands/createBackgroundVideo"
+
 interface SessionData {
   melimi00: {
     videos: string[]
@@ -55,10 +60,14 @@ bot.use(conversations())
 bot.use(createConversation(imageSizeConversation))
 bot.use(createConversation(textToSpeech))
 bot.use(createConversation(generateImageConversation))
+bot.use(createConversation(createTriggerReel))
+bot.use(createConversation(createCaptionForNews))
 bot.use(createConversation(get100AnfiVesnaConversation))
 bot.use(createConversation(soulConversation))
 bot.use(createConversation(voiceConversation))
 bot.use(createConversation(inviterConversation))
+bot.use(createConversation(lipSyncConversation))
+bot.use(createConversation(createBackgroundVideo))
 bot.use(customMiddleware)
 bot.use(commands)
 
@@ -74,6 +83,7 @@ bot.on("message:text", async (ctx) => {
     await ctx.reply(answer)
   }
 })
+
 bot.on("callback_query:data", async (ctx) => {
   const callbackData = ctx.callbackQuery.data
   const isRu = ctx.from?.language_code === "ru"

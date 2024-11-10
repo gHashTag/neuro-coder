@@ -5,7 +5,7 @@ import { supabase } from "./index"
 // import fetch from "node-fetch";
 
 // Используйте динамический импорт внутри асинхронной функции
-async function fetchWithAxios(url: string, options: AxiosRequestConfig) {
+export async function fetchWithAxios(url: string, options: AxiosRequestConfig) {
   try {
     const response = await axios({
       url,
