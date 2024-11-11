@@ -1,4 +1,4 @@
-import { generateImage, pulse } from "../helpers"
+import { generateImage, pulse } from "../../helpers"
 import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard } from "grammy"

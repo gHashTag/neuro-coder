@@ -4,7 +4,7 @@ import ffmpeg from "fluent-ffmpeg"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import path from "path"
 import fs from "fs"
-import { makePhotoOnPhoto, makeTextLayers, sizePhoto } from "../../helpers"
+import { makePhotoOnPhoto, makeTextLayers, sizePhoto } from "../../../helpers"
 import { createSlideshow } from "slideshow-video"
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path)

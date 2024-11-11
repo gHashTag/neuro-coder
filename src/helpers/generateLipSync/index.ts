@@ -1,4 +1,4 @@
-import { isDev } from "../../commands/helpers"
+import { isDev } from ".."
 import { supabase } from "../../core/supabase"
 import axios from "axios"
 

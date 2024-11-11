@@ -1,7 +1,7 @@
 import { InputFile } from "grammy"
 import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
-import { createAudioFileFromText } from "../helpers"
+import { createAudioFileFromText } from "../../helpers"
 import fs from "fs"
 import { getVoiceId } from "../../core/supabase"
 

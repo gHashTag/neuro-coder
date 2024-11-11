@@ -14,8 +14,8 @@ import { createUser, supabase } from "../core/supabase"
 import { bot } from ".."
 import { ElevenLabsClient } from "elevenlabs"
 import { v4 as uuid } from "uuid"
-import { models } from "./constants"
-import { triggerWord } from "./neuro_broker/mock"
+import { models } from "../commands/constants"
+import { triggerWord } from "../commands/neuro_broker/mock"
 
 if (!process.env.CREATOMATE_API_KEY) {
   throw new Error("CREATOMATE_API_KEY is not set")

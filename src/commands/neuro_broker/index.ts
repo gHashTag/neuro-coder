@@ -13,7 +13,7 @@ import {
   getSellVillaSteps,
   mergeAudioFiles,
   translateText,
-} from "../helpers"
+} from "../../helpers"
 import { Step } from "src/utils/types"
 import { InputMediaPhoto } from "grammy/types"
 import { getVideoUrl, uploadVideo } from "../../core/supabase/video"

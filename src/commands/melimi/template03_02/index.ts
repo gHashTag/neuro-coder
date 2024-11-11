@@ -4,7 +4,7 @@ import ffmpeg from "fluent-ffmpeg"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import path from "path"
 import fs from "fs"
-import { makeTextLayers, overlayPhotoOnVideo, toShortVideo } from "../../helpers"
+import { makeTextLayers, overlayPhotoOnVideo, toShortVideo } from "../../../helpers"
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 

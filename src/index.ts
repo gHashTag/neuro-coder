@@ -8,7 +8,7 @@ import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
 import { session, SessionFlavor } from "grammy"
 import { imageSizeConversation } from "./commands/imagesize"
-import { customMiddleware, generateImage, pulse, imageToVideo, upgradePrompt } from "./commands/helpers"
+import { customMiddleware, generateImage, pulse, imageToVideo, upgradePrompt } from "./helpers"
 import { generateImageConversation } from "./commands/generateImage"
 import createTriggerReel from "./commands/trigger_reel"
 import createCaptionForNews from "./commands/сaptionForNews"
@@ -49,13 +49,26 @@ bot.api.setMyCommands([
   },
   {
     command: "avatar",
-    description: "👤 Рассказать о себе аватару",
+    description: "👤 Рассказать о себе",
   },
   {
     command: "voice",
     description: "🎤 Добавить аватару голос",
   },
+  {
+    command: "text_to_speech",
+    description: "🎤 Преобразовать текст в речь",
+  },
+  {
+    command: "lipsync",
+    description: "🎥 Синхронизация губ",
+  },
+  {
+    command: "b_roll",
+    description: "🎥 Создать B-roll",
+  },
 ])
+
 bot.use(conversations())
 bot.use(createConversation(imageSizeConversation))
 bot.use(createConversation(textToSpeech))

@@ -4,7 +4,7 @@ import ffmpeg from "fluent-ffmpeg"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import path from "path"
 import fs from "fs"
-import { getSlides, makeTextLayers, overlayPhotoOnVideo, toShortVideo } from "../../helpers"
+import { getSlides, makeTextLayers, overlayPhotoOnVideo, toShortVideo } from "../../../helpers"
 import { getHistory, setHistory } from "../../../core/supabase/ai"
 import { getVideoUrl, uploadVideo } from "../../../core/supabase/video"
 
