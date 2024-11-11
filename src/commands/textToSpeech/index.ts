@@ -14,6 +14,7 @@ const textToSpeech = async (conversation: Conversation<MyContext>, ctx: MyContex
   const voice_id = await getVoiceId(ctx.from?.id?.toString() || "")
   if (!voice_id) {
     await ctx.reply(lang ? "🎯 Для корректной работы пропишите команду /voice" : "🎯 For correct operation, write the /voice command")
+    return
   }
   const audioStream = await createAudioFileFromText({ text: message.text, voice_id })
   console.log(audioStream, "audioStream")
