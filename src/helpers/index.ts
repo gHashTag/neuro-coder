@@ -1252,8 +1252,6 @@ export const generateImage = async (prompt: string, model_type: string, telegram
         prompt_strength: 0.8,
         extra_lora_scale: 1,
         num_inference_steps: 28,
-        width: 1080,
-        height: 1920,
       },
     })
     console.log(output)
