@@ -1252,6 +1252,8 @@ export const generateImage = async (prompt: string, model_type: string, telegram
         prompt_strength: 0.8,
         extra_lora_scale: 1,
         num_inference_steps: 28,
+        width: 1080,
+        height: 1920,
       },
     })
     console.log(output)
@@ -1420,11 +1422,6 @@ export const createAudioFileFromText = async ({ text, voice_id }: { text: string
 
 export const createRender = async ({ template_id, modifications }: { template_id: string; modifications: Record<string, string> }) => {
   try {
-    const source = new Creatomate.Source({
-      outputFormat: "mp4",
-      elements: [new Creatomate.Video({ source: modifications["Video-1"] })],
-    })
-
     const options = {
       templateId: template_id,
       modifications: modifications,

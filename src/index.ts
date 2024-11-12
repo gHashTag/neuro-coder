@@ -41,31 +41,35 @@ bot.use(session({ initial: () => ({}) }))
 bot.api.setMyCommands([
   {
     command: "start",
-    description: "👋 Начать использовать бота",
+    description: "👋 Start for use bot / Начать использовать бота",
+  },
+  {
+    command: "model",
+    description: "🤖 Change model / Изменить модель",
   },
   {
     command: "imagesize",
-    description: "🖼️ Изменить размер генерируемого изображения",
+    description: "🖼️ Change image size / Изменить размер генерируемого изображения",
   },
   {
     command: "avatar",
-    description: "👤 Рассказать о себе",
+    description: "👤 Tell about yourself / Рассказать о себе",
   },
   {
     command: "voice",
-    description: "🎤 Добавить аватару голос",
+    description: "🎤 Add voice to avatar / Добавить аватару голос",
   },
   {
     command: "text_to_speech",
-    description: "🎤 Преобразовать текст в речь",
+    description: "🎤 Convert text to speech / Преобразовать текст в речь",
   },
   {
     command: "lipsync",
-    description: "🎥 Синхронизация губ",
+    description: "🎥 Lipsync / Синхронизация губ",
   },
   {
     command: "b_roll",
-    description: "🎥 Создать B-roll",
+    description: "🎥 Create B-roll / Создать B-roll",
   },
 ])
 

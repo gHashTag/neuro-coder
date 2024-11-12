@@ -168,7 +168,7 @@ const createReels = async (ctx: Context): Promise<void> => {
 
           if (!ctx.from) throw new Error("No user")
           const fileName = `${ctx.from.id}_${Date.now()}.mp4`
-          await uploadVideo(videoOutput.filePath, ctx.from.id.toString(), "neuro_broker", fileName)
+          await uploadVideo(videoOutput.filePath, "neuro_broker", fileName)
           const videoUrl = await getVideoUrl("neuro_broker", fileName)
 
           if (!videoUrl) throw new Error("No video url")
