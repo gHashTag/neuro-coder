@@ -25,6 +25,7 @@ import { lipSyncConversation } from "./commands/lipSyncConversation"
 import { createBackgroundVideo } from "./commands/createBackgroundVideo"
 import { start } from "./commands/start"
 import leeSolarNumerolog from "./commands/lee_solar_numerolog"
+import leeSolarBroker from "./commands/lee_solar_broker"
 
 interface SessionData {
   melimi00: {
@@ -96,6 +97,8 @@ bot.use(createConversation(inviterConversation))
 bot.use(createConversation(lipSyncConversation))
 bot.use(createConversation(createBackgroundVideo))
 bot.use(createConversation(leeSolarNumerolog))
+bot.use(createConversation(leeSolarBroker))
+
 bot.command("start", start)
 bot.use(customMiddleware)
 bot.use(commands)

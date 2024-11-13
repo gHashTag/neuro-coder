@@ -89,6 +89,10 @@ composer.command("lee_solar_numerolog", async (ctx) => {
   await ctx.conversation.enter("leeSolarNumerolog")
 })
 
+composer.command("lee_solar_broker", async (ctx) => {
+  await ctx.conversation.enter("leeSolarBroker")
+})
+
 composer.command("yellowshoess", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
