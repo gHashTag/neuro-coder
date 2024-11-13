@@ -10,12 +10,14 @@ export async function invite(ctx: MyContext) {
   const inviteCount = await getReferalsCount(telegram_id)
 
   const text = isRu
-    ? `Чтобы пригласить друга, отправьте ему эту ссылку: 🌟 <b><code>https://t.me/${botUsername}?start=${telegram_id}</code></b>
-     Пусть он присоединится к нам и получит массу удовольствия! 
+    ? `Чтобы пригласить друга, отправьте ему эту ссылку: 
+🌟 <b><code>https://t.me/${botUsername}?start=${telegram_id}</code></b>
+Пусть он присоединится к нам и получит массу удовольствия! 
     
     😊 <b>Рефералов:</b> ${inviteCount}`
-    : `To invite a friend, send them this link: 🌟 <b><code>https://t.me/${botUsername}?start=${telegram_id}</code></b>
-     Let them join us and have a great time! 
+    : `To invite a friend, send them this link: 
+🌟 <b><code>https://t.me/${botUsername}?start=${telegram_id}</code></b>
+Let them join us and have a great time! 
     
     😊 <b>Referrals:</b> ${inviteCount}`
   await ctx.reply(text, { parse_mode: "HTML" })

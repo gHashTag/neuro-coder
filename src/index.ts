@@ -50,7 +50,7 @@ bot.api.setMyCommands([
   },
   {
     command: "invite",
-    description: "👥 Пригласить друга",
+    description: "👥 Invite a friend / Пригласить друга",
   },
   {
     command: "imagesize",
