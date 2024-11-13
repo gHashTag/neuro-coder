@@ -23,6 +23,7 @@ import { answerAi } from "./core/openai/requests"
 import textToSpeech from "./commands/textToSpeech"
 import { lipSyncConversation } from "./commands/lipSyncConversation"
 import { createBackgroundVideo } from "./commands/createBackgroundVideo"
+import { start } from "./commands/start"
 
 interface SessionData {
   melimi00: {
@@ -42,6 +43,10 @@ bot.api.setMyCommands([
   {
     command: "start",
     description: "👋 Начать использовать бота",
+  },
+  {
+    command: "invite",
+    description: "👥 Пригласить друга",
   },
   {
     command: "imagesize",
@@ -68,6 +73,7 @@ bot.use(createConversation(voiceConversation))
 bot.use(createConversation(inviterConversation))
 bot.use(createConversation(lipSyncConversation))
 bot.use(createConversation(createBackgroundVideo))
+bot.command("start", start)
 bot.use(customMiddleware)
 bot.use(commands)
 

@@ -21,14 +21,15 @@ import textToSpeech from "./textToSpeech"
 // import melimi04 from "./melimi/melimi04";
 // import melimi05 from "./melimi/melimi05";
 // import melimi06 from "./melimi/melimi06";
-import { start } from "./start"
+// import { start } from "./start"
 import { model } from "./model"
+import { invite } from "./invite"
 // import neurocoder02 from "./neurocoder/neurocoder02";
 // import neurocoder03 from "./neurocoder/neurocoder03";
 
 const composer = new Composer<MyContext>()
 
-composer.command("start", start)
+// composer.command("start", start)
 
 composer.command("hello", hello)
 
@@ -151,6 +152,8 @@ composer.command("soul", async (ctx) => {
 composer.command("voice", async (ctx) => {
   await ctx.conversation.enter("voiceConversation")
 })
+
+composer.command("invite", invite)
 
 // composer.command("get100", async (ctx) => {
 //   await ctx.conversation.enter("get100AnfiVesnaConversation");

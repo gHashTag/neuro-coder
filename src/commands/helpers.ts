@@ -1305,7 +1305,7 @@ export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, 
   if (telegram_id) {
     // Ваша логика здесь
     console.log(username, telegram_id, "username, telegram_id")
-    await createUser(username, telegram_id.toString())
+    await createUser({ username, telegram_id: telegram_id.toString() })
 
     // Проверка наличия инвайтера
     const { data: user, error } = await supabase.from("users").select("inviter").eq("telegram_id", telegram_id).maybeSingle()

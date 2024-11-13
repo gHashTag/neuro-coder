@@ -1,9 +1,14 @@
 import { InputFile } from "grammy"
 import { MyContext } from "../../utils/types"
+import { createUser } from "../../core/supabase"
 
 async function start(ctx: MyContext) {
   const photoPath = "assets/neurocoder/neurocoder.png"
   const isRu = ctx.from?.language_code === "ru"
+  const params = ctx?.message?.text && ctx?.message?.text.split(" ")[1]
+
+  console.log(params)
+  await createUser({ username: ctx.from?.username || "", telegram_id: ctx.from?.id.toString() || "", inviter: params })
 
   const captionRu =
     "👋 Привет!\n" +
