@@ -23,6 +23,7 @@ import { answerAi } from "./core/openai/requests"
 import textToSpeech from "./commands/textToSpeech"
 import { lipSyncConversation } from "./commands/lipSyncConversation"
 import { createBackgroundVideo } from "./commands/createBackgroundVideo"
+import { start } from "./commands/start"
 import leeSolarNumerolog from "./commands/lee_solar_numerolog"
 
 interface SessionData {
@@ -47,6 +48,10 @@ bot.api.setMyCommands([
   {
     command: "model",
     description: "🤖 Change model / Изменить модель",
+  },
+  {
+    command: "invite",
+    description: "👥 Invite a friend / Пригласить друга",
   },
   {
     command: "imagesize",
@@ -91,6 +96,7 @@ bot.use(createConversation(inviterConversation))
 bot.use(createConversation(lipSyncConversation))
 bot.use(createConversation(createBackgroundVideo))
 bot.use(createConversation(leeSolarNumerolog))
+bot.command("start", start)
 bot.use(customMiddleware)
 bot.use(commands)
 

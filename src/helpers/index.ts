@@ -1301,11 +1301,26 @@ export const upgradePrompt = async (prompt: string) => {
 export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, next) => {
   const username = ctx.from?.username || ""
   const telegram_id = ctx.from?.id
+  const chatMember = await bot.api.getChatMember("@neuro_coder_ai", telegram_id || 0)
+  const isSubscribed = chatMember.status === "member" || chatMember.status === "administrator" || chatMember.status === "creator"
+
+  if (!isSubscribed) {
+    const isRu = ctx.from?.language_code === "ru"
+    await ctx.reply(
+      isRu ? "Пожалуйста, подпишитесь на наш канал, чтобы продолжить использование бота. 😊" : "Please subscribe to our channel to continue using the bot. 😊",
+      {
+        reply_markup: {
+          inline_keyboard: [[{ text: "Подписаться", url: `t.me/neuro_coder_ai` }]],
+        },
+      },
+    )
+    return
+  }
 
   if (telegram_id) {
     // Ваша логика здесь
     console.log(username, telegram_id, "username, telegram_id")
-    await createUser(username, telegram_id.toString())
+    await createUser({ username, telegram_id: telegram_id.toString() })
 
     // Проверка наличия инвайтера
     const { data: user, error } = await supabase.from("users").select("inviter").eq("telegram_id", telegram_id).maybeSingle()
