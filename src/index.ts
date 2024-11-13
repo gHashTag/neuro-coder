@@ -8,7 +8,7 @@ import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
 import { session, SessionFlavor } from "grammy"
 import { imageSizeConversation } from "./commands/imagesize"
-import { customMiddleware, generateImage, pulse, imageToVideo, upgradePrompt } from "./commands/helpers"
+import { customMiddleware, generateImage, pulse, imageToVideo, upgradePrompt } from "./helpers"
 import { generateImageConversation } from "./commands/generateImage"
 import createTriggerReel from "./commands/trigger_reel"
 import createCaptionForNews from "./commands/сaptionForNews"
@@ -42,7 +42,11 @@ bot.use(session({ initial: () => ({}) }))
 bot.api.setMyCommands([
   {
     command: "start",
-    description: "👋 Начать использовать бота",
+    description: "👋 Start for use bot / Начать использовать бота",
+  },
+  {
+    command: "model",
+    description: "🤖 Change model / Изменить модель",
   },
   {
     command: "invite",
@@ -50,17 +54,30 @@ bot.api.setMyCommands([
   },
   {
     command: "imagesize",
-    description: "🖼️ Изменить размер генерируемого изображения",
+    description: "🖼️ Change image size / Изменить размер генерируемого изображения",
   },
   {
     command: "avatar",
-    description: "👤 Рассказать о себе аватару",
+    description: "👤 Tell about yourself / Рассказать о себе",
   },
   {
     command: "voice",
-    description: "🎤 Добавить аватару голос",
+    description: "🎤 Add voice to avatar / Добавить аватару голос",
+  },
+  {
+    command: "text_to_speech",
+    description: "🎤 Convert text to speech / Преобразовать текст в речь",
+  },
+  {
+    command: "lipsync",
+    description: "🎥 Lipsync / Синхронизация губ",
+  },
+  {
+    command: "b_roll",
+    description: "🎥 Create B-roll / Создать B-roll",
   },
 ])
+
 bot.use(conversations())
 bot.use(createConversation(imageSizeConversation))
 bot.use(createConversation(textToSpeech))

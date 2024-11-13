@@ -81,8 +81,9 @@ async function getBRollVideo(query: string): Promise<string[]> {
   try {
     const response = await client.videos.search({
       query,
-      per_page: 10,
+      per_page: 5,
       orientation: "portrait",
+      quality: "high",
     })
 
     console.log(response)

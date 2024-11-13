@@ -1,11 +1,11 @@
-import { generateImage } from "../helpers"
+import { generateImage } from "../../helpers"
 import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard } from "grammy"
 
 async function get100AnfiVesnaConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const keyboard = new InlineKeyboard().text("Отменить генерацию", "cancel")
-  const model_type = "kirill_korolev"
+  const model_type = "neuro_coder"
   console.log(model_type)
   await ctx.reply(
     "Привет! Напишите промпт на английском для генерации изображения. Если вы хотите использовать какой-то референс, то прикрепите изображение к сообщению.",

@@ -2,7 +2,7 @@ import { Context, InputFile } from "grammy"
 
 import { promises as fs } from "fs"
 import path from "path"
-import { createSlideshow, generateImagesForMeditation, translateText, getCaptionForNews } from "../helpers"
+import { createSlideshow, generateImagesForMeditation, translateText, getCaptionForNews } from "../../helpers"
 import { Step } from "src/utils/types"
 import { InputMediaPhoto } from "grammy/types"
 import { Conversation } from "@grammyjs/conversations"
@@ -24,7 +24,7 @@ const createCaptionForNews = async (conversation: Conversation<MyContext>, ctx: 
     if (!ctx.from) throw new Error("User not found")
 
     const { message } = await conversation.wait()
-    
+
     const caption = await getCaptionForNews({
       prompt: message?.text || "",
     })

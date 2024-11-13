@@ -1,7 +1,7 @@
 import { supabase } from "."
 import fs from "fs"
 
-export async function uploadVideo(filePath: string, telegram_id: string, bucket: string, fileName: string) {
+export async function uploadVideo(filePath: string, bucket: string, fileName: string) {
   try {
     const file = fs.readFileSync(filePath)
     const { data, error } = await supabase.storage.from(bucket).upload(fileName, file, {

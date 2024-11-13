@@ -4,7 +4,7 @@ import ffmpeg from "fluent-ffmpeg"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import path from "path"
 import fs from "fs"
-import { getSlides, makeTextLayers, overlayPhotoOnVideo, toShortVideo } from "../../helpers"
+import { getSlides, makeTextLayers, overlayPhotoOnVideo, toShortVideo } from "../../../helpers"
 import { getHistory, setHistory } from "../../../core/supabase/ai"
 import { getVideoUrl, uploadVideo } from "../../../core/supabase/video"
 
@@ -79,7 +79,7 @@ const melimi03 = async (ctx: Context): Promise<void> => {
     await ctx.reply(slides.reels.videoDescription)
     if (!ctx.from) throw new Error("No user")
     const fileName = `${ctx.from.id}_${Date.now()}.mp4`
-    await uploadVideo(`${outputFilePath}/final_video.mp4`, ctx.from.id.toString(), "melimi", fileName)
+    await uploadVideo(`${outputFilePath}/final_video.mp4`, "melimi", fileName)
     const videoUrl = await getVideoUrl("melimi", fileName)
     if (!videoUrl) throw new Error("No video url")
     //await setHistory({ brand: "melimi", response: slides.reels.videoDescription, video_url: videoUrl, command: "melimi03", type: "reels", voice_id: "PVKVligmzACf89A0Cegd", chat_id: ctx.from.id.toString(), lang: "ru", trigger: "melimi03" });

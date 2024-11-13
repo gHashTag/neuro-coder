@@ -15,8 +15,8 @@ import { createUser, supabase } from "../core/supabase"
 import { bot } from ".."
 import { ElevenLabsClient } from "elevenlabs"
 import { v4 as uuid } from "uuid"
-import { models } from "./constants"
-import { triggerWord } from "./neuro_broker/mock"
+import { models } from "../commands/constants"
+import { triggerWord } from "../commands/neuro_broker/mock"
 
 if (!process.env.CREATOMATE_API_KEY) {
   throw new Error("CREATOMATE_API_KEY is not set")
@@ -1420,11 +1420,6 @@ export const createAudioFileFromText = async ({ text, voice_id }: { text: string
 
 export const createRender = async ({ template_id, modifications }: { template_id: string; modifications: Record<string, string> }) => {
   try {
-    const source = new Creatomate.Source({
-      outputFormat: "mp4",
-      elements: [new Creatomate.Video({ source: modifications["Video-1"] })],
-    })
-
     const options = {
       templateId: template_id,
       modifications: modifications,
