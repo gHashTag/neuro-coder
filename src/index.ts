@@ -23,6 +23,7 @@ import { answerAi } from "./core/openai/requests"
 import textToSpeech from "./commands/textToSpeech"
 import { lipSyncConversation } from "./commands/lipSyncConversation"
 import { createBackgroundVideo } from "./commands/createBackgroundVideo"
+import leeSolarNumerolog from "./commands/lee_solar_numerolog"
 
 interface SessionData {
   melimi00: {
@@ -71,6 +72,10 @@ bot.api.setMyCommands([
     command: "b_roll",
     description: "🎥 Create B-roll / Создать B-roll",
   },
+  {
+    command: "inviter",
+    description: "👥 Inviter / Пригласить друга",
+  },
 ])
 
 bot.use(conversations())
@@ -85,6 +90,7 @@ bot.use(createConversation(voiceConversation))
 bot.use(createConversation(inviterConversation))
 bot.use(createConversation(lipSyncConversation))
 bot.use(createConversation(createBackgroundVideo))
+bot.use(createConversation(leeSolarNumerolog))
 bot.use(customMiddleware)
 bot.use(commands)
 

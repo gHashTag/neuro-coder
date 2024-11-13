@@ -48,7 +48,7 @@ composer.command("lipsync", async (ctx) => {
   await ctx.conversation.enter("lipSyncConversation")
 })
 
-composer.command("b_roll", async (ctx) => {
+composer.command("", async (ctx) => {
   await ctx.conversation.enter("createBackgroundVideo")
 })
 
@@ -82,6 +82,10 @@ composer.command("vega_condominium", async (ctx) => {
 
 composer.command("neuro_coder", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("lee_solar_numerolog", async (ctx) => {
+  await ctx.conversation.enter("leeSolarNumerolog")
 })
 
 composer.command("yellowshoess", async (ctx) => {
