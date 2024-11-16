@@ -4,12 +4,9 @@ import { createSlideshow as createSlideshowVideo, SlideshowOptions } from "slide
 import {
   createAudioFileFromText,
   createRender,
-  delay,
   deleteFileFromSupabase,
-  generateImageNeuroBroker,
   generateImagesForNeuroBroker,
   getAudioDuration,
-  getMeditationSteps,
   getSellVillaSteps,
   mergeAudioFiles,
   translateText,
@@ -29,7 +26,6 @@ import {
   location,
   officeDescription,
   outdoorDescription,
-  stepsData,
   triggerWord,
   type,
 } from "./mock"

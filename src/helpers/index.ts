@@ -1299,9 +1299,15 @@ export const upgradePrompt = async (prompt: string) => {
 }
 
 export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, next) => {
+  if (process.env.NODE_ENV === "development") {
+    // Пропускаем проверку для режима разработки
+    return await next()
+  }
+
   const username = ctx.from?.username || ""
   const telegram_id = ctx.from?.id
   const chatMember = await bot.api.getChatMember("@neuro_coder_ai", telegram_id || 0)
+  console.log(chatMember, "chatMember")
   const isSubscribed = chatMember.status === "member" || chatMember.status === "administrator" || chatMember.status === "creator"
 
   if (!isSubscribed) {

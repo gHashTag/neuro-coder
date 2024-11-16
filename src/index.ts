@@ -24,6 +24,9 @@ import textToSpeech from "./commands/textToSpeech"
 import { lipSyncConversation } from "./commands/lipSyncConversation"
 import { createBackgroundVideo } from "./commands/createBackgroundVideo"
 import { start } from "./commands/start"
+import leeSolarNumerolog from "./commands/lee_solar_numerolog"
+import leeSolarBroker from "./commands/lee_solar_broker"
+import { subtitles } from "./commands/subtitles"
 
 interface SessionData {
   melimi00: {
@@ -39,44 +42,58 @@ const bot = new Bot<MyContextWithSession>(process.env.BOT_TOKEN || "")
 bot.api.config.use(hydrateFiles(bot.token))
 
 bot.use(session({ initial: () => ({}) }))
-bot.api.setMyCommands([
-  {
-    command: "start",
-    description: "👋 Start for use bot / Начать использовать бота",
-  },
-  {
-    command: "model",
-    description: "🤖 Change model / Изменить модель",
-  },
-  {
-    command: "invite",
-    description: "👥 Invite a friend / Пригласить друга",
-  },
-  {
-    command: "imagesize",
-    description: "🖼️ Change image size / Изменить размер генерируемого изображения",
-  },
-  {
-    command: "avatar",
-    description: "👤 Tell about yourself / Рассказать о себе",
-  },
-  {
-    command: "voice",
-    description: "🎤 Add voice to avatar / Добавить аватару голос",
-  },
-  {
-    command: "text_to_speech",
-    description: "🎤 Convert text to speech / Преобразовать текст в речь",
-  },
-  {
-    command: "lipsync",
-    description: "🎥 Lipsync / Синхронизация губ",
-  },
-  {
-    command: "b_roll",
-    description: "🎥 Create B-roll / Создать B-roll",
-  },
-])
+
+console.log(process.env.NODE_ENV, "process.env.NODE_ENV")
+process.env.NODE_ENV === "development" ? development(bot) : production(bot)
+
+if (process.env.NODE_ENV === "production") {
+  bot.api.setMyCommands([
+    {
+      command: "start",
+      description: "👋 Start for use bot / Начать использовать бота",
+    },
+    {
+      command: "model",
+      description: "🤖 Change model / Изменить модель",
+    },
+    {
+      command: "invite",
+      description: "👥 Invite a friend / Пригласить друга",
+    },
+    {
+      command: "imagesize",
+      description: "🖼️ Change image size / Изменить размер генерируемого изображения",
+    },
+    {
+      command: "avatar",
+      description: "👤 Tell about yourself / Рассказать о себе",
+    },
+    {
+      command: "voice",
+      description: "🎤 Add voice to avatar / Добавить аватару голос",
+    },
+    {
+      command: "text_to_speech",
+      description: "🎤 Convert text to speech / Преобразовать текст в речь",
+    },
+    {
+      command: "lipsync",
+      description: "🎥 Lipsync / Синхронизация губ",
+    },
+    {
+      command: "b_roll",
+      description: "🎥 Create B-roll / Создать B-roll",
+    },
+    {
+      command: "subtitles",
+      description: "🎥 Create subtitles / Создать субтитры",
+    },
+    {
+      command: "inviter",
+      description: "👥 Inviter / Пригласить друга",
+    },
+  ])
+}
 
 bot.use(conversations())
 bot.use(createConversation(imageSizeConversation))
@@ -90,6 +107,10 @@ bot.use(createConversation(voiceConversation))
 bot.use(createConversation(inviterConversation))
 bot.use(createConversation(lipSyncConversation))
 bot.use(createConversation(createBackgroundVideo))
+bot.use(createConversation(leeSolarNumerolog))
+bot.use(createConversation(leeSolarBroker))
+bot.use(createConversation(subtitles))
+
 bot.command("start", start)
 bot.use(customMiddleware)
 bot.use(commands)
@@ -278,8 +299,5 @@ bot.catch((err) => {
       console.error("Ошибка отправки сообщения об ошибке пользователю:", e)
     })
 })
-
-console.log(process.env.NODE_ENV, "process.env.NODE_ENV")
-process.env.NODE_ENV === "development" ? development(bot) : production(bot)
 
 export { bot }

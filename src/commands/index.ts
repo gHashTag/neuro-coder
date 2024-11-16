@@ -85,6 +85,14 @@ composer.command("neuro_coder", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
 
+composer.command("lee_solar_numerolog", async (ctx) => {
+  await ctx.conversation.enter("leeSolarNumerolog")
+})
+
+composer.command("lee_solar_broker", async (ctx) => {
+  await ctx.conversation.enter("leeSolarBroker")
+})
+
 composer.command("yellowshoess", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
@@ -154,6 +162,10 @@ composer.command("voice", async (ctx) => {
 })
 
 composer.command("invite", invite)
+
+composer.command("subtitles", async (ctx) => {
+  await ctx.conversation.enter("subtitles")
+})
 
 // composer.command("get100", async (ctx) => {
 //   await ctx.conversation.enter("get100AnfiVesnaConversation");
