@@ -160,11 +160,16 @@ export async function createBackgroundVideo(conversation: Conversation<MyContext
         const tempFile = path.join(videoDir, `temp_${videoNumber}.mp4`)
         const bgVideoPath = path.join(videoDir, `bg-video${videoNumber}.mp4`)
 
+        console.log(videoNumber, "videoNumber")
+        console.log(tempFile, "tempFile")
+        console.log(bgVideoPath, "bgVideoPath")
+
         await downloadVideo(videoUrls[i], tempFile)
         await resizeVideo(tempFile, bgVideoPath)
 
         // Отправляем видео
         const video = new InputFile(bgVideoPath)
+        console.log(video, "video")
         await ctx.replyWithVideo(video)
 
         // Удаляем только временный файл

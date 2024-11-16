@@ -49,7 +49,7 @@ composer.command("lipsync", async (ctx) => {
   await ctx.conversation.enter("lipSyncConversation")
 })
 
-composer.command("", async (ctx) => {
+composer.command("b_roll", async (ctx) => {
   await ctx.conversation.enter("createBackgroundVideo")
 })
 
@@ -162,6 +162,10 @@ composer.command("voice", async (ctx) => {
 })
 
 composer.command("invite", invite)
+
+composer.command("subtitles", async (ctx) => {
+  await ctx.conversation.enter("subtitles")
+})
 
 // composer.command("get100", async (ctx) => {
 //   await ctx.conversation.enter("get100AnfiVesnaConversation");
