@@ -24,6 +24,7 @@ import textToSpeech from "./textToSpeech"
 // import { start } from "./start"
 import { model } from "./model"
 import { invite } from "./invite"
+import { buy } from "./buy"
 // import neurocoder02 from "./neurocoder/neurocoder02";
 // import neurocoder03 from "./neurocoder/neurocoder03";
 
@@ -64,6 +65,8 @@ composer.command("imagesize", async (ctx) => {
 composer.command("playom", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
+
+composer.command("buy", buy)
 
 composer.command("trigger_reel", async (ctx) => {
   await ctx.conversation.enter("createTriggerReel")
