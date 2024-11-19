@@ -55,7 +55,7 @@ if (process.env.NODE_ENV === "production") {
       description: "👋 Start for use bot / Начать использовать бота",
     },
     {
-      command: "pay",
+      command: "buy",
       description: "💰 Buy a subscription / Купить подписку",
     },
     {
@@ -93,10 +93,6 @@ if (process.env.NODE_ENV === "production") {
     {
       command: "subtitles",
       description: "🎥 Create subtitles / Создать субтитры",
-    },
-    {
-      command: "inviter",
-      description: "👥 Inviter / Пригласить друга",
     },
   ])
 }
