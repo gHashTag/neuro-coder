@@ -29,6 +29,7 @@ import leeSolarBroker from "./commands/lee_solar_broker"
 import { subtitles } from "./commands/subtitles"
 import { checkSubscriptionByTelegramId, isLimitAi, sendPaymentInfo } from "./core/supabase/payments"
 import { getUid } from "./core/supabase"
+import createAinews from "./commands/ainews"
 
 interface SessionData {
   melimi00: {
@@ -94,6 +95,10 @@ if (process.env.NODE_ENV === "production") {
       command: "subtitles",
       description: "🎥 Create subtitles / Создать субтитры",
     },
+    {
+      command: "ainews",
+      description: "📰 Create AI news caption / Создать описание AI новости",
+    }
   ])
 }
 
@@ -112,6 +117,7 @@ bot.use(createConversation(createBackgroundVideo))
 bot.use(createConversation(leeSolarNumerolog))
 bot.use(createConversation(leeSolarBroker))
 bot.use(createConversation(subtitles))
+bot.use(createConversation(createAinews))
 
 bot.command("start", start)
 bot.use(customMiddleware)
