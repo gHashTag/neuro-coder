@@ -11,6 +11,7 @@ export const models = {
     key: "ghashtag/vega_condominium:19ba41aebd5e3bd920c08149c08cd1a72f74910587d9421ce2fbb5b118635347",
     word: "TOK",
   },
+  dpbelarusx: { key: "ghashtag/dpbelarusx:75f9be2071f26e6f06be9f450606717de485acd4d4f6be422276ceaa6244aa26", word: "TOK very fashionable man " },
   yellowshoess: { key: "ghashtag/yellowshoess:f496e9339501d16a2ed83a57f49c1e888eae9b2e5073a296b28c33b01c052f0c", word: "TOK very fashionable man " },
   gimba: { key: "ghashtag/gimba:828b4a2cb2fb238c4034532e3e8e72a87c3ac4b7f6530ad1869e670f6d1b750b", word: "GIMBA very fashionable man " },
   karin: {

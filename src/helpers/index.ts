@@ -48,9 +48,19 @@ const clientRunway = new RunwayML({ apiKey: process.env.RUNWAY_API_KEY })
 
 const client = new Creatomate.Client(process.env.CREATOMATE_API_KEY)
 
+console.log("Environment check:", {
+  nodeEnv: process.env.NODE_ENV,
+  elevenLabsKeyExists: !!process.env.ELEVENLABS_API_KEY,
+  elevenLabsKeyPrefix: process.env.ELEVENLABS_API_KEY?.substring(0, 5),
+})
+
+console.log("ELEVENLABS_API_KEY:", process.env.ELEVENLABS_API_KEY?.substring(0, 5) + "...")
+
+console.log("Initializing ElevenLabs client...")
 export const elevenlabs = new ElevenLabsClient({
   apiKey: process.env.ELEVENLABS_API_KEY,
 })
+console.log("ElevenLabs client initialized")
 
 export const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
@@ -1410,35 +1420,58 @@ export async function mergeAudioFiles(audioStream1: string, audioStream2: string
   })
 }
 
-// Start of Selection
 export const createAudioFileFromText = async ({ text, voice_id }: { text: string; voice_id: string }): Promise<string> => {
+  // Логируем входные данные
+  console.log("Attempting to create audio with:", {
+    voice_id,
+    textLength: text.length,
+    apiKeyPresent: !!process.env.ELEVENLABS_API_KEY,
+    apiKeyPrefix: process.env.ELEVENLABS_API_KEY?.substring(0, 5),
+  })
+
   return new Promise<string>(async (resolve, reject) => {
     try {
+      // Проверяем наличие API ключа
+      if (!process.env.ELEVENLABS_API_KEY) {
+        throw new Error("ELEVENLABS_API_KEY отсутствует")
+      }
+
+      // Логируем попытку генерации
+      console.log("Generating audio stream...")
+
       const audioStream = await elevenlabs.generate({
         voice: voice_id,
         model_id: "eleven_turbo_v2_5",
         text,
       })
 
-      // Создаем временный файл для сохранения аудио
+      // Логируем успешную генерацию
+      console.log("Audio stream generated successfully")
+
       const outputPath = path.join(os.tmpdir(), `audio_${Date.now()}.mp3`)
       const writeStream = createWriteStream(outputPath)
 
       audioStream.pipe(writeStream)
 
       writeStream.on("finish", () => {
+        console.log("Audio file written successfully to:", outputPath)
         resolve(outputPath)
       })
 
       writeStream.on("error", (error) => {
+        console.error("Error writing audio file:", error)
         reject(error)
       })
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Error in createAudioFileFromText:", {
+        message: error.message,
+        statusCode: error.statusCode,
+        stack: error.stack,
+      })
       reject(error)
     }
   })
 }
-
 export const createRender = async ({ template_id, modifications }: { template_id: string; modifications: Record<string, string> }) => {
   try {
     const options = {

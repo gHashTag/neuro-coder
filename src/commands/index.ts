@@ -81,6 +81,10 @@ composer.command("vega_condominium", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
 
+composer.command("dpbelarusx", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
 composer.command("neuro_coder", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
@@ -167,9 +171,9 @@ composer.command("subtitles", async (ctx) => {
   await ctx.conversation.enter("subtitles")
 })
 
-// composer.command("get100", async (ctx) => {
-//   await ctx.conversation.enter("get100AnfiVesnaConversation");
-// });
+composer.command("get100", async (ctx) => {
+  await ctx.conversation.enter("get100AnfiVesnaConversation")
+})
 
 composer.command("model", model)
 // composer.command("neurocoder01", neurocoder01);
