@@ -54,6 +54,11 @@ export const createUser = async ({ username, telegram_id, inviter = "" }: { user
   return existingUser
 }
 
+export const getUid = async (telegram_id: string) => {
+  const { data, error } = await supabase.from("users").select("user_id").eq("telegram_id", telegram_id).maybeSingle()
+  if (error) throw new Error(`Ошибка при получении user_id: ${error.message}`)
+  return data?.user_id
+}
 export const updateUserSoul = async (telegram_id: string, company: string, position: string, designation: string) => {
   const { error } = await supabase.from("users").update({ company, position, designation }).eq("telegram_id", telegram_id)
   if (error) {

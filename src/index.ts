@@ -15,7 +15,7 @@ import createCaptionForNews from "./commands/сaptionForNews"
 import { get100AnfiVesnaConversation } from "./commands/get100"
 import { soulConversation } from "./commands/soul"
 import { voiceConversation } from "./commands/voice"
-import { getGeneratedImages, getModel, getPrompt, savePrompt, setModel } from "./core/supabase/ai"
+import { getGeneratedImages, getModel, getPrompt, incrementLimit, savePrompt, setModel } from "./core/supabase/ai"
 import { InputMediaPhoto } from "grammy/types"
 import { inviterConversation } from "./commands/inviter"
 import { models } from "./commands/constants"
@@ -27,6 +27,9 @@ import { start } from "./commands/start"
 import leeSolarNumerolog from "./commands/lee_solar_numerolog"
 import leeSolarBroker from "./commands/lee_solar_broker"
 import { subtitles } from "./commands/subtitles"
+import { checkSubscriptionByTelegramId, isLimitAi, sendPaymentInfo } from "./core/supabase/payments"
+import { getUid } from "./core/supabase"
+import createAinews from "./commands/ainews"
 
 interface SessionData {
   melimi00: {
@@ -51,6 +54,10 @@ if (process.env.NODE_ENV === "production") {
     {
       command: "start",
       description: "👋 Start for use bot / Начать использовать бота",
+    },
+    {
+      command: "buy",
+      description: "💰 Buy a subscription / Купить подписку",
     },
     {
       command: "model",
@@ -89,9 +96,9 @@ if (process.env.NODE_ENV === "production") {
       description: "🎥 Create subtitles / Создать субтитры",
     },
     {
-      command: "inviter",
-      description: "👥 Inviter / Пригласить друга",
-    },
+      command: "ainews",
+      description: "📰 Create AI news caption / Создать описание AI новости",
+    }
   ])
 }
 
@@ -110,15 +117,69 @@ bot.use(createConversation(createBackgroundVideo))
 bot.use(createConversation(leeSolarNumerolog))
 bot.use(createConversation(leeSolarBroker))
 bot.use(createConversation(subtitles))
+bot.use(createConversation(createAinews))
 
 bot.command("start", start)
 bot.use(customMiddleware)
 bot.use(commands)
 
+bot.on("pre_checkout_query", (ctx) => {
+  ctx.answerPreCheckoutQuery(true)
+  return
+})
+
+bot.on("message:successful_payment", async (ctx) => {
+  // const lang = ctx.from?.language_code === "ru"
+  console.log("ctx 646(succesful_payment)", ctx)
+  const level = ctx.message.successful_payment.invoice_payload
+  if (level === "avatar") {
+    await incrementLimit({ telegram_id: ctx.from?.id.toString() || "", amount: 400 })
+  }
+  if (!ctx.from?.id) throw new Error("No telegram id")
+  const user_id = await getUid(ctx.from.id.toString())
+  if (!user_id) throw new Error("No user_id")
+  await sendPaymentInfo(user_id, level)
+  // const levelForMessage =
+  //   level === "start"
+  //     ? lang
+  //       ? "НейроСтарт"
+  //       : "NeuroStart"
+  //     : level === "base"
+  //     ? lang
+  //       ? "НейроБаза"
+  //       : "NeuroBase"
+  //     : level === "student"
+  //     ? lang
+  //       ? "НейроУченик"
+  //       : "NeuroStudent"
+  //     : lang
+  //     ? "НейроЭксперт"
+  //     : "NeuroExpert"
+  // await ctx.reply(lang ? "🤝 Спасибо за покупку!" : "🤝 Thank you for the purchase!")
+  // const textToPost = lang
+  //   ? `🪙 @${ctx.from.username} спасибо за покупку уровня ${levelForMessage}!`
+  //   : `🪙 @${ctx.from.username} thank you for the purchase level ${levelForMessage}!`
+  // await ctx.api.sendMessage(mediaChatId(lang), textToPost)
+  return
+})
+
 bot.on("message:text", async (ctx) => {
   if (ctx.message.text.startsWith("/")) return
   if (ctx.message.text) {
+    const isRu = ctx.from?.language_code === "ru"
     const model = await getModel(ctx.from?.id.toString() || "")
+    const subscription = await checkSubscriptionByTelegramId(ctx.from?.id.toString() || "")
+    if (subscription === "unsubscribed") {
+      const isLimit = await isLimitAi(ctx.from.id.toString())
+      if (isLimit) {
+        await ctx.reply(
+          isRu
+            ? "У вас закончились бесплатные ежедневные запросы на использование нейросети 🧠. Подписка неактивна. \n\n/buy - выбери уровень и оформляй подписку, чтобы получить неограниченный доступ к нейросети 🧠"
+            : "🔒 You are not subscribed to any level. The subscription is inactive. \n\n/buy - select a level and subscribe, to get unlimited access to the neural network 🧠",
+        )
+        return
+      }
+    }
     const answer = await answerAi(model, ctx.message.text, ctx.from?.language_code || "en")
     if (!answer) {
       await ctx.reply("❌ Извините, произошла ошибка при ответе на ваш запрос. Пожалуйста, попробуйте позже.")
@@ -131,6 +192,60 @@ bot.on("message:text", async (ctx) => {
 bot.on("callback_query:data", async (ctx) => {
   const callbackData = ctx.callbackQuery.data
   const isRu = ctx.from?.language_code === "ru"
+  if (callbackData.startsWith("buy")) {
+    if (callbackData.endsWith("avatar")) {
+      await ctx.replyWithInvoice(
+        isRu ? "Цифровой аватар" : "Digital avatar",
+        isRu
+          ? "Представьте, у вас есть возможность создать уникальную цифровую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим лицом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
+          : "Imagine you have the opportunity to create a unique digital copy of yourself! I can train the AI on your photos so that you can receive images with your face and body in any style and setting — from fantastic worlds to fashion photo sessions. This is a great opportunity for a personal brand or just for fun!",
+        "avatar",
+        "XTR",
+        [{ label: "Цена", amount: 5645 }],
+      )
+      return
+    }
+    if (callbackData.endsWith("start")) {
+      await ctx.replyWithInvoice(
+        isRu ? "НейроСтарт" : "NeuroStart",
+        isRu ? "Вы получите подписку уровня 'НейроСтарт'" : "You will receive a subscription to the 'NeuroStart' level",
+        "start",
+        "XTR",
+        [{ label: "Цена", amount: 55 }],
+      )
+      return
+    }
+    if (callbackData.endsWith("base")) {
+      await ctx.replyWithInvoice(
+        isRu ? "НейроБаза" : "NeuroBase",
+        isRu ? "Вы получите подписку уровня 'НейроБаза'" : "You will receive a subscription to the 'NeuroBase' level",
+        "base",
+        "XTR",
+        [{ label: "Цена", amount: 565 }],
+      )
+      return
+    }
+    if (callbackData.endsWith("student")) {
+      await ctx.replyWithInvoice(
+        isRu ? "НейроУченик" : "NeuroStudent",
+        isRu ? "Вы получите подписку уровня 'НейроУченик'" : "You will receive a subscription to the 'NeuroStudent' level",
+        "student",
+        "XTR",
+        [{ label: "Цена", amount: 5655 }],
+      )
+      return
+    }
+    if (callbackData.endsWith("expert")) {
+      await ctx.replyWithInvoice(
+        isRu ? "НейроЭксперт" : "NeuroExpert",
+        isRu ? "Вы получите подписку уровня 'НейроЭксперт'" : "You will receive a subscription to the 'NeuroExpert' level",
+        "expert",
+        "XTR",
+        [{ label: "Цена", amount: 16955 }],
+      )
+      return
+    }
+  }
   if (callbackData.startsWith("generate_")) {
     try {
       const count = parseInt(callbackData.split("_")[1])

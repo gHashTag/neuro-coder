@@ -7,7 +7,7 @@ import clipmaker from "./clipmaker"
 import leela from "./leela"
 import createTriggerReel from "./trigger_reel"
 import createCaptionForNews from "./сaptionForNews"
-
+import createAinews from "./ainews"
 import neuro_broker from "./neuro_broker"
 import textToSpeech from "./textToSpeech"
 
@@ -24,9 +24,10 @@ import textToSpeech from "./textToSpeech"
 // import { start } from "./start"
 import { model } from "./model"
 import { invite } from "./invite"
+import { buy } from "./buy"
 // import neurocoder02 from "./neurocoder/neurocoder02";
 // import neurocoder03 from "./neurocoder/neurocoder03";
-
+    
 const composer = new Composer<MyContext>()
 
 // composer.command("start", start)
@@ -64,6 +65,8 @@ composer.command("imagesize", async (ctx) => {
 composer.command("playom", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
+
+composer.command("buy", buy)
 
 composer.command("trigger_reel", async (ctx) => {
   await ctx.conversation.enter("createTriggerReel")
@@ -195,8 +198,8 @@ composer.command("melimi_cat", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
 
-composer.command("melimi_cat", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
+composer.command("ainews", async (ctx) => {
+  await ctx.conversation.enter("createAinews")
 })
 
 export default composer
