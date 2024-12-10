@@ -10,7 +10,7 @@ import { MyContext, MyContextWithSession, Step } from "../utils/types"
 import Replicate from "replicate"
 import { createWriteStream, promises as fs } from "fs"
 import { getAspectRatio, incrementGeneratedImages, savePrompt } from "../core/supabase/ai"
-import { MiddlewareFn } from "grammy"
+import { InputFile, MiddlewareFn } from "grammy"
 import { createUser, supabase } from "../core/supabase"
 import { bot } from ".."
 import { ElevenLabsClient } from "elevenlabs"
@@ -1548,14 +1548,25 @@ export const generateVoice = async (text: string, voiceId: string) => {
 export const pulse = async (ctx: MyContext, image: string, prompt: string, command: string) => {
   try {
     if (process.env.NODE_ENV === "development") return
+
     const truncatedPrompt = prompt.length > 800 ? prompt.slice(0, 800) : prompt
     const caption = `@${ctx.from?.username || "Пользователь без username"} Telegram ID: ${
       ctx.from?.id
     } сгенерировал изображение с промптом: ${truncatedPrompt} \n\n Команда: ${command}`
 
-    await bot.api.sendPhoto("-4166575919", image, { caption })
+    // Если изображение начинается с data:image/, нужно получить только base64
+    let imageToSend = image
+    if (image.startsWith("data:image/")) {
+      imageToSend = image.split(",")[1]
+    }
+
+    // Преобразуем base64 в буфер
+    const imageBuffer = Buffer.from(imageToSend, "base64")
+
+    // Отправляем как InputFile
+    await bot.api.sendPhoto("-4166575919", new InputFile(imageBuffer), { caption })
   } catch (error) {
-    console.error(error)
+    console.error("Ошибка при отправке пульса:", error)
     throw new Error("Ошибка при отправке пульса")
   }
 }
