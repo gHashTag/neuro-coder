@@ -70,13 +70,7 @@ export const isDev = process.env.NODE_ENV === "development"
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 
-// Добавляем типы для Replicate API
-interface PredictionStatus {
-  id: string
-  status: "starting" | "processing" | "succeeded" | "failed" | "canceled"
-  error: string | null
-  output: string | null
-}
+// Добавляем типы для Replicate APIdd
 interface GenerationResult {
   image: string | Buffer
   prompt_id: string
@@ -164,6 +158,118 @@ export const generateImage = async (prompt: string, model_type: string, telegram
       const imageUrl = output[0]
       console.log("URL изображения:", imageUrl)
 
+      const imageResponse = await axios.get(imageUrl, {
+        responseType: "arraybuffer",
+        validateStatus: (status) => status === 200,
+        timeout: 30000,
+      })
+
+      const imageBuffer = Buffer.from(imageResponse.data)
+      const prompt_id = await savePrompt(prompt, model_type, imageUrl, telegram_id)
+
+      return { image: imageBuffer, prompt_id }
+    } else if (model_type === "sdxl") {
+      const input = {
+        width: aspect_ratio === "1:1" ? 1024 : 1024,
+        height: aspect_ratio === "1:1" ? 1024 : 768,
+        prompt: `${models[model_type].word} ${prompt}`,
+        refine: "expert_ensemble_refiner",
+        apply_watermark: false,
+        num_inference_steps: 25,
+        negative_prompt:
+          "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
+      }
+
+      const output = await replicate.run(modelKey, { input })
+      if (!output || !Array.isArray(output) || !output[0]) {
+        throw new Error("Некорректный ответ от API Replicate")
+      }
+
+      const prompt_id = await savePrompt(prompt, model_type, output[0], telegram_id)
+      return { image: output[0], prompt_id }
+    } else if (model_type === "sd3") {
+      const input = {
+        prompt: `${models[model_type].word} ${prompt}`,
+        aspect_ratio: aspect_ratio === "1:1" ? "1:1" : aspect_ratio === "16:9" ? "16:9" : "3:2",
+        negative_prompt:
+          "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
+      }
+
+      let retries = 3
+      let output: any = null
+
+      while (retries > 0) {
+        try {
+          output = await replicate.run(modelKey, { input })
+
+          if (typeof output === "string") {
+            output = [output]
+          } else if (output && typeof output === "object" && "output" in output) {
+            output = [output.output]
+          } else if (!Array.isArray(output)) {
+            output = [output]
+          }
+
+          if (!output[0]) {
+            throw new Error(`Некорректный ответ от API Replicate: ${JSON.stringify(output)}`)
+          }
+          break
+        } catch (error) {
+          console.error(`Попытка ${4 - retries} не удалась:`, error)
+          retries--
+          if (retries === 0) throw error
+          await new Promise((resolve) => setTimeout(resolve, 2000))
+        }
+      }
+
+      const imageUrl = output[0]
+      const imageResponse = await axios.get(imageUrl, {
+        responseType: "arraybuffer",
+        validateStatus: (status) => status === 200,
+        timeout: 30000,
+      })
+
+      const imageBuffer = Buffer.from(imageResponse.data)
+      const prompt_id = await savePrompt(prompt, model_type, imageUrl, telegram_id)
+
+      return { image: imageBuffer, prompt_id }
+    } else if (model_type === "recraft") {
+      const input = {
+        prompt: `${models[model_type].word} ${prompt}`,
+        size: aspect_ratio === "1:1" ? "1024x1024" : aspect_ratio === "16:9" ? "1365x768" : "1365x1024",
+        style: "any",
+        negative_prompt:
+          "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
+      }
+
+      let retries = 3
+      let output: any = null
+
+      while (retries > 0) {
+        try {
+          output = await replicate.run(modelKey, { input })
+
+          if (typeof output === "string") {
+            output = [output]
+          } else if (output && typeof output === "object" && "output" in output) {
+            output = [output.output]
+          } else if (!Array.isArray(output)) {
+            output = [output]
+          }
+
+          if (!output[0]) {
+            throw new Error(`Некорректный ответ от API Replicate: ${JSON.stringify(output)}`)
+          }
+          break
+        } catch (error) {
+          console.error(`Попытка ${4 - retries} не удалась:`, error)
+          retries--
+          if (retries === 0) throw error
+          await new Promise((resolve) => setTimeout(resolve, 2000))
+        }
+      }
+
+      const imageUrl = output[0]
       const imageResponse = await axios.get(imageUrl, {
         responseType: "arraybuffer",
         validateStatus: (status) => status === 200,

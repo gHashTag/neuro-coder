@@ -178,7 +178,7 @@ composer.command("get100", async (ctx) => {
   await ctx.conversation.enter("get100AnfiVesnaConversation")
 })
 
-composer.command("flux", async (ctx) => {
+composer.command("text_to_image", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
 

@@ -8,11 +8,54 @@ import { generateMoreImagesButtons } from "../../helpers/buttonHandlers"
 const generateImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
   try {
+    // Показываем меню выбора модели
+    await ctx.reply(isRu ? "🎨 Выберите модель для генерации:" : "🎨 Choose generation model:", {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "Flux Pro Ultra",
+              callback_data: "select_model_flux",
+            },
+            {
+              text: "SDXL",
+              callback_data: "select_model_sdxl",
+            },
+          ],
+          [
+            {
+              text: "SD 3.5 Turbo",
+              callback_data: "select_model_sd3",
+            },
+            {
+              text: "Recraft v3",
+              callback_data: "select_model_recraft",
+            },
+          ],
+          [
+            {
+              text: isRu ? "❌ Отмена" : "❌ Cancel",
+              callback_data: "cancel",
+            },
+          ],
+        ],
+      },
+    })
+
+    // Ждем выбор модели
+    const modelResponse = await conversation.waitFor("callback_query:data")
+
+    if (modelResponse.callbackQuery.data === "cancel") {
+      await ctx.reply(isRu ? "❌ Генерация отменена" : "❌ Generation cancelled")
+      return
+    }
+
+    const model_type = modelResponse.callbackQuery.data.replace("select_model_", "")
+
     const keyboard = new InlineKeyboard().text(isRu ? "❌ Отменить генерацию" : "❌ Cancel generation", "cancel")
-    const model_type = ctx.message?.text?.slice(1)
 
     const greetingMessage = await ctx.reply(
-      isRu ? "👋 Привет! Напишите промпт на английском для генерации изображения." : "👋 Hello! Write a prompt in English to generate an image.",
+      isRu ? "👋 Напишите промпт на английском для генерации изображения." : "👋 Hello! Write a prompt in English to generate an image.",
       { reply_markup: keyboard },
     )
 

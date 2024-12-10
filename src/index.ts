@@ -199,7 +199,14 @@ bot.on("callback_query:data", async (ctx) => {
 
   try {
     const data = ctx.callbackQuery.data
+    await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
 
+    // Добавляем новый обработчик для выбора модели
+    if (data.startsWith("select_model_")) {
+      const model = data.replace("select_model_", "")
+      await setModel(ctx.from.id.toString(), model)
+      return // Выходим, так как дальнейший диалог продолжится в conversation
+    }
     if (data.startsWith("generate_improved_")) {
       // Обработка улучшенного промпта
       const promptId = data.split("_")[2]

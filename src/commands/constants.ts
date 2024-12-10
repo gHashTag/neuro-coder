@@ -74,4 +74,28 @@ export const models = {
       en: "🎨 Flux - photorealistic high quality images",
     },
   },
+  sdxl: {
+    key: "stability-ai/sdxl:7762fd07cf82c948538e41f63f77d685e02b063e37e496e96eefd46c929f9bdc",
+    word: "ultra realistic photograph, 8k uhd, high quality",
+    description: {
+      ru: "🎨 SDXL - фотореалистичные изображения высокого качества",
+      en: "🎨 SDXL - photorealistic high quality images",
+    },
+  },
+  sd3: {
+    key: "stability-ai/stable-diffusion-3.5-large-turbo",
+    word: "",
+    description: {
+      ru: "🎨 SD3 - фотореалистичные изображения высокого качества",
+      en: "🎨 SD3 - photorealistic high quality images",
+    },
+  },
+  recraft: {
+    key: "recraft-ai/recraft-v3",
+    word: "",
+    description: {
+      ru: "🎨 Recraft - фотореалистичные изображения высокого качества",
+      en: "🎨 Recraft - photorealistic high quality images",
+    },
+  },
 }
