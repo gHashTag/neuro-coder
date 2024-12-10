@@ -14,7 +14,7 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
         inline_keyboard: [
           [
             {
-              text: "Flux Pro Ultra",
+              text: "Flux 1.1Pro Ultra",
               callback_data: "select_model_flux",
             },
             {

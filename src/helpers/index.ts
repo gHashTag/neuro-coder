@@ -1543,6 +1543,7 @@ export const pulse = async (ctx: MyContext, image: string, prompt: string, comma
     const caption = `@${ctx.from?.username || "Пользователь без username"} Telegram ID: ${
       ctx.from?.id
     } сгенерировал изображение с промптом: ${truncatedPrompt} \n\n Команда: ${command}`
+
     await bot.api.sendPhoto("-4166575919", image, { caption })
   } catch (error) {
     console.error(error)
