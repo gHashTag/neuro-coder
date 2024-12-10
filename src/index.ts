@@ -16,7 +16,7 @@ import { get100AnfiVesnaConversation } from "./commands/get100"
 import { soulConversation } from "./commands/soul"
 import { voiceConversation } from "./commands/voice"
 import { getGeneratedImages, getModel, getPrompt, incrementLimit, savePrompt, setModel } from "./core/supabase/ai"
-import { InputMediaPhoto } from "grammy/types"
+import { InputMediaPhoto, InputFile } from "grammy/types"
 import { inviterConversation } from "./commands/inviter"
 import { models } from "./commands/constants"
 import { answerAi } from "./core/openai/requests"
@@ -28,8 +28,9 @@ import leeSolarNumerolog from "./commands/lee_solar_numerolog"
 import leeSolarBroker from "./commands/lee_solar_broker"
 import { subtitles } from "./commands/subtitles"
 import { checkSubscriptionByTelegramId, isLimitAi, sendPaymentInfo } from "./core/supabase/payments"
-import { getUid } from "./core/supabase"
+import { getUid, supabase } from "./core/supabase"
 import createAinews from "./commands/ainews"
+import { generateMoreImagesButtons } from "./helpers/buttonHandlers"
 
 interface SessionData {
   melimi00: {
@@ -93,12 +94,16 @@ if (process.env.NODE_ENV === "production") {
     },
     {
       command: "subtitles",
-      description: "🎥 Create subtitles / Создать субтитры",
+      description: "🎥 Create subtitles / Со��дать субтитры",
     },
     {
       command: "ainews",
       description: "📰 Create AI news caption / Создать описание AI новости",
-    }
+    },
+    {
+      command: "text_to_image",
+      description: "🎨 Generate image from text / Сгенерировать изображение из текста",
+    },
   ])
 }
 
@@ -190,212 +195,210 @@ bot.on("message:text", async (ctx) => {
 })
 
 bot.on("callback_query:data", async (ctx) => {
-  const callbackData = ctx.callbackQuery.data
   const isRu = ctx.from?.language_code === "ru"
-  if (callbackData.startsWith("buy")) {
-    if (callbackData.endsWith("avatar")) {
-      await ctx.replyWithInvoice(
-        isRu ? "Цифровой аватар" : "Digital avatar",
-        isRu
-          ? "Представьте, у вас есть возможность создать уникальную цифровую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим лицом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
-          : "Imagine you have the opportunity to create a unique digital copy of yourself! I can train the AI on your photos so that you can receive images with your face and body in any style and setting — from fantastic worlds to fashion photo sessions. This is a great opportunity for a personal brand or just for fun!",
-        "avatar",
-        "XTR",
-        [{ label: "Цена", amount: 5645 }],
-      )
-      return
+
+  try {
+    const data = ctx.callbackQuery.data
+
+    if (data.startsWith("generate_improved_")) {
+      // Обработка улучшенного промпта
+      const promptId = data.split("_")[2]
+      const promptData = await getPrompt(promptId)
+      if (!promptData) {
+        await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+        await ctx.answerCallbackQuery()
+        return
+      }
+
+      await ctx.reply(isRu ? "⏳ Начинаю улучшение промпта..." : "⏳ Starting prompt improvement...")
+
+      // Улучшаем промпт
+      const improvedPrompt = await upgradePrompt(promptData.prompt)
+      if (!improvedPrompt) {
+        await ctx.reply(isRu ? "Не удалось улучшить промпт" : "Failed to improve prompt")
+        return
+      }
+
+      // Сохраняем улучшенный промпт в базу данных
+      const { data: savedPrompt, error } = await supabase
+        .from("prompts_history")
+        .insert({
+          prompt: improvedPrompt,
+          model_type: promptData.model_type,
+          telegram_id: ctx.from.id.toString(),
+          improved_from: promptId,
+        })
+        .select()
+        .single()
+
+      if (error || !savedPrompt) {
+        console.error("Ошибка при сохранении улучшенного промпта:", error)
+        await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
+        return
+      }
+
+      // Показываем улучшенный промпт и спрашиваем подтверждение
+      await ctx.reply(isRu ? `Улучшенный промпт:\n${improvedPrompt}\n\nСгенерировать изображение?` : `Improved prompt:\n${improvedPrompt}\n\nGenerate image?`, {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: isRu ? "✅ Да" : "✅ Yes", callback_data: `generate_improved_${savedPrompt.prompt_id}` }],
+            [{ text: isRu ? "❌ Нет" : "❌ No", callback_data: "cancel" }],
+          ],
+        },
+      })
+    } else if (data.startsWith("generate_")) {
+      // Сразу отвечаем на callback query в начале
+      await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
+
+      const [_, count, promptId] = data.split("_")
+      const promptData = await getPrompt(promptId)
+      if (!promptData) {
+        await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+        return
+      }
+
+      const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
+
+      try {
+        const numImages = parseInt(count)
+        for (let i = 0; i < numImages; i++) {
+          const result = await generateImage(promptData.prompt, promptData.model_type, ctx.from.id.toString(), ctx)
+          if (!result) {
+            await ctx.reply(isRu ? "Ошибка при генерации изображения" : "Error generating image")
+            continue
+          }
+
+          const photoToSend = Buffer.isBuffer(result.image) ? new InputFile(result.image) : result.image
+          await ctx.replyWithPhoto(photoToSend)
+          await ctx.reply(isRu ? `⏳ Сгенерировано ${i + 1} из ${numImages}...` : `⏳ Generated ${i + 1} of ${numImages}...`)
+
+          const pulseImage = Buffer.isBuffer(result.image) ? `data:image/jpeg;base64,${result.image.toString("base64")}` : result.image
+          await pulse(ctx, pulseImage, promptData.prompt, `/${promptData.model_type}`)
+        }
+      } catch (error) {
+        console.error("Ошибка при генерации:", error)
+        await ctx.reply(isRu ? "Произошла ошибка при генерации. Пожалуйста, попробуйте позже." : "An error occurred during generation. Please try again later.")
+      } finally {
+        generateMoreImagesButtons(ctx, promptId)
+        await ctx.api
+          .deleteMessage(ctx.chat?.id || "", generatingMessage.message_id)
+          .catch((e) => console.error("Ошибка при удалении сообщения о генерации:", e))
+      }
+    } else if (data.startsWith("improve_")) {
+      await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
+
+      const promptId = data.split("_")[1]
+      const promptData = await getPrompt(promptId)
+
+      if (!promptData) {
+        await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+        return
+      }
+
+      await ctx.reply(isRu ? "⏳ Начинаю улучшение промпта..." : "⏳ Starting prompt improvement...")
+
+      try {
+        const improvedPrompt = await upgradePrompt(promptData.prompt)
+        if (!improvedPrompt) {
+          await ctx.reply(isRu ? "Не удалось улучшить промпт" : "Failed to improve prompt")
+          return
+        }
+
+        // Сохраняем улучшенный промпт
+        const { data: savedPrompt, error } = await supabase
+          .from("prompts_history")
+          .insert({
+            prompt: improvedPrompt,
+            model_type: promptData.model_type,
+            telegram_id: ctx.from.id.toString(),
+            improved_from: promptId,
+          })
+          .select()
+          .single()
+
+        if (error || !savedPrompt) {
+          console.error("Ошибка при сохранении улучшенного промпта:", error)
+          await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
+          return
+        }
+
+        // Показываем улучшенный промпт и спрашиваем подтверждение
+        await ctx.reply(
+          isRu ? `Улучшенный промпт:\n${improvedPrompt}\n\nСгенерировать изображение?` : `Improved prompt:\n${improvedPrompt}\n\nGenerate image?`,
+          {
+            reply_markup: {
+              inline_keyboard: [
+                [{ text: isRu ? "✅ Да" : "✅ Yes", callback_data: `generate_1_${savedPrompt.prompt_id}` }],
+                [{ text: isRu ? "❌ Нет" : "❌ No", callback_data: "cancel" }],
+              ],
+            },
+          },
+        )
+      } catch (error) {
+        console.error("Ошибка при улучшении промпта:", error)
+        await ctx.reply(isRu ? "Произошла ошибка при улучшении промпта" : "An error occurred while improving the prompt")
+      }
     }
-    if (callbackData.endsWith("start")) {
-      await ctx.replyWithInvoice(
-        isRu ? "НейроСтарт" : "NeuroStart",
-        isRu ? "Вы получите подписку уровня 'НейроСтарт'" : "You will receive a subscription to the 'NeuroStart' level",
-        "start",
-        "XTR",
-        [{ label: "Цена", amount: 55 }],
-      )
-      return
+
+    if (data === "retry") {
+      await ctx.answerCallbackQuery()
+      // Получаем последний промпт пользователя
+      const { data: lastPrompt } = await supabase
+        .from("prompts_history")
+        .select("*")
+        .eq("telegram_id", ctx.from.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single()
+
+      if (!lastPrompt) {
+        await ctx.reply("Не найден предыдущий промпт для повторной генерации")
+        return
+      }
+
+      // Генерируем новое изображение с тем же промптом
+      const result = await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id.toString(), ctx)
+      console.log("result4", result)
+      if (!result) {
+        throw new Error("Не удалось сгенерировать изображение")
+      }
+
+      // Отправляем новое изображение
+      if (Buffer.isBuffer(result.image)) {
+        await ctx.replyWithPhoto(new InputFile(result.image))
+      } else {
+        await ctx.replyWithPhoto(result.image)
+      }
+
+      // Отправляем в pulse
+      const pulseImage = Buffer.isBuffer(result.image) ? `data:image/jpeg;base64,${result.image.toString("base64")}` : result.image
+
+      await pulse(ctx, pulseImage, lastPrompt.prompt, `/${lastPrompt.model_type}`)
+
+      // Показываем те же кнопки снова
+      await ctx.reply("Что дальше?", {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: "🔄 Повторить генерацию", callback_data: "retry" }],
+            [{ text: "⬆️ Улучшить промпт", callback_data: "improve" }],
+            [{ text: "🎥 Сгенерировать видео", callback_data: "video" }],
+          ],
+        },
+      })
     }
-    if (callbackData.endsWith("base")) {
-      await ctx.replyWithInvoice(
-        isRu ? "НейроБаза" : "NeuroBase",
-        isRu ? "Вы получите подписку уровня 'НейроБаза'" : "You will receive a subscription to the 'NeuroBase' level",
-        "base",
-        "XTR",
-        [{ label: "Цена", amount: 565 }],
-      )
-      return
-    }
-    if (callbackData.endsWith("student")) {
-      await ctx.replyWithInvoice(
-        isRu ? "НейроУченик" : "NeuroStudent",
-        isRu ? "Вы получите подписку уровня 'НейроУченик'" : "You will receive a subscription to the 'NeuroStudent' level",
-        "student",
-        "XTR",
-        [{ label: "Цена", amount: 5655 }],
-      )
-      return
-    }
-    if (callbackData.endsWith("expert")) {
-      await ctx.replyWithInvoice(
-        isRu ? "НейроЭксперт" : "NeuroExpert",
-        isRu ? "Вы получите подписку уровня 'НейроЭксперт'" : "You will receive a subscription to the 'NeuroExpert' level",
-        "expert",
-        "XTR",
-        [{ label: "Цена", amount: 16955 }],
-      )
-      return
-    }
-  }
-  if (callbackData.startsWith("generate_")) {
+  } catch (error) {
+    console.error("Ошибка при обработке callback query:", error)
     try {
-      const count = parseInt(callbackData.split("_")[1])
-      const prompt_id = callbackData.split("_")[2]
-      const info = await getGeneratedImages(ctx.from?.id.toString() || "")
-      const { count: generatedCount, limit } = info
-
-      if (generatedCount >= limit) {
-        await ctx.reply(
-          isRu
-            ? "⚠️ У вас не осталось использований. Пожалуйста, оплатите генерацию изображений."
-            : "⚠️ You have no more uses left. Please pay for image generation.",
-        )
-        return
-      } else if (generatedCount + count > limit) {
-        await ctx.reply(
-          isRu
-            ? `⚠️ У вас осталось ${limit - generatedCount} использований. Пожалуйста, оплатите генерацию изображений.`
-            : `⚠️ You have ${limit - generatedCount} uses left. Please pay for image generation.`,
-        )
-        return
-      }
-
-      if (ctx.callbackQuery.message?.message_id) {
-        await ctx.api.deleteMessage(ctx.chat?.id || "", ctx.callbackQuery.message?.message_id)
-      }
-
-      const prompt = await getPrompt(prompt_id)
-      const message = await ctx.reply(isRu ? "⏳ Генерация изображений началась..." : "⏳ Image generation has started...")
-
-      const images: InputMediaPhoto[] = []
-      for (let i = 0; i < count; i++) {
-        const { image } = await generateImage(prompt.prompt, prompt.model_type, ctx.from?.id.toString(), ctx, "")
-        images.push({ type: "photo", media: image })
-        await ctx.api.editMessageText(
-          ctx.chat?.id || "",
-          message.message_id,
-          isRu ? `⏳ Сгенерировано изображений ${i + 1}/${count}...` : `⏳ Generated images ${i + 1}/${count}...`,
-        )
-        await pulse(ctx, image, prompt.prompt, `${prompt.model_type} (with callback)`)
-      }
-
-      await ctx.replyWithMediaGroup(images)
-      await ctx.api.deleteMessage(ctx.chat?.id || "", message.message_id)
-      await ctx.reply(isRu ? `🤔 Сгенерировать еще?` : `🤔 Generate more?`, {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: "1", callback_data: `generate_1_${prompt_id}` },
-              { text: "2", callback_data: `generate_2_${prompt_id}` },
-            ],
-            [
-              { text: "3", callback_data: `generate_3_${prompt_id}` },
-              { text: "4", callback_data: `generate_4_${prompt_id}` },
-            ],
-            [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${prompt_id}` }],
-            [{ text: isRu ? "🎥 Сгенерировать видео" : "🎥 Generate video", callback_data: `video_${prompt_id}` }],
-          ],
-        },
-      })
+      await ctx.answerCallbackQuery()
     } catch (e) {
-      console.error("Ошибка при генерации изображений:", e)
-      await ctx.reply(
-        isRu
-          ? "❌ Извините, произошла ошибка при генерации изображений. Пожалуйста, попробуйте позже."
-          : "❌ Sorry, an error occurred while generating images. Please try again later.",
-      )
+      console.error("Не удалось ответить на callback query:", e)
     }
-  } else if (callbackData.startsWith("model_")) {
-    const model = callbackData.split("_")[1]
-    const message_id = ctx.callbackQuery.message?.message_id
-    await setModel(ctx.from?.id.toString() || "", model)
-    if (!message_id) return
-    await ctx.api.deleteMessage(ctx.chat?.id || "", message_id)
-    await ctx.reply(isRu ? "🧠 Модель успешно изменена!" : "🧠 Model successfully changed!")
-  } else if (callbackData.startsWith("improve_")) {
-    const prompt_id = callbackData.split("_")[callbackData.split("_").length - 1]
-    const prompt = await getPrompt(prompt_id)
-    console.log(prompt_id, "prompt_id")
-    console.log(callbackData, "callbackData")
+    await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")
+  } finally {
+    const loadingMessage = await ctx.reply(isRu ? "⏳ Начинаю генерацию изображений..." : "⏳ Starting image generation...")
 
-    if (callbackData.includes("toVideo")) {
-      console.log(prompt.prompt, prompt.image_url, "prompt.prompt, prompt.image_url")
-      await imageToVideo(prompt.image_url, prompt.prompt)
-      return
-    }
-    if (callbackData.includes("accept")) {
-      await ctx.editMessageText(isRu ? `🤔 Сгенерировать еще с новым промптом?` : `🤔 Generate more with new prompt?`, {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: "1", callback_data: `generate_1_${prompt_id}` },
-              { text: "2", callback_data: `generate_2_${prompt_id}` },
-            ],
-            [
-              { text: "3", callback_data: `generate_3_${prompt_id}` },
-              { text: "4", callback_data: `generate_4_${prompt_id}` },
-            ],
-            [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${prompt_id}` }],
-          ],
-        },
-      })
-      return
-    } else if (callbackData.includes("reject")) {
-      await ctx.editMessageText(isRu ? `🤔 Сгенерировать еще с изначальным промптом?` : `🤔 Generate more with initial prompt?`, {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: "1", callback_data: `generate_1_${prompt_id}` },
-              { text: "2", callback_data: `generate_2_${prompt_id}` },
-            ],
-            [
-              { text: "3", callback_data: `generate_3_${prompt_id}` },
-              { text: "4", callback_data: `generate_4_${prompt_id}` },
-            ],
-            [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${prompt_id}` }],
-          ],
-        },
-      })
-      return
-    }
-    const systemMessage = await ctx.reply(isRu ? "🧠 Улучшение промпта..." : "🧠 Prompt upgrading...")
-    const upgradedPrompt = await upgradePrompt(`${models[prompt.model_type].word} ${prompt.prompt}`)
-
-    if (!upgradedPrompt) {
-      await ctx.reply(
-        isRu
-          ? "❌ Извините, произошла ошибка при улучшении промпта. Пожалуйста, попробуйте позже."
-          : "❌ Sorry, an error occurred while upgrading the prompt. Please try again later.",
-      )
-      await ctx.api.deleteMessage(ctx.chat?.id || "", systemMessage.message_id)
-      return
-    }
-
-    const upgradedPromptId = await savePrompt(upgradedPrompt, prompt.model_type)
-    await ctx.api.deleteMessage(ctx.chat?.id || "", systemMessage.message_id)
-
-    console.log(upgradedPrompt, "upgradedPrompt")
-    await ctx.editMessageText(upgradedPrompt, {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            { text: "✅", callback_data: `improve_accept_${upgradedPromptId}` },
-            { text: "❌", callback_data: `improve_reject_${prompt_id}` },
-          ],
-          [{ text: "🔄", callback_data: `improve_${prompt_id}` }],
-        ],
-      },
-    })
-    return
+    // Удаляем сообщение о загрузке в любом случае
+    await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMessage.message_id).catch(console.error) // игнорируем ошибку если сообщение уже удалено
   }
 })
 
@@ -407,7 +410,7 @@ bot.catch((err) => {
   ctx
     .reply(
       isRu
-        ? "Извините, произошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте позже."
+        ? "Извините, поизошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте позже."
         : "Sorry, an error occurred while processing your request. Please try again later.",
     )
     .catch((e) => {

@@ -1,18 +1,15 @@
 import { generateImage } from "../../helpers"
 import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
-import { InlineKeyboard } from "grammy"
+import { InlineKeyboard, InputFile } from "grammy"
 
 async function get100AnfiVesnaConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const keyboard = new InlineKeyboard().text("Отменить генерацию", "cancel")
-  const model_type = "playom"
+  const model_type = "dpbelarusx"
   console.log(model_type)
-  await ctx.reply(
-    "Привет! Напишите промпт на английском для генерации изображения. Если вы хотите использовать какой-то референс, то прикрепите изображение к сообщению.",
-    {
-      reply_markup: keyboard,
-    },
-  )
+  await ctx.reply("Привет! Напишите промпт на английском для генерации изображения.", {
+    reply_markup: keyboard,
+  })
   const { message, callbackQuery } = await conversation.wait()
 
   if (callbackQuery?.data === "cancel") {
@@ -22,20 +19,31 @@ async function get100AnfiVesnaConversation(conversation: Conversation<MyContext>
 
   if (!message || !ctx.from?.id) return
 
-  const text = message.photo ? message.caption : message.text
-  let file
-  if (message.photo) {
-    const referenceFileId = message.photo[0].file_id
-    file = await ctx.api.getFile(referenceFileId)
+  const text = message.text
+  if (!text) {
+    await ctx.reply("Пожалуйста, отправьте текстовое сообщение с промптом.")
+    return
   }
-  const fileUrl = message.photo ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : ""
-  console.log(fileUrl)
+
   const generatingMessage = await ctx.reply("Генерация изображения началась...")
+
   for (let i = 0; i < 100; i++) {
-    const { image } = await generateImage(text || "", model_type || "", ctx.from?.id.toString(), ctx, fileUrl)
-    await ctx.replyWithPhoto(image, { caption: `Фото: ${i + 1} / 100` })
+    const result = await generateImage(text, model_type, ctx.from.id.toString(), ctx)
+    if (!result) {
+      await ctx.reply("Ошибка при генерации изображения")
+      continue
+    }
+
+    const { image } = result
+    if (Buffer.isBuffer(image)) {
+      await ctx.replyWithPhoto(new InputFile(image), { caption: `Фото: ${i + 1} / 100` })
+    } else {
+      await ctx.replyWithPhoto(image, { caption: `Фото: ${i + 1} / 100` })
+    }
   }
+
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id)
   return
 }
+
 export { get100AnfiVesnaConversation }

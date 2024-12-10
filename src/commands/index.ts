@@ -27,7 +27,7 @@ import { invite } from "./invite"
 import { buy } from "./buy"
 // import neurocoder02 from "./neurocoder/neurocoder02";
 // import neurocoder03 from "./neurocoder/neurocoder03";
-    
+
 const composer = new Composer<MyContext>()
 
 // composer.command("start", start)
@@ -176,6 +176,10 @@ composer.command("subtitles", async (ctx) => {
 
 composer.command("get100", async (ctx) => {
   await ctx.conversation.enter("get100AnfiVesnaConversation")
+})
+
+composer.command("flux", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
 })
 
 composer.command("model", model)

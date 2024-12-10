@@ -66,4 +66,12 @@ export const models = {
     key: "ghashtag/muse_nataly:3fa7b4ac8687f4f0fa96ebe19fbcf4847ccbc44024dd859eaac9d352ea66d3cf",
     word: "METAMUSE very fashionable girl ",
   },
+  flux: {
+    key: "black-forest-labs/flux-1.1-pro-ultra" as const,
+    word: "ultra realistic photograph, 8k uhd, high quality",
+    description: {
+      ru: "🎨 Flux - фотореалистичные изображения высокого качества",
+      en: "🎨 Flux - photorealistic high quality images",
+    },
+  },
 }

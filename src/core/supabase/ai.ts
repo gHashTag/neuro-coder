@@ -261,7 +261,7 @@ export async function createVoiceSyncLabs({ fileUrl, username }: { fileUrl: stri
   }
 }
 
-export const savePrompt = async (prompt: string, model_type: string, image_url?: string) => {
+export const savePrompt = async (prompt: string, model_type: string, image_url?: string, telegram_id?: string) => {
   // Проверяем, существует ли уже такой промпт в таблице
   const { data: existingPrompt, error: selectError } = await supabase
     .from("prompts_history")
@@ -269,6 +269,7 @@ export const savePrompt = async (prompt: string, model_type: string, image_url?:
     .eq("prompt", prompt)
     .eq("model_type", model_type)
     .eq("image_url", image_url)
+    .eq("telegram_id", telegram_id)
     .maybeSingle()
 
   if (selectError) {
@@ -277,32 +278,26 @@ export const savePrompt = async (prompt: string, model_type: string, image_url?:
   }
 
   if (existingPrompt) {
-    // Если промпт уже существует, возвращаем его prompt_id
     return existingPrompt.prompt_id
   }
 
   // Если промпт не существует, добавляем его в таблицу
   const { data: newPrompt, error } = await supabase
     .from("prompts_history")
-    .insert({ prompt: prompt, model_type: model_type, image_url: image_url })
+    .insert({
+      prompt: prompt,
+      model_type: model_type,
+      image_url: image_url,
+      telegram_id: telegram_id,
+    })
     .select()
     .single()
+
   if (error) {
     console.error("Ошибка при сохранении промпта:", error)
     return null
   }
 
-  // const { data: newPrompt, error: newError } = await supabase
-  //   .from("prompts_history")
-  //   .select("prompt_id")
-  //   .eq("prompt", prompt)
-  //   .eq("model_type", model_type)
-  //   .eq("image_url", image_url)
-  //   .maybeSingle()
-  // if (newError || !newPrompt) {
-  //   console.error("Ошибка при получении prompt_id для нового промпта:", newError)
-  //   return null
-  // }
   return newPrompt.prompt_id
 }
 

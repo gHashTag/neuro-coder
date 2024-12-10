@@ -70,6 +70,141 @@ export const isDev = process.env.NODE_ENV === "development"
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 
+// Добавляем типы для Replicate API
+interface PredictionStatus {
+  id: string
+  status: "starting" | "processing" | "succeeded" | "failed" | "canceled"
+  error: string | null
+  output: string | null
+}
+interface GenerationResult {
+  image: string | Buffer
+  prompt_id: string
+}
+interface GenerationResult {
+  image: string | Buffer
+  prompt_id: string
+}
+
+interface PredictionStatus {
+  id: string
+  status: "starting" | "processing" | "succeeded" | "failed" | "canceled"
+  error: string | null
+  output: string | null
+}
+
+interface GenerationResult {
+  image: string | Buffer
+  prompt_id: string
+}
+
+interface PredictionStatus {
+  id: string
+  status: "starting" | "processing" | "succeeded" | "failed" | "canceled"
+  error: string | null
+  output: string | null
+}
+
+export const generateImage = async (prompt: string, model_type: string, telegram_id: string, ctx: MyContext): Promise<GenerationResult> => {
+  try {
+    await incrementGeneratedImages(telegram_id)
+    const aspect_ratio = await getAspectRatio(telegram_id)
+
+    const modelKey = models[model_type]?.key
+    if (!modelKey) {
+      throw new Error(`Неподдерживаемый тип модели: ${model_type}`)
+    }
+
+    if (model_type === "flux") {
+      const input = {
+        prompt: `${models[model_type].word} ${prompt}`,
+        aspect_ratio: aspect_ratio === "1:1" ? "1:1" : aspect_ratio === "16:9" ? "16:9" : "3:2",
+        negative_prompt: "nsfw, erotic, violence, bad anatomy",
+      }
+
+      console.log("Отправляемые параметры:", input)
+
+      let retries = 3
+      let output: any = null
+
+      while (retries > 0) {
+        try {
+          output = await replicate.run("black-forest-labs/flux-1.1-pro-ultra", { input })
+
+          console.log("Сырой ответ от API:", output)
+
+          // Проверяем различные форматы ответа
+          if (typeof output === "string") {
+            output = [output]
+          } else if (output && typeof output === "object" && "output" in output) {
+            output = [output.output]
+          } else if (!Array.isArray(output)) {
+            output = [output]
+          }
+
+          if (!output[0]) {
+            throw new Error(`Некорректный ответ от API Replicate: ${JSON.stringify(output)}`)
+          }
+
+          console.log("Обработанный ответ:", output)
+          break
+        } catch (error) {
+          console.error(`Попытка ${4 - retries} не удалась:`, error)
+          console.error("Полный ответ:", output)
+          retries--
+          if (retries === 0) throw error
+          await new Promise((resolve) => setTimeout(resolve, 2000))
+        }
+      }
+
+      if (!output || !output[0]) {
+        throw new Error("Не удалось получить URL изображения")
+      }
+
+      const imageUrl = output[0]
+      console.log("URL изображения:", imageUrl)
+
+      const imageResponse = await axios.get(imageUrl, {
+        responseType: "arraybuffer",
+        validateStatus: (status) => status === 200,
+        timeout: 30000,
+      })
+
+      const imageBuffer = Buffer.from(imageResponse.data)
+      const prompt_id = await savePrompt(prompt, model_type, imageUrl, telegram_id)
+
+      return { image: imageBuffer, prompt_id }
+    } else {
+      const input = {
+        prompt: `${models[model_type].word} ${prompt}`,
+        model: "dev",
+        reference: "",
+        lora_scale: 1,
+        num_outputs: 1,
+        aspect_ratio,
+        output_format: "png",
+        guidance_scale: 3.5,
+        output_quality: 90,
+        prompt_strength: 0.8,
+        extra_lora_scale: 1,
+        num_inference_steps: 28,
+      }
+
+      const output = (await replicate.run(modelKey, { input })) as string[]
+      if (!output || !Array.isArray(output) || !output[0]) {
+        throw new Error("Некорректный ответ от API Replicate")
+      }
+
+      const prompt_id = await savePrompt(prompt, model_type, output[0], telegram_id)
+      return { image: output[0], prompt_id }
+    }
+  } catch (error) {
+    console.error("Ошибка при генерации изображения:", error)
+    await pulse(ctx, "", `${prompt}\n\nОшибка при генерации изображения: ${error}`, `/${model_type}`)
+    throw error
+  }
+}
+
 export async function sizePhoto(photoPath: string, outputPath: string): Promise<string> {
   try {
     const photo = sharp(photoPath)
@@ -412,7 +547,7 @@ export function createYellowAndWhiteText(width: number, height: number, text: st
           fill: none;
         }
       </style>
-      <rect width="100%" height="100%" fill="rgba(0,0,0,0)"/>
+      <rect width="100%" height="100%" fill="rgba(0,0,0)"/>
       ${textElements}
     </svg>
   `
@@ -428,7 +563,7 @@ export function createSVGWithHighlightedText(width: number, height: number, text
   const paddingX = 10 // Горизонтальный отступ
   const paddingY = 10 // Вертикальный отступ
 
-  // Функция для измерения ширины текста (приблизительно)
+  // Функция для измерения ширины текста (приблизи��ельно)
   function getTextWidth(text: string): number {
     return text.length * (fontSize * 0.6) // Приблизительный расчет
   }
@@ -504,7 +639,7 @@ export async function addTextOnImage({ imagePath, text, step }: { imagePath: str
       buffer = Buffer.from(response.data, "binary")
       console.log(`Изображение успешно загружено для шага ${step}`)
     } catch (downloadError: any) {
-      console.error(`Ошибка загрузки изображения для шага ${step}:`, downloadError.message)
+      console.error(`Ошибка загрузки и��ображения для шага ${step}:`, downloadError.message)
       if (downloadError.response) {
         console.error(`Статус ответа: ${downloadError.response.status}`)
         console.error(`Заголовки ответа:`, downloadError.response.headers)
@@ -1048,13 +1183,13 @@ export async function getTriggerReel({ prompt }: { prompt: string }) {
 
 Вышел лучший в мире генератор видео от Мета. Компания только что выпустила нейросеть, создающую ролики ядерного качества. Можно редактировать стиль и визуал видео, генерировать клипы с собственным лицом. Сразу создает все звуковые эффекты, и в результате получается полностью готовый контент. Конкуренты по всему миру вспотели и внимательно наблюдают. Хочешь попробовать прямо сейчас, пиши "МЕТА" в комментарии к этому видео!
 
-Вот это Баста, и сейчас мы на нем заработаем. Находим на Ютубе любое его шоу или интервью, копируем ссылку и закидываем в сервис Wizard AI, который с помощью нейросети автоматически определяет интересные вирусные моменты, дальше сам нарезает нам это длинное видео, на много коротких, добавляет субтитры и сам монтирует. На выходе имеем десяток готовых рилз. За счет медийного лица Баста такие видео набирают большие просмотры. А когда у нас есть просмотры, зарабатывать можно за счет продажи рекламы или партнерских программ. Хочешь попробовать прямо сейчас, пиши "БАСТА" в комментарии к этому видео!
+Вот это Баста, и сейч��с мы на нем заработаем. Находим на Ютубе любое его шоу ��ли интервью, копируем ссылку и закидываем в сервис Wizard AI, который с помощью нейросети автоматически определяет интересные вирусные моменты, дальше сам нарезает нам это длинное видео, на много коротких, добавляет субтитры и сам монтирует. На выходе имеем десяток готовых рилз. За счет медийного лица Баста такие видео набирают большие просмотры. �� когда у нас есть просмотры, зарабатывать можно за счет продажи рекламы или партнерских программ. Хочешь попробовать прямо сейчас, пиши "БАСТА" в комментарии к этому видео!
 
-Один из самых легких методов получить миллионы просмотров на рилсах заключается в повторении контента других блогеров, который получил миллионы просмотров. Но здесь многие ошибаются, копируя контент дословно. Чтобы сделать ваш рилс уникальным, вы можете загрузить его в чат GPT. Он переформулирует сценарий, сохраняя основную мысль, но используя другие слова. Для упрощения создания контента, вы можете отправить ваш рилс моему боту, который преобразует его в текст. Хочешь получить бесплатный доступ к GPT в телеграм  прямо сейчас, пиши "GPT" в комментарии к этому видео!
+Один из самых легких методов получит�� миллионы просмотров на рилсах заключается в повторении контента других блогеров, который получил миллионы просмотров. Но здесь многие ошибаются, копируя контент дословно. Чтобы сделать ваш рилс уникальным, вы можете загрузить его в чат GPT. Он переформулирует сценарий, сохраняя основную мысль, но используя другие слова. Для упрощения создания контента, вы можете отправить ваш рилс моему боту, который преобразует его в текст. Хочешь получить бесплатный доступ к GPT в телеграм  прямо сейчас, пиши "GPT" в комментарии к этому видео!
 
 Могу ли вы различить реального блогера от цифрового Искусственные блогеры в соцсетях становятся все более популярными Это больше чем просто аватары это полноценные цифровые личности создающие контент и взаимодействующие с публикой. Они могут работать без остановки без усталости и не требуют отдыха. Такие цифровые персонажи привлекают сотни тысяч подписчиков и зарабатывают миллионы. Для этого нужно лишь цифровизировать себя и свои знания. С одной стороны это удобно и выгодно с другой стороны возникают беспокойства о потере человеческого в общении. Хочешь прямо сейчас научаться создавать ИИ агентов, пиши "НЕЙРО" в комментарии к этому видео и получи бесплатные уроки по нейросетям!
 
-С помощью этого сервиса ты можешь создавать до пятидесяти рилс в день. Особенность в том, что он самостоятельно монтирует видео благодаря Искусственному Интеллекту. Сервис автоматически выбирает кадры, соответствующие твоему тексту, озвучивает их, добавляет титры, музыку и даже создает анимацию. Особенно отмечается его эффективная работа с русским языком. Хочешь получить доступ прямо сейчас, пиши "ТАЙМФРЕЙМ" в комментарии к этому видео!
+С помощью этого сервиса ты можешь создавать до пятидесяти рилс в день. Особенность в том, что он самостоятельно монтирует видео благодаря Искусственному Интеллекту. Сервис автома��ически выбирает кадры, соответствующие твоему тексту, озвучив��ет их, добавляет титры, музыку и даже создает анимацию. Особенно отмечается его эффективная работа с русским языком. Хочешь получить доступ прямо сейчас, пиши "ТАЙМФРЕЙМ" в комментарии к этому видео!
 
 Это изменит ваш взгляд на работу. Восемьдесят процентов вашей работы, вероятно, может сделать кто-то другой, вы можете делегировать ее. И вот как. Есть этот инструмент, который вы можете использовать на своем ноутбуке, называется Tango, он легко документирует ваш рабочий процесс и автоматически создает интерактивные руководства. Просто получите расширение и выполняйте свои задачи как обычно, и все. И поверьте мне, вы будете удивлены, как много вещей вы можете поручить другим людям. Хочешь получить доступ прямо сейчас, пиши "ТАНГО" в комментарии к этому видео!
 
@@ -1223,7 +1358,7 @@ export async function translateText(text: string, targetLang: string): Promise<s
           role: "system",
           content: `You are a professional translator. Don't translate the trigger **word ${triggerWord}** and leave it in English. Always answer with letters, without using numbers. Translate the following text to ${targetLang}. Preserve the original meaning and tone as much as possible. ${
             targetLang === "ru" &&
-            "In Cyrillic all words. Правильно писать **на острове Пхукет**. Это связано с тем, что острова, в том числе Пхукет, в русском языке чаще всего употребляются с предлогом «на»."
+            "In Cyrillic all words. Правильно писать **на острове Пхукет**. Это связано с тем, что острова, в том числе Пхук��т, в русском языке чаще всего употребляют��я с предлогом «на»."
           }`,
         },
         {
@@ -1292,38 +1427,6 @@ export const generateVoice = async (text: string, voiceId: string) => {
   } catch (error) {
     console.error(error)
     throw new Error("Ошибка при генерации голоса")
-  }
-}
-
-export const generateImage = async (prompt: string, model_type: string, telegram_id: string, ctx: MyContext, reference?: string) => {
-  try {
-    await incrementGeneratedImages(telegram_id)
-    console.log(prompt, "prompt")
-
-    const aspect_ratio = await getAspectRatio(telegram_id)
-    const output = await replicate.run(models[model_type].key, {
-      input: {
-        prompt: `${models[model_type].word} ${prompt}`,
-        model: "dev",
-        reference: reference ? reference : "",
-        lora_scale: 1,
-        num_outputs: 1,
-        aspect_ratio: aspect_ratio,
-        output_format: "png",
-        guidance_scale: 3.5,
-        output_quality: 90,
-        prompt_strength: 0.8,
-        extra_lora_scale: 1,
-        num_inference_steps: 28,
-      },
-    })
-    console.log(output)
-    const prompt_id = await savePrompt(prompt, model_type, output[0])
-    return { image: output[0], prompt_id: prompt_id }
-  } catch (error) {
-    console.error(error)
-    await pulse(ctx, "", `${prompt}\n\nОшибка при генерации изображения: ${error}`, `/${model_type}`)
-    throw new Error("Ошибка при генерации изображения")
   }
 }
 
