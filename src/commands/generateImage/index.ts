@@ -88,11 +88,18 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
 
     const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from.id.toString(), ctx)
 
+    if (!image) {
+      throw new Error("Не удалось получить изображение")
+    }
+
     await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id)
 
     // Обработка изображения для отправки
     const photoToSend = Buffer.isBuffer(image) ? new InputFile(image) : image
-    await ctx.replyWithPhoto(photoToSend)
+    await ctx.replyWithPhoto(photoToSend).catch((error) => {
+      console.error("Ошибка при отправке фото:", error)
+      throw error
+    })
 
     // Обработка изображения для pulse
     const pulseImage = Buffer.isBuffer(image) ? `data:image/jpeg;base64,${image.toString("base64")}` : image
@@ -105,7 +112,7 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
     }
   } catch (error) {
     console.error("Error in generateImageConversation:", error)
-    await ctx.reply(isRu ? "❌ Произошла ошибка" : "❌ An error occurred")
+    await ctx.reply(isRu ? `❌ Произошла ошибка: ${JSON.stringify(error)}` : `❌ An error occurred: ${JSON.stringify(error)}`)
   }
 }
 

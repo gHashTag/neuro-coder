@@ -185,8 +185,17 @@ export const generateImage = async (prompt: string, model_type: string, telegram
         throw new Error("Некорректный ответ от API Replicate")
       }
 
-      const prompt_id = await savePrompt(prompt, model_type, output[0], telegram_id)
-      return { image: output[0], prompt_id }
+      const imageUrl = output[0]
+      const imageResponse = await axios.get(imageUrl, {
+        responseType: "arraybuffer",
+        validateStatus: (status) => status === 200,
+        timeout: 30000,
+      })
+
+      const imageBuffer = Buffer.from(imageResponse.data)
+      const prompt_id = await savePrompt(prompt, model_type, imageUrl, telegram_id)
+
+      return { image: imageBuffer, prompt_id }
     } else if (model_type === "sd3") {
       const input = {
         prompt: `${models[model_type].word} ${prompt}`,
