@@ -261,14 +261,14 @@ export async function createVoiceSyncLabs({ fileUrl, username }: { fileUrl: stri
   }
 }
 
-export const savePrompt = async (prompt: string, model_type: string, image_url?: string, telegram_id?: string) => {
+export const savePrompt = async (prompt: string, model_type: string, media_url?: string, telegram_id?: string): Promise<number | null> => {
   // Проверяем, существует ли уже такой промпт в таблице
   const { data: existingPrompt, error: selectError } = await supabase
     .from("prompts_history")
     .select("prompt_id")
     .eq("prompt", prompt)
     .eq("model_type", model_type)
-    .eq("image_url", image_url)
+    .eq("media_url", media_url)
     .eq("telegram_id", telegram_id)
     .maybeSingle()
 
@@ -287,7 +287,7 @@ export const savePrompt = async (prompt: string, model_type: string, image_url?:
     .insert({
       prompt: prompt,
       model_type: model_type,
-      image_url: image_url,
+      media_url: media_url,
       telegram_id: telegram_id,
     })
     .select()

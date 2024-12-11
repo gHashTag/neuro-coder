@@ -3,7 +3,7 @@ import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard, InputFile } from "grammy"
 import { getGeneratedImages } from "../../core/supabase/ai"
-import { generateMoreImagesButtons } from "../../helpers/buttonHandlers"
+import { buttonHandlers } from "../../helpers/buttonHandlers"
 import { generateImage } from "src/helpers/generateImage"
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
@@ -87,7 +87,7 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
 
     const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
 
-    const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from.id.toString(), ctx)
+    const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from.id.toString())
 
     if (!image) {
       throw new Error("Не удалось получить изображение")
@@ -109,7 +109,7 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
     if (count < limit) {
       await ctx.reply(isRu ? `ℹ️ Осталось ${limit - count} использований` : `ℹ️ ${limit - count} uses left`)
 
-      generateMoreImagesButtons(ctx, prompt_id)
+      buttonHandlers(ctx, prompt_id?.toString() || "")
     }
   } catch (error) {
     console.error("Error in generateImageConversation:", error)

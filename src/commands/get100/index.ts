@@ -28,7 +28,7 @@ async function get100AnfiVesnaConversation(conversation: Conversation<MyContext>
   const generatingMessage = await ctx.reply("Генерация изображения началась...")
 
   for (let i = 0; i < 100; i++) {
-    const result = await generateImage(text, model_type, ctx.from.id.toString(), ctx)
+    const result = await generateImage(text, model_type, ctx.from.id.toString())
     if (!result) {
       await ctx.reply("Ошибка при генерации изображения")
       continue

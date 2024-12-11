@@ -1,6 +1,6 @@
 import { MyContext } from "../utils/types"
 
-export const generateMoreImagesButtons = async (ctx: MyContext, promptId: string | number) => {
+export const buttonHandlers = async (ctx: MyContext, promptId: string) => {
   const isRu = ctx.from?.language_code === "ru"
 
   await ctx.reply(isRu ? `🤔 Сгенерировать еще?` : `🤔 Generate more?`, {

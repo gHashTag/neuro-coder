@@ -30,9 +30,10 @@ import { subtitles } from "./commands/subtitles"
 import { checkSubscriptionByTelegramId, isLimitAi, sendPaymentInfo } from "./core/supabase/payments"
 import { getUid, supabase } from "./core/supabase"
 import createAinews from "./commands/ainews"
-import { generateMoreImagesButtons } from "./helpers/buttonHandlers"
+import { buttonHandlers } from "./helpers/buttonHandlers"
 import { textToImageConversation } from "./commands/text_to_image"
 import { generateImage } from "./helpers/generateImage"
+import { textToVideoConversation } from "./commands/text_to_video"
 
 interface SessionData {
   melimi00: {
@@ -106,6 +107,10 @@ if (process.env.NODE_ENV === "production") {
       command: "text_to_image",
       description: "🎨 Generate image from text / Сгенерировать изображение из текста",
     },
+    {
+      command: "text_to_video",
+      description: "🎥 Generate video from text / Сгенерировать видео из текста",
+    },
   ])
 }
 
@@ -126,6 +131,7 @@ bot.use(createConversation(leeSolarBroker))
 bot.use(createConversation(subtitles))
 bot.use(createConversation(createAinews))
 bot.use(createConversation(textToImageConversation))
+bot.use(createConversation(textToVideoConversation))
 
 bot.command("start", start)
 bot.use(customMiddleware)
@@ -277,7 +283,7 @@ bot.on("callback_query:data", async (ctx) => {
       try {
         const numImages = parseInt(count)
         for (let i = 0; i < numImages; i++) {
-          const result = await generateImage(promptData.prompt, promptData.model_type, ctx.from.id.toString(), ctx)
+          const result = await generateImage(promptData.prompt, promptData.model_type, ctx.from.id.toString())
           if (!result) {
             await ctx.reply(isRu ? "Ошибка при генерации изображения" : "Error generating image")
             continue
@@ -294,7 +300,7 @@ bot.on("callback_query:data", async (ctx) => {
         console.error("Ошибка при генерации:", error)
         await ctx.reply(isRu ? "Произошла ошибка при генерации. Пожалуйста, попробуйте позже." : "An error occurred during generation. Please try again later.")
       } finally {
-        generateMoreImagesButtons(ctx, promptId)
+        buttonHandlers(ctx, promptId)
         await ctx.api
           .deleteMessage(ctx.chat?.id || "", generatingMessage.message_id)
           .catch((e) => console.error("Ошибка при удалении сообщения о генерации:", e))
@@ -372,7 +378,7 @@ bot.on("callback_query:data", async (ctx) => {
       }
 
       // Генерируем новое изображение с тем же промптом
-      const result = await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id.toString(), ctx)
+      const result = await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id.toString())
       console.log("result4", result)
       if (!result) {
         throw new Error("Не удалось сгенерировать изображение")

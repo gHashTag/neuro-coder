@@ -1,11 +1,22 @@
 import { replicate } from "../core/replicate"
 import axios from "axios"
 import { incrementGeneratedImages, getAspectRatio, savePrompt } from "../core/supabase/ai"
-import type { MyContext } from "../utils/types"
 
 interface GenerationResult {
   image: string | Buffer
-  prompt_id: number
+  prompt_id: number | null
+}
+
+interface ModelInput {
+  prompt: string
+  width?: number
+  height?: number
+  size?: string
+  aspect_ratio?: string
+  negative_prompt?: string
+  refine?: string
+  apply_watermark?: boolean
+  num_inference_steps?: number
 }
 
 interface ModelConfig {
@@ -15,8 +26,10 @@ interface ModelConfig {
     ru: string
     en: string
   }
-  getInput: (prompt: string, aspect_ratio: string) => any
+  getInput: (prompt: string, aspect_ratio: string) => ModelInput
 }
+
+type ApiResponse = string | string[] | { output: string }
 
 const modelConfigs: Record<string, ModelConfig> = {
   flux: {
@@ -93,7 +106,7 @@ const modelConfigs: Record<string, ModelConfig> = {
   },
 }
 
-async function processApiResponse(output: any): Promise<string> {
+async function processApiResponse(output: ApiResponse): Promise<string> {
   if (typeof output === "string") return output
   if (Array.isArray(output) && output[0]) return output[0]
   if (output && typeof output === "object" && "output" in output) return output.output
@@ -109,7 +122,7 @@ async function fetchImage(url: string): Promise<Buffer> {
   return Buffer.from(response.data)
 }
 
-export const generateImage = async (prompt: string, model_type: string, telegram_id: string, ctx: MyContext): Promise<GenerationResult> => {
+export const generateImage = async (prompt: string, model_type: string, telegram_id: string): Promise<GenerationResult> => {
   try {
     await incrementGeneratedImages(telegram_id)
     const aspect_ratio = await getAspectRatio(telegram_id)
@@ -120,11 +133,12 @@ export const generateImage = async (prompt: string, model_type: string, telegram
     }
 
     const input = modelConfig.getInput(`${modelConfig.word} ${prompt}`, aspect_ratio)
-    let output: any = null
+    let output: ApiResponse = ""
     let retries = 3
 
     while (retries > 0) {
       try {
+        // @ts-expect-error Replicate API возвращает string | string[] но не типизирован корректно
         output = await replicate.run(modelConfig.key, { input })
         const imageUrl = await processApiResponse(output)
         const imageBuffer = await fetchImage(imageUrl)

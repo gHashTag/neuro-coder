@@ -182,6 +182,10 @@ composer.command("text_to_image", async (ctx) => {
   await ctx.conversation.enter("textToImageConversation")
 })
 
+composer.command("text_to_video", async (ctx) => {
+  await ctx.conversation.enter("textToVideoConversation")
+})
+
 composer.command("model", model)
 // composer.command("neurocoder01", neurocoder01);
 // composer.command("neurocoder02", neurocoder02);
