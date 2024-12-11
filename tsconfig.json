@@ -12,8 +12,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "paths": {
-      "src/*": ["src/*"],
-      "api/*": ["api/*"],
       "@/*": ["src/*"]
     }
   },

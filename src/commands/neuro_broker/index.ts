@@ -11,7 +11,7 @@ import {
   mergeAudioFiles,
   translateText,
 } from "../../helpers"
-import { Step } from "src/utils/types"
+import { Step } from "../../utils/types"
 import { InputMediaPhoto } from "grammy/types"
 import { getVideoUrl, uploadVideo } from "../../core/supabase/video"
 import path from "path"

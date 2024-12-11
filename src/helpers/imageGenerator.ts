@@ -8,7 +8,7 @@ export const generateImages = async (ctx: MyContext, text: string, modelType: st
     return
   }
   for (let i = 0; i < count; i++) {
-    const { image } = await generateImage(text, modelType, ctx.from?.id.toString(), ctx)
+    const { image } = await generateImage(text, modelType, ctx.from?.id.toString())
     const imageStr = Buffer.isBuffer(image) ? `data:image/jpeg;base64,${image.toString("base64")}` : image.toString()
     images.push(imageStr)
   }

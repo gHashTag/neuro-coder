@@ -4,7 +4,7 @@ import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard, InputFile } from "grammy"
 import { getGeneratedImages } from "../../core/supabase/ai"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
-import { generateImage } from "src/helpers/generateImage"
+import { generateImage } from "../../helpers/generateImage"
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"

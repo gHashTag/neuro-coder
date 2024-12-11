@@ -4,7 +4,7 @@ import { InlineKeyboard } from "grammy"
 import { getGeneratedImages } from "../../core/supabase/ai"
 import { InputFile } from "grammy"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
-import { generateImage } from "src/helpers/generateImage"
+import { generateImage } from "../../helpers/generateImage"
 
 export const generateMoreImagesButtons = async (ctx: MyContext, prompt_id: string | number | null) => {
   try {
