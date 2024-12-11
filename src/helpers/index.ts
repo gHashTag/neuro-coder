@@ -80,23 +80,9 @@ interface GenerationResult {
   prompt_id: string
 }
 
-interface PredictionStatus {
-  id: string
-  status: "starting" | "processing" | "succeeded" | "failed" | "canceled"
-  error: string | null
-  output: string | null
-}
-
 interface GenerationResult {
   image: string | Buffer
   prompt_id: string
-}
-
-interface PredictionStatus {
-  id: string
-  status: "starting" | "processing" | "succeeded" | "failed" | "canceled"
-  error: string | null
-  output: string | null
 }
 
 export const generateImage = async (prompt: string, model_type: string, telegram_id: string, ctx: MyContext): Promise<GenerationResult> => {
@@ -290,6 +276,52 @@ export const generateImage = async (prompt: string, model_type: string, telegram
       const prompt_id = await savePrompt(prompt, model_type, imageUrl, telegram_id)
 
       return { image: imageBuffer, prompt_id }
+    } else if (model_type === "photon") {
+      const input = {
+        prompt: `${models[model_type].word} ${prompt}`,
+      }
+
+      console.log("Photon input:", input)
+
+      try {
+        const output = await replicate.run(modelKey, { input })
+        console.log("Photon raw output:", output)
+
+        // Проверяем различные форматы ответа
+        let processedOutput
+        if (typeof output === "string") {
+          processedOutput = [output]
+        } else if (output && typeof output === "object" && "output" in output) {
+          processedOutput = [output.output]
+        } else if (Array.isArray(output)) {
+          processedOutput = output
+        } else {
+          processedOutput = [output]
+        }
+
+        console.log("Photon processed output:", processedOutput)
+
+        if (!processedOutput[0]) {
+          throw new Error(`Некорректный ответ от API Replicate: ${JSON.stringify(output)}`)
+        }
+
+        const imageUrl = processedOutput[0]
+        console.log("Photon image URL:", imageUrl)
+
+        const imageResponse = await axios.get(imageUrl, {
+          responseType: "arraybuffer",
+          validateStatus: (status) => status === 200,
+          timeout: 30000,
+        })
+
+        const imageBuffer = Buffer.from(imageResponse.data)
+        const prompt_id = await savePrompt(prompt, model_type, imageUrl, telegram_id)
+
+        return { image: imageBuffer, prompt_id }
+      } catch (error) {
+        console.error("Error in Photon generation:", error)
+        throw error
+      }
     } else {
       const input = {
         prompt: `${models[model_type].word} ${prompt}`,
@@ -1264,7 +1296,7 @@ export async function getSellVillaSteps({ prompt, location, type }: { prompt: st
     return JSON.parse(content)
   } catch (error) {
     console.error("Error:", error)
-    throw error // Перебрасываем ошибку, чтобы она могла быть обработана выше
+    throw error // Перебрасываем ошибку, чтобы она могла быть обработа��а выше
   }
 }
 

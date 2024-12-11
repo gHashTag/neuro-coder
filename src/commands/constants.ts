@@ -98,4 +98,12 @@ export const models = {
       en: "🎨 Recraft - photorealistic high quality images",
     },
   },
+  photon: {
+    key: "luma/photon",
+    word: "",
+    description: {
+      ru: "🎨 Photon - фотореалистичные изображения высокого качества",
+      en: "🎨 Photon - photorealistic high quality images",
+    },
+  },
 }

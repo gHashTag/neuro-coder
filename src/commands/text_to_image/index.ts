@@ -34,6 +34,12 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
           ],
           [
             {
+              text: "Photon",
+              callback_data: "select_model_photon",
+            },
+          ],
+          [
+            {
               text: isRu ? "❌ Отмена" : "❌ Cancel",
               callback_data: "cancel",
             },
