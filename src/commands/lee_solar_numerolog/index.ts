@@ -1,8 +1,8 @@
 import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
-import { generateImage } from "../../helpers"
-import { InputFile } from "grammy"
 
+import { InputFile } from "grammy"
+import { generateImage } from "src/helpers/generateImage"
 const leeSolarNumerolog = async (conversation: Conversation<MyContext>, ctx: MyContext) => {
   try {
     await ctx.reply("Введите дату рождения в формате DD.MM.YYYY:")

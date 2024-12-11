@@ -8,7 +8,7 @@ import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
 import { session, SessionFlavor } from "grammy"
 import { imageSizeConversation } from "./commands/imagesize"
-import { customMiddleware, generateImage, pulse, upgradePrompt } from "./helpers"
+import { customMiddleware, pulse, upgradePrompt } from "./helpers"
 import { generateImageConversation } from "./commands/generateImage"
 import createTriggerReel from "./commands/trigger_reel"
 import createCaptionForNews from "./commands/сaptionForNews"
@@ -32,6 +32,7 @@ import { getUid, supabase } from "./core/supabase"
 import createAinews from "./commands/ainews"
 import { generateMoreImagesButtons } from "./helpers/buttonHandlers"
 import { textToImageConversation } from "./commands/text_to_image"
+import { generateImage } from "./helpers/generateImage"
 
 interface SessionData {
   melimi00: {

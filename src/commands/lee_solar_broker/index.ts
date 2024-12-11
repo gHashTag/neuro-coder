@@ -1,7 +1,7 @@
 import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
-import { generateImage } from "../../helpers"
 import { InputFile } from "grammy"
+import { generateImage } from "src/helpers/generateImage"
 
 const leeSolarBroker = async (conversation: Conversation<MyContext>, ctx: MyContext) => {
   try {

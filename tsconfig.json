@@ -13,7 +13,8 @@
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "src/*": ["src/*"],
-      "api/*": ["api/*"]
+      "api/*": ["api/*"],
+      "@/*": ["src/*"]
     }
   },
   "include": ["src/**/*", "api/**/*"]

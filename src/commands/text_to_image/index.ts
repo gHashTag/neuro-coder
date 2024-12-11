@@ -1,9 +1,10 @@
-import { generateImage, pulse } from "../../helpers"
+import { pulse } from "../../helpers"
 import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard, InputFile } from "grammy"
 import { getGeneratedImages } from "../../core/supabase/ai"
 import { generateMoreImagesButtons } from "../../helpers/buttonHandlers"
+import { generateImage } from "src/helpers/generateImage"
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
@@ -83,12 +84,6 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
     if (!message || !ctx.from?.id) return
 
     const text = message.photo ? message.caption : message.text
-    let fileUrl = ""
-
-    if (message.document) {
-      const file = await ctx.api.getFile(message.document.file_id)
-      fileUrl = `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}`
-    }
 
     const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
 

@@ -1,10 +1,11 @@
-import { generateImage, pulse } from "../../helpers"
+import { pulse } from "../../helpers"
 import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard } from "grammy"
 import { getGeneratedImages } from "../../core/supabase/ai"
 import { InputFile } from "grammy"
 import { generateMoreImagesButtons } from "../../helpers/buttonHandlers"
+import { generateImage } from "src/helpers/generateImage"
 
 const generateImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"

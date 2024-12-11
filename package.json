@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/api/index.js",
     "build": "tsc",
-    "dev": "nodemon src/index.ts",
+    "dev": "nodemon -r tsconfig-paths/register src/index.ts",
     "lint": "eslint . --cache --ext .ts,.js",
     "dev:server": "nodemon src/server.ts",
     "format": "prettier --write 'src/**/*.ts'"
@@ -65,6 +65,7 @@
     "nodemon": "^2.0.15",
     "prettier": "^2.8.8",
     "ts-node": "^10.4.0",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^4.5.4"
   }
 }
