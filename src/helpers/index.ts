@@ -112,6 +112,7 @@ export const generateImage = async (prompt: string, model_type: string, telegram
     if (model_type === "flux") {
       const input = {
         prompt: `${models[model_type].word} ${prompt}`,
+        size: aspect_ratio === "1:1" ? "1024x1024" : aspect_ratio === "16:9" ? "1365x768" : "1365x1024",
         aspect_ratio: aspect_ratio === "1:1" ? "1:1" : aspect_ratio === "16:9" ? "16:9" : "3:2",
         negative_prompt: "nsfw, erotic, violence, bad anatomy",
       }

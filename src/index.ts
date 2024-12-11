@@ -8,17 +8,17 @@ import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
 import { session, SessionFlavor } from "grammy"
 import { imageSizeConversation } from "./commands/imagesize"
-import { customMiddleware, generateImage, pulse, imageToVideo, upgradePrompt } from "./helpers"
+import { customMiddleware, generateImage, pulse, upgradePrompt } from "./helpers"
 import { generateImageConversation } from "./commands/generateImage"
 import createTriggerReel from "./commands/trigger_reel"
 import createCaptionForNews from "./commands/сaptionForNews"
 import { get100AnfiVesnaConversation } from "./commands/get100"
 import { soulConversation } from "./commands/soul"
 import { voiceConversation } from "./commands/voice"
-import { getGeneratedImages, getModel, getPrompt, incrementLimit, savePrompt, setModel } from "./core/supabase/ai"
-import { InputMediaPhoto, InputFile } from "grammy/types"
+import { getModel, getPrompt, incrementLimit, setModel } from "./core/supabase/ai"
+import { InputFile } from "grammy/types"
 import { inviterConversation } from "./commands/inviter"
-import { models } from "./commands/constants"
+
 import { answerAi } from "./core/openai/requests"
 import textToSpeech from "./commands/textToSpeech"
 import { lipSyncConversation } from "./commands/lipSyncConversation"
@@ -31,6 +31,7 @@ import { checkSubscriptionByTelegramId, isLimitAi, sendPaymentInfo } from "./cor
 import { getUid, supabase } from "./core/supabase"
 import createAinews from "./commands/ainews"
 import { generateMoreImagesButtons } from "./helpers/buttonHandlers"
+import { textToImageConversation } from "./commands/text_to_image"
 
 interface SessionData {
   melimi00: {
@@ -94,7 +95,7 @@ if (process.env.NODE_ENV === "production") {
     },
     {
       command: "subtitles",
-      description: "🎥 Create subtitles / Со��дать субтитры",
+      description: "🎥 Create subtitles / Создать субтитры",
     },
     {
       command: "ainews",
@@ -123,6 +124,7 @@ bot.use(createConversation(leeSolarNumerolog))
 bot.use(createConversation(leeSolarBroker))
 bot.use(createConversation(subtitles))
 bot.use(createConversation(createAinews))
+bot.use(createConversation(textToImageConversation))
 
 bot.command("start", start)
 bot.use(customMiddleware)
@@ -169,7 +171,12 @@ bot.on("message:successful_payment", async (ctx) => {
 })
 
 bot.on("message:text", async (ctx) => {
-  if (ctx.message.text.startsWith("/")) return
+  console.log("Received message:", ctx.message?.text)
+  if (ctx.message?.text?.startsWith("/")) {
+    console.log("Skipping command message")
+    return
+  }
+
   if (ctx.message.text) {
     const isRu = ctx.from?.language_code === "ru"
     const model = await getModel(ctx.from?.id.toString() || "")
@@ -212,7 +219,7 @@ bot.on("callback_query:data", async (ctx) => {
       const promptId = data.split("_")[2]
       const promptData = await getPrompt(promptId)
       if (!promptData) {
-        await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+        await ctx.reply(isRu ? "Не удало��ь найти информацию о промпте" : "Could not find prompt information")
         await ctx.answerCallbackQuery()
         return
       }
@@ -413,7 +420,7 @@ bot.catch((err) => {
   const ctx = err.ctx
   const isRu = ctx.from?.language_code === "ru"
   console.error(`Ошибка при обработке обновления ${ctx.update.update_id}:`)
-  console.error(err.error)
+  console.error("error", err.error)
   ctx
     .reply(
       isRu
@@ -423,6 +430,11 @@ bot.catch((err) => {
     .catch((e) => {
       console.error("Ошибка отправки сообщения об ошибке пользователю:", e)
     })
+})
+
+// Регистрируем команду
+bot.command("text_to_image", async (ctx) => {
+  await ctx.conversation.enter("textToImageConversation")
 })
 
 export { bot }

@@ -179,7 +179,7 @@ composer.command("get100", async (ctx) => {
 })
 
 composer.command("text_to_image", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
+  await ctx.conversation.enter("textToImageConversation")
 })
 
 composer.command("model", model)
