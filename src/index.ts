@@ -57,11 +57,11 @@ if (process.env.NODE_ENV === "production") {
   bot.api.setMyCommands([
     {
       command: "start",
-      description: "👋 Start bot / Запустить бота"
+      description: "👋 Start bot / Запустить бота",
     },
     {
-      command: "help", 
-      description: "❓ Help / Помощь"
+      command: "help",
+      description: "❓ Help / Помощь",
     },
     {
       command: "buy",
@@ -118,7 +118,7 @@ if (process.env.NODE_ENV === "production") {
     {
       command: "caption_for_ai_news",
       description: "📝 Create AI news caption / Создать описание для AI новостей",
-    }
+    },
   ])
 }
 
@@ -222,6 +222,61 @@ bot.on("callback_query:data", async (ctx) => {
   try {
     const data = ctx.callbackQuery.data
     await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
+
+    if (data.startsWith("buy")) {
+      if (data.endsWith("avatar")) {
+        await ctx.replyWithInvoice(
+          isRu ? "Цифровой аватар" : "Digital avatar",
+          isRu
+            ? "Представьте, у вас есть возможность создать уникальную цифровую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим лицом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
+            : "Imagine you have the opportunity to create a unique digital copy of yourself! I can train the AI on your photos so that you can receive images with your face and body in any style and setting — from fantastic worlds to fashion photo sessions. This is a great opportunity for a personal brand or just for fun!",
+          "avatar",
+          "XTR",
+          [{ label: "Цена", amount: 5645 }],
+        )
+        return
+      }
+      if (data.endsWith("start")) {
+        await ctx.replyWithInvoice(
+          isRu ? "НейроСтарт" : "NeuroStart",
+          isRu ? "Вы получите подписку уровня 'НейроСтарт'" : "You will receive a subscription to the 'NeuroStart' level",
+          "start",
+          "XTR",
+          [{ label: "Цена", amount: 55 }],
+        )
+        return
+      }
+      if (data.endsWith("base")) {
+        await ctx.replyWithInvoice(
+          isRu ? "НейроБаза" : "NeuroBase",
+          isRu ? "Вы получите подписку уровня 'НейроБаза'" : "You will receive a subscription to the 'NeuroBase' level",
+          "base",
+          "XTR",
+          [{ label: "Цена", amount: 565 }],
+        )
+        return
+      }
+      if (data.endsWith("student")) {
+        await ctx.replyWithInvoice(
+          isRu ? "НейроУченик" : "NeuroStudent",
+          isRu ? "Вы получите подписку уровня 'НейроУченик'" : "You will receive a subscription to the 'NeuroStudent' level",
+          "student",
+          "XTR",
+          [{ label: "Цена", amount: 5655 }],
+        )
+        return
+      }
+      if (data.endsWith("expert")) {
+        await ctx.replyWithInvoice(
+          isRu ? "НейроЭксперт" : "NeuroExpert",
+          isRu ? "Вы получите подписку уровня 'НейроЭксперт'" : "You will receive a subscription to the 'NeuroExpert' level",
+          "expert",
+          "XTR",
+          [{ label: "Цена", amount: 16955 }],
+        )
+        return
+      }
+    }
 
     // Добавляем новый обработчик для выбора модели
     if (data.startsWith("select_model_")) {
