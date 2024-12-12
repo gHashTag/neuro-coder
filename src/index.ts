@@ -113,6 +113,11 @@ if (process.env.NODE_ENV === "production") {
     },
   ])
 }
+  {
+    command: "caption_for_ai_news",
+    description: "📝 Create AI news caption / Создать описание для AI новостей",
+  },
+])
 
 bot.use(conversations())
 bot.use(createConversation(imageSizeConversation))
@@ -193,7 +198,7 @@ bot.on("message:text", async (ctx) => {
       if (isLimit) {
         await ctx.reply(
           isRu
-            ? "У вас закончились бесплатные ежедневные запросы на использование нейросети 🧠. Подписка неактивна. \n\n/buy - выбери уровень и оформляй подписку, чтобы получить неограниченный доступ к нейросети 🧠"
+            ? "У вас закончились бесплатные ежедневные запросы на использование нейросети 🧠. Подписка неактивна. \n\n/buy - выбери уровень и оформляй подписку, чтобы пол��ить неограниченный доступ к нейросети 🧠"
             : "🔒 You are not subscribed to any level. The subscription is inactive. \n\n/buy - select a level and subscribe, to get unlimited access to the neural network 🧠",
         )
         return
@@ -201,7 +206,7 @@ bot.on("message:text", async (ctx) => {
     }
     const answer = await answerAi(model, ctx.message.text, ctx.from?.language_code || "en")
     if (!answer) {
-      await ctx.reply("❌ Извините, произошла ошибка при ответе на ваш запрос. Пожалуйста, попробуйте позже.")
+      await ctx.reply("❌ Извините, произошла ошибка при ответе на ваш запро��. Пожалуйста, попробуйте позже.")
       return
     }
     await ctx.reply(answer)
@@ -226,7 +231,7 @@ bot.on("callback_query:data", async (ctx) => {
       const promptId = data.split("_")[2]
       const promptData = await getPrompt(promptId)
       if (!promptData) {
-        await ctx.reply(isRu ? "Не удало��ь найти информацию о промпте" : "Could not find prompt information")
+        await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
         await ctx.answerCallbackQuery()
         return
       }
@@ -253,7 +258,7 @@ bot.on("callback_query:data", async (ctx) => {
         .single()
 
       if (error || !savedPrompt) {
-        console.error("Ошибка при сохранении улучшенного промпта:", error)
+        console.error("Ошибка при сохранении улучшенного ��ромпта:", error)
         await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
         return
       }
@@ -343,7 +348,7 @@ bot.on("callback_query:data", async (ctx) => {
           return
         }
 
-        // Показываем улучшенный промпт и спрашиваем подтверждение
+        // Показываем улучшенный п��омпт и спрашиваем подтверждение
         await ctx.reply(
           isRu ? `Улучшенный промпт:\n${improvedPrompt}\n\nСгенерировать изображение?` : `Improved prompt:\n${improvedPrompt}\n\nGenerate image?`,
           {
@@ -356,7 +361,7 @@ bot.on("callback_query:data", async (ctx) => {
           },
         )
       } catch (error) {
-        console.error("Ошибка при улучшении промпта:", error)
+        console.error("Ошибка при улучшении прмпта:", error)
         await ctx.reply(isRu ? "Произошла ошибка при улучшении промпта" : "An error occurred while improving the prompt")
       }
     }
@@ -367,13 +372,13 @@ bot.on("callback_query:data", async (ctx) => {
       const { data: lastPrompt } = await supabase
         .from("prompts_history")
         .select("*")
-        .eq("telegram_id", ctx.from.id)
+        .eq("telegram_id", ctx.from)
         .order("created_at", { ascending: false })
         .limit(1)
         .single()
 
       if (!lastPrompt) {
-        await ctx.reply("Не найден предыдущий промпт для повторной генерации")
+        await ctx.reply("Не н��йден предыдущий промпт для повторной генерации")
         return
       }
 
@@ -426,12 +431,12 @@ bot.on("callback_query:data", async (ctx) => {
 bot.catch((err) => {
   const ctx = err.ctx
   const isRu = ctx.from?.language_code === "ru"
-  console.error(`Ошибка при обработке обновления ${ctx.update.update_id}:`)
+  console.error(`Ошибка пи обработке обновления ${ctx.update.update_id}:`)
   console.error("error", err.error)
   ctx
     .reply(
       isRu
-        ? "Извините, поизошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте позже."
+        ? "Извините, поизошла ошбка при обработке вашего запроса. Пожалуйста, попробуйте позже."
         : "Sorry, an error occurred while processing your request. Please try again later.",
     )
     .catch((e) => {

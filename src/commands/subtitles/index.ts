@@ -12,7 +12,10 @@ export async function subtitles(conversation: Conversation<MyContext>, ctx: MyCo
   const isRu = ctx.from?.language_code === "ru"
 
   try {
-    await ctx.reply(isRu ? "Отправьте URL видео для создания субтитров" : "Send video URL for subtitles creation")
+    await ctx.reply(
+      isRu ? "Отправьте URL видео для создания субтитров" : "Send video URL for subtitles creation",
+      { reply_markup: { force_reply: true } }
+    )
 
     const videoUrlMsg = await conversation.wait()
     const videoUrl = videoUrlMsg.message?.text
