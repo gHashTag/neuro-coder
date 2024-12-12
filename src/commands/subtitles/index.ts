@@ -60,8 +60,8 @@ export async function subtitles(conversation: Conversation<MyContext>, ctx: MyCo
     await ctx.replyWithChatAction("upload_video")
     await ctx.replyWithVideo(new InputFile(tempFilePath), {
       caption: isRu
-        ? `✅ Видео с субтитрами готово!\nДлительность: ${result[0].duration} сек\nРазмер: ${Math.round((result[0].fileSize / 1024 / 1024) * 100) / 100} МБ`
-        : `✅ Video with subtitles is ready!\nDuration: ${result[0].duration} sec\nSize: ${Math.round((result[0].fileSize / 1024 / 1024) * 100) / 100} MB`,
+        ? `✅ Видео с субтитрами готово!\nДлительность: ${result[0].duration} сек\nРазмер: ${Math.round((result[0].fileSize / 1024 / 1024) * 100) / 100} МБ\nСсылка на видео: ${videoFileUrl}`
+        : `✅ Video with subtitles is ready!\nDuration: ${result[0].duration} sec\nSize: ${Math.round((result[0].fileSize / 1024 / 1024) * 100) / 100} MB\nVideo link: ${videoFileUrl}`,
     })
 
     // Удаляем временный файл
