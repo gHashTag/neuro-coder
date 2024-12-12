@@ -57,7 +57,11 @@ if (process.env.NODE_ENV === "production") {
   bot.api.setMyCommands([
     {
       command: "start",
-      description: "👋 Start for use bot / Начать использовать бота",
+      description: "👋 Start bot / Запустить бота"
+    },
+    {
+      command: "help", 
+      description: "❓ Help / Помощь"
     },
     {
       command: "buy",
@@ -111,13 +115,12 @@ if (process.env.NODE_ENV === "production") {
       command: "text_to_video",
       description: "🎥 Generate video from text / Сгенерировать видео из текста",
     },
+    {
+      command: "caption_for_ai_news",
+      description: "📝 Create AI news caption / Создать описание для AI новостей",
+    }
   ])
 }
-  {
-    command: "caption_for_ai_news",
-    description: "📝 Create AI news caption / Создать описание для AI новостей",
-  },
-])
 
 bot.use(conversations())
 bot.use(createConversation(imageSizeConversation))
@@ -348,7 +351,7 @@ bot.on("callback_query:data", async (ctx) => {
           return
         }
 
-        // Показываем улучшенный п��омпт и спрашиваем подтверждение
+        // Показываем улучшенный промпт и спрашиваем подтверждение
         await ctx.reply(
           isRu ? `Улучшенный промпт:\n${improvedPrompt}\n\nСгенерировать изображение?` : `Improved prompt:\n${improvedPrompt}\n\nGenerate image?`,
           {
@@ -436,7 +439,7 @@ bot.catch((err) => {
   ctx
     .reply(
       isRu
-        ? "Извините, поизошла ошбка при обработке вашего запроса. Пожалуйста, попробуйте позже."
+        ? "Извините, поиз��шла ошбка при обработке вашего запроса. Пожалуйста, попробуйте позже."
         : "Sorry, an error occurred while processing your request. Please try again later.",
     )
     .catch((e) => {
