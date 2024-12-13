@@ -36,6 +36,7 @@ import { generateImage } from "./helpers/generateImage"
 import { textToVideoConversation } from "./commands/text_to_video"
 import imageToVideo from "./commands/image_to_video"
 import image_to_video from "./commands/image_to_video"
+import { imageToPromptConversation } from "./commands/image_to_prompt"
 
 interface SessionData {
   melimi00: {
@@ -125,6 +126,10 @@ if (process.env.NODE_ENV === "production") {
       command: "image_to_video",
       description: "🎥 Generate video from image / Сгенерировать видео из изображения",
     },
+    {
+      command: "image_to_prompt",
+      description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
+    },
   ])
 }
 
@@ -147,6 +152,7 @@ bot.use(createConversation(createAinews))
 bot.use(createConversation(textToImageConversation))
 bot.use(createConversation(textToVideoConversation))
 bot.use(createConversation<MyContextWithSession>(imageToVideo))
+bot.use(createConversation(imageToPromptConversation))
 
 bot.command("start", start)
 bot.use(customMiddleware)
@@ -216,7 +222,7 @@ bot.on("message:text", async (ctx) => {
     }
     const answer = await answerAi(model, ctx.message.text, ctx.from?.language_code || "en")
     if (!answer) {
-      await ctx.reply("❌ Извините, произошла ошибка при ответе на ваш запро��. Пожалуйста, попробуйте позже.")
+      await ctx.reply("❌ Извините, произошла ошибка при ответе на ваш запро��. Пожалуйста, попробуйте позж��.")
       return
     }
     await ctx.reply(answer)
@@ -256,7 +262,7 @@ bot.on("callback_query:data", async (ctx) => {
       if (data.endsWith("base")) {
         await ctx.replyWithInvoice(
           isRu ? "НейроБаза" : "NeuroBase",
-          isRu ? "Вы получите подписку уровня 'НейроБаза'" : "You will receive a subscription to the 'NeuroBase' level",
+          isRu ? "Вы получите подписку уровня 'Не��роБаза'" : "You will receive a subscription to the 'NeuroBase' level",
           "base",
           "XTR",
           [{ label: "Цена", amount: 565 }],
@@ -289,7 +295,7 @@ bot.on("callback_query:data", async (ctx) => {
     if (data.startsWith("select_model_")) {
       const model = data.replace("select_model_", "")
       await setModel(ctx.from.id.toString(), model)
-      return // Выходим, так как дальнейший диалог продолжится в conversation
+      return // Выхо��им, так как дальнейший диалог продолжится в conversation
     }
     if (data.startsWith("generate_improved_")) {
       // Обработка улучшенного промпта
@@ -431,6 +437,52 @@ bot.on("callback_query:data", async (ctx) => {
         console.error("Ошибка при улучшении прмпта:", error)
         await ctx.reply(isRu ? "Произошла ошибка при улучшении промпта" : "An error occurred while improving the prompt")
       }
+    } else if (data.startsWith("generate_image_")) {
+      const prompt = data.replace("generate_image_", "")
+
+      // Отправляем сообщение о начале генерации
+      const generatingMsg = await ctx.reply(isRu ? "⏳ Генерирую изображение..." : "⏳ Generating image...")
+
+      try {
+        // Используем существующую функцию generateImage
+        const result = await generateImage(prompt, "sdxl", ctx.from.id.toString())
+
+        if (!result) {
+          throw new Error("Failed to generate image")
+        }
+
+        // Отправляем сгенерированное изображение
+        const photoToSend = Buffer.isBuffer(result.image) ? new InputFile(result.image) : result.image
+
+        await ctx.replyWithPhoto(photoToSend)
+
+        // Отправляем в pulse
+        const pulseImage = Buffer.isBuffer(result.image) ? `data:image/jpeg;base64,${result.image.toString("base64")}` : result.image
+
+        await pulse(ctx, pulseImage, prompt, "/sdxl")
+
+        // Показываем кнопки для дальнейших действий
+        await ctx.reply(isRu ? "Что дальше?" : "What's next?", {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: isRu ? "🔄 Повторить генерацию" : "🔄 Regenerate", callback_data: "retry" }],
+              [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: "improve" }],
+              [{ text: isRu ? "🎥 Сгенерировать видео" : "🎥 Generate video", callback_data: "video" }],
+            ],
+          },
+        })
+      } catch (error) {
+        console.error("Error generating image:", error)
+        await ctx.reply(
+          isRu
+            ? "❌ Произошла ошибка при генерации изображения. Пожалуйста, попробуйте позже."
+            : "❌ An error occurred while generating the image. Please try again later.",
+        )
+      } finally {
+        // Удаляем сообщение о генерации
+        await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMsg.message_id).catch(console.error)
+      }
+      return
     }
 
     if (data === "retry") {
@@ -491,7 +543,7 @@ bot.on("callback_query:data", async (ctx) => {
     const loadingMessage = await ctx.reply(isRu ? "⏳ Начинаю генерацию изображений..." : "⏳ Starting image generation...")
 
     // Удаляем сообщение о загрузке в любом случае
-    await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMessage.message_id).catch(console.error) // игнорируем ошибку если сообщение уже удалено
+    await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMessage.message_id).catch(console.error) // и��норируем ошибку если сообщение уже удалено
   }
 })
 
@@ -514,6 +566,10 @@ bot.catch((err) => {
 // Регистрируем команду
 bot.command("text_to_image", async (ctx) => {
   await ctx.conversation.enter("textToImageConversation")
+})
+
+bot.command("image_to_prompt", async (ctx) => {
+  await ctx.conversation.enter("imageToPromptConversation")
 })
 
 export { bot }

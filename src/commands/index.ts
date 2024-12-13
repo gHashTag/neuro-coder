@@ -202,4 +202,9 @@ composer.command("image_to_video", async (ctx) => {
   await ctx.conversation.enter("imageToVideo")
 })
 
+composer.command("image_to_prompt", async (ctx) => {
+  console.log("Entering image_to_prompt conversation")
+  await ctx.conversation.enter("imageToPromptConversation")
+})
+
 export default composer

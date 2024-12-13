@@ -24,7 +24,7 @@ async function retry<T>(fn: () => Promise<T>, attempts = 3, delay = 1000): Promi
 
 async function imageToVideo(conversation: Conversation<MyConversationType>, ctx: MyConversationType) {
   const isRu = ctx.from?.language_code === "ru"
-  await ctx.reply(isRu ? "Пожалуйста, отправьте изображение и опишите желаемое движение" : "Please send an image and describe the desired movement")
+  await ctx.reply(isRu ? "Пожалуйста, отправьте изображение" : "Please send an image")
 
   const imageMsg = await conversation.wait()
 
@@ -78,7 +78,7 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
       await writeFile(tempFilePath, videoBuffer)
 
       await ctx.replyWithVideo(new InputFile(tempFilePath))
-      await ctx.reply("Видео успешно создано!")
+      await ctx.reply(isRu ? "Видео успешно создано!" : "Video successfully created!")
     } else {
       await ctx.reply(isRu ? "Произошла ошибка при создании видео" : "An error occurred while creating the video")
     }
