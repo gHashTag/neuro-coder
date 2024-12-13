@@ -5,28 +5,12 @@ import circle from "./circle"
 import hello from "./hello"
 import clipmaker from "./clipmaker"
 import leela from "./leela"
-import createTriggerReel from "./trigger_reel"
-import createCaptionForNews from "./сaptionForNews"
-import createAinews from "./ainews"
+
 import neuro_broker from "./neuro_broker"
-import textToSpeech from "./textToSpeech"
 
-// import neurocoder_test from "./neurocoder/neurocoder_test";
-// import neurocoder01 from "./neurocoder/neurocoder01";
-
-// import melimi_test from "./melimi/melimi_test";
-// import melimi01 from "./melimi/melimi01";
-// import melimi02 from "./melimi/melimi02";
-// import melimi03 from "./melimi/melimi03";
-// import melimi04 from "./melimi/melimi04";
-// import melimi05 from "./melimi/melimi05";
-// import melimi06 from "./melimi/melimi06";
-// import { start } from "./start"
 import { model } from "./model"
 import { invite } from "./invite"
 import { buy } from "./buy"
-// import neurocoder02 from "./neurocoder/neurocoder02";
-// import neurocoder03 from "./neurocoder/neurocoder03";
 
 const composer = new Composer<MyContext>()
 
@@ -208,6 +192,10 @@ composer.command("melimi_cat", async (ctx) => {
 
 composer.command("ainews", async (ctx) => {
   await ctx.conversation.enter("createAinews")
+})
+
+composer.command("image_to_video", async (ctx) => {
+  await ctx.conversation.enter("imageToVideo")
 })
 
 export default composer

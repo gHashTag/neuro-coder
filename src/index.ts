@@ -34,6 +34,8 @@ import { buttonHandlers } from "./helpers/buttonHandlers"
 import { textToImageConversation } from "./commands/text_to_image"
 import { generateImage } from "./helpers/generateImage"
 import { textToVideoConversation } from "./commands/text_to_video"
+import imageToVideo from "./commands/image_to_video"
+import image_to_video from "./commands/image_to_video"
 
 interface SessionData {
   melimi00: {
@@ -111,6 +113,10 @@ if (process.env.NODE_ENV === "production") {
       command: "text_to_video",
       description: "🎥 Generate video from text / Сгенерировать видео из текста",
     },
+    {
+      command: "image_to_video",
+      description: "🎥 Generate video from image / Сгенерировать видео из изображения",
+    },
   ])
 }
 
@@ -132,6 +138,7 @@ bot.use(createConversation(subtitles))
 bot.use(createConversation(createAinews))
 bot.use(createConversation(textToImageConversation))
 bot.use(createConversation(textToVideoConversation))
+bot.use(createConversation<MyContextWithSession>(imageToVideo))
 
 bot.command("start", start)
 bot.use(customMiddleware)
@@ -226,7 +233,7 @@ bot.on("callback_query:data", async (ctx) => {
       const promptId = data.split("_")[2]
       const promptData = await getPrompt(promptId)
       if (!promptData) {
-        await ctx.reply(isRu ? "Не удало��ь найти информацию о промпте" : "Could not find prompt information")
+        await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
         await ctx.answerCallbackQuery()
         return
       }
@@ -254,7 +261,7 @@ bot.on("callback_query:data", async (ctx) => {
 
       if (error || !savedPrompt) {
         console.error("Ошибка при сохранении улучшенного промпта:", error)
-        await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
+        await ctx.reply(isRu ? "Ошибка при сохранении улучшенно��о промпта" : "Error saving improved prompt")
         return
       }
 
