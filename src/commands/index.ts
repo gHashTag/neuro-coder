@@ -170,6 +170,10 @@ composer.command("text_to_video", async (ctx) => {
   await ctx.conversation.enter("textToVideoConversation")
 })
 
+composer.command("caption_for_ai_news", async (ctx) => {
+  await ctx.conversation.enter("createCaptionForNews")
+})
+
 composer.command("model", model)
 // composer.command("neurocoder01", neurocoder01);
 // composer.command("neurocoder02", neurocoder02);

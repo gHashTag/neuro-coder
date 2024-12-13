@@ -59,7 +59,11 @@ if (process.env.NODE_ENV === "production") {
   bot.api.setMyCommands([
     {
       command: "start",
-      description: "👋 Start for use bot / Начать использовать бота",
+      description: "👋 Start bot / Запустить бота",
+    },
+    {
+      command: "help",
+      description: "❓ Help / Помощь",
     },
     {
       command: "buy",
@@ -112,6 +116,10 @@ if (process.env.NODE_ENV === "production") {
     {
       command: "text_to_video",
       description: "🎥 Generate video from text / Сгенерировать видео из текста",
+    },
+    {
+      command: "caption_for_ai_news",
+      description: "📝 Create AI news caption / Создать описание для AI новостей",
     },
     {
       command: "image_to_video",
@@ -200,7 +208,7 @@ bot.on("message:text", async (ctx) => {
       if (isLimit) {
         await ctx.reply(
           isRu
-            ? "У вас закончились бесплатные ежедневные запросы на использование нейросети 🧠. Подписка неактивна. \n\n/buy - выбери уровень и оформляй подписку, чтобы получить неограниченный доступ к нейросети 🧠"
+            ? "У вас закончились бесплатные ежедневные запросы на использование нейросети 🧠. Подписка неактивна. \n\n/buy - выбери уровень и оформляй подписку, чтобы пол��ить неограниченный доступ к нейросети 🧠"
             : "🔒 You are not subscribed to any level. The subscription is inactive. \n\n/buy - select a level and subscribe, to get unlimited access to the neural network 🧠",
         )
         return
@@ -208,7 +216,7 @@ bot.on("message:text", async (ctx) => {
     }
     const answer = await answerAi(model, ctx.message.text, ctx.from?.language_code || "en")
     if (!answer) {
-      await ctx.reply("❌ Извините, произошла ошибка при ответе на ваш запрос. Пожалуйста, попробуйте позже.")
+      await ctx.reply("❌ Извините, произошла ошибка при ответе на ваш запро��. Пожалуйста, попробуйте позже.")
       return
     }
     await ctx.reply(answer)
@@ -221,6 +229,61 @@ bot.on("callback_query:data", async (ctx) => {
   try {
     const data = ctx.callbackQuery.data
     await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
+
+    if (data.startsWith("buy")) {
+      if (data.endsWith("avatar")) {
+        await ctx.replyWithInvoice(
+          isRu ? "Цифровой аватар" : "Digital avatar",
+          isRu
+            ? "Представьте, у вас есть возможность создать уникальную цифровую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим лицом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
+            : "Imagine you have the opportunity to create a unique digital copy of yourself! I can train the AI on your photos so that you can receive images with your face and body in any style and setting — from fantastic worlds to fashion photo sessions. This is a great opportunity for a personal brand or just for fun!",
+          "avatar",
+          "XTR",
+          [{ label: "Цена", amount: 5645 }],
+        )
+        return
+      }
+      if (data.endsWith("start")) {
+        await ctx.replyWithInvoice(
+          isRu ? "НейроСтарт" : "NeuroStart",
+          isRu ? "Вы получите подписку уровня 'НейроСтарт'" : "You will receive a subscription to the 'NeuroStart' level",
+          "start",
+          "XTR",
+          [{ label: "Цена", amount: 55 }],
+        )
+        return
+      }
+      if (data.endsWith("base")) {
+        await ctx.replyWithInvoice(
+          isRu ? "НейроБаза" : "NeuroBase",
+          isRu ? "Вы получите подписку уровня 'НейроБаза'" : "You will receive a subscription to the 'NeuroBase' level",
+          "base",
+          "XTR",
+          [{ label: "Цена", amount: 565 }],
+        )
+        return
+      }
+      if (data.endsWith("student")) {
+        await ctx.replyWithInvoice(
+          isRu ? "НейроУченик" : "NeuroStudent",
+          isRu ? "Вы получите подписку уровня 'НейроУченик'" : "You will receive a subscription to the 'NeuroStudent' level",
+          "student",
+          "XTR",
+          [{ label: "Цена", amount: 5655 }],
+        )
+        return
+      }
+      if (data.endsWith("expert")) {
+        await ctx.replyWithInvoice(
+          isRu ? "НейроЭксперт" : "NeuroExpert",
+          isRu ? "Вы получите подписку уровня 'НейроЭксперт'" : "You will receive a subscription to the 'NeuroExpert' level",
+          "expert",
+          "XTR",
+          [{ label: "Цена", amount: 16955 }],
+        )
+        return
+      }
+    }
 
     // Добавляем новый обработчик для выбора модели
     if (data.startsWith("select_model_")) {
@@ -260,6 +323,8 @@ bot.on("callback_query:data", async (ctx) => {
         .single()
 
       if (error || !savedPrompt) {
+        console.error("Ошибка при сохранении улучшенного ��ромпта:", error)
+        await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
         console.error("Ошибка при сохранении улучшенного промпта:", error)
         await ctx.reply(isRu ? "Ошибка при сохранении улучшенно��о промпта" : "Error saving improved prompt")
         return
@@ -363,7 +428,7 @@ bot.on("callback_query:data", async (ctx) => {
           },
         )
       } catch (error) {
-        console.error("Ошибка при улучшении промпта:", error)
+        console.error("Ошибка при улучшении прмпта:", error)
         await ctx.reply(isRu ? "Произошла ошибка при улучшении промпта" : "An error occurred while improving the prompt")
       }
     }
@@ -374,13 +439,13 @@ bot.on("callback_query:data", async (ctx) => {
       const { data: lastPrompt } = await supabase
         .from("prompts_history")
         .select("*")
-        .eq("telegram_id", ctx.from.id)
+        .eq("telegram_id", ctx.from)
         .order("created_at", { ascending: false })
         .limit(1)
         .single()
 
       if (!lastPrompt) {
-        await ctx.reply("Не найден предыдущий промпт для повторной генерации")
+        await ctx.reply("Не н��йден предыдущий промпт для повторной генерации")
         return
       }
 
@@ -433,12 +498,12 @@ bot.on("callback_query:data", async (ctx) => {
 bot.catch((err) => {
   const ctx = err.ctx
   const isRu = ctx.from?.language_code === "ru"
-  console.error(`Ошибка при обработке обновления ${ctx.update.update_id}:`)
+  console.error(`Ошибка пи обработке обновления ${ctx.update.update_id}:`)
   console.error("error", err.error)
   ctx
     .reply(
       isRu
-        ? "Извините, поизошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте позже."
+        ? "Извините, поиз��шла ошбка при обработке вашего запроса. Пожалуйста, попробуйте позже."
         : "Sorry, an error occurred while processing your request. Please try again later.",
     )
     .catch((e) => {
