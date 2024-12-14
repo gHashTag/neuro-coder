@@ -6,7 +6,7 @@ import archiver from "archiver"
 import { createWriteStream } from "fs"
 
 import { supabase } from "../../core/supabase"
-import { replicate } from "@/core/replicate"
+import { replicate } from "../../core/replicate"
 import { createModelTraining, updateModelTraining } from "../../core/supabase"
 
 // Добавляем интерфейс для ошибки API
