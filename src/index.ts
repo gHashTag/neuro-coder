@@ -15,7 +15,7 @@ import createCaptionForNews from "./commands/сaptionForNews"
 import { get100AnfiVesnaConversation } from "./commands/get100"
 import { soulConversation } from "./commands/soul"
 import { voiceConversation } from "./commands/voice"
-import { getModel, getPrompt, incrementLimit, setModel } from "./core/supabase/ai"
+import { getPrompt, incrementLimit, setModel } from "./core/supabase/ai"
 import { InputFile } from "grammy/types"
 import { inviterConversation } from "./commands/inviter"
 
@@ -27,15 +27,14 @@ import { start } from "./commands/start"
 import leeSolarNumerolog from "./commands/lee_solar_numerolog"
 import leeSolarBroker from "./commands/lee_solar_broker"
 import { subtitles } from "./commands/subtitles"
-import { checkSubscriptionByTelegramId, isLimitAi, sendPaymentInfo } from "./core/supabase/payments"
-import { getUid, supabase } from "./core/supabase"
+import { sendPaymentInfo } from "./core/supabase/payments"
+import { getUid, supabase, getUserModel } from "./core/supabase"
 import createAinews from "./commands/ainews"
 import { buttonHandlers } from "./helpers/buttonHandlers"
 import { textToImageConversation } from "./commands/text_to_image"
 import { generateImage } from "./helpers/generateImage"
 import { textToVideoConversation } from "./commands/text_to_video"
 import imageToVideo from "./commands/image_to_video"
-import image_to_video from "./commands/image_to_video"
 import { imageToPromptConversation } from "./commands/image_to_prompt"
 import { trainFluxModelConversation } from "./commands/train_flux_model"
 
@@ -72,8 +71,8 @@ if (process.env.NODE_ENV === "production") {
       description: "💰 Buy a subscription / Купить подписку",
     },
     {
-      command: "model",
-      description: "🤖 Change model / Изменить модель",
+      command: "select_model",
+      description: "🤖 Select model / Выбрать модель",
     },
     {
       command: "invite",
@@ -109,7 +108,7 @@ if (process.env.NODE_ENV === "production") {
     },
     {
       command: "ainews",
-      description: "📰 Create AI news caption / Создать описание AI новости",
+      description: "📰 Create AI news caption / Создать описа��ие AI новости",
     },
     {
       command: "text_to_image",
@@ -204,7 +203,7 @@ bot.on("message:successful_payment", async (ctx) => {
   //     : lang
   //     ? "НейроЭксперт"
   //     : "NeuroExpert"
-  // await ctx.reply(lang ? "🤝 Спасибо за покупку!" : "🤝 Thank you for the purchase!")
+  // await ctx.reply(lang ? "🤝 Спасибо за окупку!" : "🤝 Thank you for the purchase!")
   // const textToPost = lang
   //   ? `🪙 @${ctx.from.username} спасибо за покупку уровня ${levelForMessage}!`
   //   : `🪙 @${ctx.from.username} thank you for the purchase level ${levelForMessage}!`
@@ -213,33 +212,36 @@ bot.on("message:successful_payment", async (ctx) => {
 })
 
 bot.on("message:text", async (ctx) => {
-  console.log("Received message:", ctx.message?.text)
-  if (ctx.message?.text?.startsWith("/")) {
-    console.log("Skipping command message")
+  // Если это команда, пропускаем
+  if (ctx.message.text.startsWith("/")) {
     return
   }
 
-  if (ctx.message.text) {
-    const isRu = ctx.from?.language_code === "ru"
-    const model = await getModel(ctx.from?.id.toString() || "")
-    const subscription = await checkSubscriptionByTelegramId(ctx.from?.id.toString() || "")
-    if (subscription === "unsubscribed") {
-      const isLimit = await isLimitAi(ctx.from.id.toString())
-      if (isLimit) {
-        await ctx.reply(
-          isRu
-            ? "У вас закончились бесплатные ежедневные запросы на использование нейросети 🧠. Подписка неактивна. \n\n/buy - выбери уровень и оформляй подписку, чтобы пол��ить неограниченный доступ к нейросети 🧠"
-            : "🔒 You are not subscribed to any level. The subscription is inactive. \n\n/buy - select a level and subscribe, to get unlimited access to the neural network 🧠",
-        )
-        return
-      }
-    }
-    const answer = await answerAi(model, ctx.message.text, ctx.from?.language_code || "en")
-    if (!answer) {
-      await ctx.reply("❌ Извините, произошла ошибка при ответе на ваш запро��. Пожалуйста, попробуйте позж��.")
+  // Здесь должен быть вызов GPT
+  try {
+    // Получаем модель пользователя
+    const userModel = await getUserModel(ctx.from?.id.toString() || "")
+
+    const response = await answerAi(
+      userModel, // используем модель из базы данных
+      ctx.message.text,
+      ctx.from?.language_code || "en",
+    )
+
+    // Проверяем, что ответ не null
+    if (!response) {
+      await ctx.reply(
+        ctx.from?.language_code === "ru"
+          ? "Не удалось получить ответ от GPT. Пожалуйста, попробуйте позже."
+          : "Failed to get response from GPT. Please try again later.",
+      )
       return
     }
-    await ctx.reply(answer)
+
+    await ctx.reply(response)
+  } catch (error) {
+    console.error("Error in GPT response:", error)
+    await ctx.reply(ctx.from?.language_code === "ru" ? "Произошла ошибка при обработке запроса" : "An error occurred while processing your request")
   }
 })
 
@@ -255,7 +257,7 @@ bot.on("callback_query:data", async (ctx) => {
         await ctx.replyWithInvoice(
           isRu ? "Цифровой аватар" : "Digital avatar",
           isRu
-            ? "Представьте, у вас есть возможность создать уникальную цифровую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим л��цом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
+            ? "Представьте, у вас есть возможность создать уникальную цифровую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим лцом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
             : "Imagine you have the opportunity to create a unique digital copy of yourself! I can train the AI on your photos so that you can receive images with your face and body in any style and setting — from fantastic worlds to fashion photo sessions. This is a great opportunity for a personal brand or just for fun!",
           "avatar",
           "XTR",
@@ -309,14 +311,14 @@ bot.on("callback_query:data", async (ctx) => {
     if (data.startsWith("select_model_")) {
       const model = data.replace("select_model_", "")
       await setModel(ctx.from.id.toString(), model)
-      return // Выхо��им, так как дальнейший диалог продолжится в conversation
+      return
     }
     if (data.startsWith("generate_improved_")) {
       // Обработка улучшенного промпта
       const promptId = data.split("_")[2]
       const promptData = await getPrompt(promptId)
       if (!promptData) {
-        await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+        await ctx.reply(isRu ? "Не удалось найти информаци�� о промпте" : "Could not find prompt information")
         await ctx.answerCallbackQuery()
         return
       }
@@ -557,7 +559,7 @@ bot.on("callback_query:data", async (ctx) => {
     const loadingMessage = await ctx.reply(isRu ? "⏳ Начинаю генерацию изображений..." : "⏳ Starting image generation...")
 
     // Удаляем сообщение о загрузке в любом случае
-    await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMessage.message_id).catch(console.error) // и����норируем ошибку если сообщение уже удалено
+    await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMessage.message_id).catch(console.error) // и����норируем ошибку если сообщение ��же удалено
   }
 })
 
@@ -577,7 +579,7 @@ bot.catch((err) => {
     })
 })
 
-// Регистрируем команду
+// Регистрир��ем команду
 bot.command("text_to_image", async (ctx) => {
   await ctx.conversation.enter("textToImageConversation")
 })

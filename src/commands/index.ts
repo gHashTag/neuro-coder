@@ -8,9 +8,9 @@ import leela from "./leela"
 
 import neuro_broker from "./neuro_broker"
 
-import { model } from "./model"
 import { invite } from "./invite"
 import { buy } from "./buy"
+import selectModelComposer from "./select_model"
 
 const composer = new Composer<MyContext>()
 
@@ -178,37 +178,6 @@ composer.command("train_flux_model", async (ctx) => {
   await ctx.conversation.enter("trainFluxModelConversation")
 })
 
-composer.command("model", model)
-// composer.command("neurocoder01", neurocoder01);
-// composer.command("neurocoder02", neurocoder02);
-// composer.command("neurocoder03", neurocoder03);
-// composer.command("neurocoder_test", neurocoder_test);
-// composer.command("create_neurocoder_dj", async (ctx) => {
-//   await ctx.conversation.enter("neurocoderDjConversation");
-// });
-
-// composer.command("melimi01", melimi01);
-// composer.command("melimi02", melimi02);
-// composer.command("melimi03", melimi03);
-// composer.command("melimi04", melimi04);
-// composer.command("melimi05", melimi05);
-// composer.command("melimi06", melimi06);
-// composer.command("melimi_test", melimi_test);
-composer.command("melimi_cat", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("ainews", async (ctx) => {
-  await ctx.conversation.enter("createAinews")
-})
-
-composer.command("image_to_video", async (ctx) => {
-  await ctx.conversation.enter("imageToVideo")
-})
-
-composer.command("image_to_prompt", async (ctx) => {
-  console.log("Entering image_to_prompt conversation")
-  await ctx.conversation.enter("imageToPromptConversation")
-})
+composer.use(selectModelComposer)
 
 export default composer

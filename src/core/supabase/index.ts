@@ -102,3 +102,14 @@ export const updateModelTraining = async (user_id: string, model_name: string, u
   const { error } = await supabase.from("model_trainings").update(updates).eq("user_id", user_id).eq("model_name", model_name).eq("status", "processing")
   if (error) throw new Error(`Ошибка при обновлении записи о тренировке: ${error.message}`)
 }
+
+export const getUserModel = async (telegram_id: string): Promise<string> => {
+  const { data, error } = await supabase.from("users").select("model").eq("telegram_id", telegram_id).single()
+
+  if (error) {
+    console.error("Error getting user model:", error)
+    return "gpt-3.5-turbo" // дефолтная модель если произошла ошибка
+  }
+
+  return data?.model || "gpt-3.5-turbo"
+}
