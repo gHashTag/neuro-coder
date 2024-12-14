@@ -5,7 +5,7 @@ import { supabase } from "../../core/supabase"
 import { InputFile } from "grammy"
 import { pulse } from "../../helpers"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
-import { savePrompt, setAspectRatio } from "../../core/supabase/ai"
+import { savePrompt } from "../../core/supabase/ai"
 import { generateNeuroImage } from "src/helpers/generateNeuroImage"
 
 type MyConversation = Conversation<MyContext & ConversationFlavor>

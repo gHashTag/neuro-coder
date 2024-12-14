@@ -302,18 +302,37 @@ async function ensureSupabaseAuth(): Promise<void> {
 
 export async function trainFluxModelConversation(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
-  const images: { buffer: Buffer; filename: string }[] = []
   const userId = ctx.from?.id.toString()
-  const username = ctx.from?.username || ctx.from?.id.toString()
+  const username = ctx.from?.username
+  const images: { buffer: Buffer; filename: string }[] = []
   let isCancelled = false
+  let modelName = ""
 
-  // Проверяем наличие userId
   if (!userId) {
     await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
     return
   }
 
+  if (!username) {
+    await ctx.reply(
+      isRu ? "❌ Для обучения модели необходимо указать username в настройках Telegram" : "❌ You need to set a username in Telegram settings to train a model",
+    )
+    return
+  }
+
   try {
+    // Формируем название модели из username
+    modelName = `${username.toLowerCase()}`
+
+    // Проверяем, есть ли уже модель с таким именем
+    const { data: existingModel } = await supabase.from("model_trainings").select("*").eq("model_name", modelName).single()
+
+    if (existingModel) {
+      // Добавляем номер к имени модели, если такая уже существует
+      const { count } = await supabase.from("model_trainings").select("*", { count: "exact" }).eq("user_id", userId)
+      modelName = `${username.toLowerCase()}_${(count || 0) + 1}`
+    }
+
     // Запрашиваем изображения с кнопкой отмены
     await ctx.reply(
       isRu
@@ -405,30 +424,7 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
     await ctx.reply(isRu ? "⏳ Загружаю архив..." : "⏳ Uploading archive...")
     const zipUrl = await uploadToSupabase(zipPath, userId)
 
-    // Запрашиваем имя модели
-    await ctx.reply(
-      isRu
-        ? "Введите название для вашей модели (только латинские буквы, цифры и дефисы)"
-        : "Enter a name for your model (only latin letters, numbers and hyphens)",
-    )
-
-    const modelNameMsg = await conversation.wait()
-    const modelName = modelNameMsg.message?.text?.toLowerCase().replace(/[^a-z0-9-]/g, "-")
-
-    if (!modelName) {
-      await ctx.reply(isRu ? "❌ Некорректное имя модели" : "❌ Invalid model name")
-      return
-    }
-
-    // Запрашиваем trigger word
-    await ctx.reply(
-      isRu
-        ? "Введите trigger word - уникальное слово, которое будет активировать вашу модель (например: TOK или CYBRPNK)"
-        : "Enter trigger word - unique word that will activate your model (e.g. TOK or CYBRPNK)",
-    )
-
-    const triggerWordMsg = await conversation.wait()
-    const triggerWord = triggerWordMsg.message?.text
+    const triggerWord = `${username.toLocaleUpperCase()}`
 
     if (!triggerWord) {
       await ctx.reply(isRu ? "❌ Некорректный trigger word" : "❌ Invalid trigger word")
