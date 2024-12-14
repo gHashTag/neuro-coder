@@ -21,11 +21,18 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
         "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
       num_inference_steps: 28,
       guidance_scale: 3.5,
-      width: aspect_ratio === "1:1" ? 1024 : aspect_ratio === "16:9" ? 1365 : 768,
-      height: aspect_ratio === "1:1" ? 1024 : aspect_ratio === "16:9" ? 768 : 1365,
+      // Устанавливаем размеры в зависимости от aspect_ratio
+      ...(aspect_ratio === "1:1"
+        ? { width: 1024, height: 1024 }
+        : aspect_ratio === "16:9"
+        ? { width: 1365, height: 768 }
+        : aspect_ratio === "9:16"
+        ? { width: 768, height: 1365 }
+        : { width: 1024, height: 1024 }), // дефолтный размер
       sampler: "flowmatch",
       seed: 42,
       num_outputs: 1,
+      aspect_ratio, // Добавляем aspect_ratio в параметры
     }
 
     console.log("Using model:", model_type)

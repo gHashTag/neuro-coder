@@ -93,7 +93,7 @@ if (process.env.NODE_ENV === "production") {
     },
     {
       command: "text_to_speech",
-      description: "🎤 Convert text to speech / Преобразовать текст в речь",
+      description: "🎤 Convert text to speech / П��еобразовать текст в речь",
     },
     {
       command: "lipsync",
@@ -275,8 +275,19 @@ bot.on("callback_query:data", async (ctx) => {
 
     if (data.startsWith("size_")) {
       const size = data.replace("size_", "")
-      await setAspectRatio(ctx.from?.id.toString() || "", size)
-      await ctx.reply(isRu ? `✅ Размер изображения изменен на ${size}` : `✅ Image size changed to ${size}`)
+      const userId = ctx.from?.id.toString()
+
+      if (!userId) {
+        await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
+        return
+      }
+
+      await setAspectRatio(userId, size)
+      await ctx.reply(
+        isRu
+          ? `✅ Размер изображения изменен на ${size}.\nНажмите команду /neuro_photo чтобы сгенерировать изображение`
+          : `✅ Image size changed to ${size}. \nClick the command /neuro_photo to generate an image  `,
+      )
       return
     }
 
@@ -400,7 +411,7 @@ bot.on("callback_query:data", async (ctx) => {
         return
       }
 
-      const generatingMessage = await ctx.reply(isRu ? "⏳ ��енерация..." : "⏳ Generating...")
+      const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
 
       try {
         const numImages = parseInt(count)
@@ -484,7 +495,7 @@ bot.on("callback_query:data", async (ctx) => {
     } else if (data.startsWith("generate_image_")) {
       const prompt = data.replace("generate_image_", "")
 
-      // Отправляем сообщение о начале генерации
+      // Отправляем сообщ��ние о начале генерации
       const generatingMsg = await ctx.reply(isRu ? "⏳ Генерирую изображение..." : "⏳ Generating image...")
 
       try {
@@ -541,7 +552,7 @@ bot.on("callback_query:data", async (ctx) => {
         .single()
 
       if (!lastPrompt) {
-        await ctx.reply("Не найден предыдущий промпт для повторной генерации")
+        await ctx.reply("Не найден предыдущий промпт для повторно�� генерации")
         return
       }
 
@@ -583,18 +594,13 @@ bot.on("callback_query:data", async (ctx) => {
       console.error("Не удалось ответить на callback query:", e)
     }
     await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")
-  } finally {
-    const loadingMessage = await ctx.reply(isRu ? "⏳ Начинаю генерацию изображений..." : "⏳ Starting image generation...")
-
-    // Удаляем сообщение о загрузке в любом случае
-    await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMessage.message_id).catch(console.error) // и����норируем ошибку если сообщение ��же удалено
   }
 })
 
 bot.catch((err) => {
   const ctx = err.ctx
   const isRu = ctx.from?.language_code === "ru"
-  console.error(`Ошибка пи об��аботке обновле��ия ${ctx.update.update_id}:`)
+  console.error(`Ошибка пи обаботке обновлеия ${ctx.update.update_id}:`)
   console.error("error", err.error)
   ctx
     .reply(
@@ -634,21 +640,6 @@ bot.callbackQuery("change_size", async (ctx) => {
       ],
     },
   })
-})
-
-// Обработчик выбора размера
-bot.callbackQuery(/^size_(.+)$/, async (ctx) => {
-  const isRu = ctx.from?.language_code === "ru"
-  const size = ctx.match[1]
-  const userId = ctx.from?.id.toString()
-
-  if (!userId) {
-    await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
-    return
-  }
-
-  await setAspectRatio(userId, size)
-  await ctx.reply(isRu ? `✅ Размер изображения изменен на ${size}` : `✅ Image size changed to ${size}`)
 })
 
 export { bot }
