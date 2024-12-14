@@ -101,7 +101,7 @@ async function uploadToSupabase(zipPath: string, userId: string): Promise<string
     const filename = `training_images_${timestamp}.zip`
     const filePath = `training/${userId}/${filename}`
 
-    const { data, error } = await supabase.storage.from("ai-training").upload(filePath, zipBuffer, {
+    const { error } = await supabase.storage.from("ai-training").upload(filePath, zipBuffer, {
       contentType: "application/zip",
       upsert: false,
     })
@@ -143,8 +143,17 @@ interface TrainingInput {
   wandb_sample_interval: number
 }
 
+interface TrainingResponse {
+  id: string
+  status: string
+  urls: {
+    get: string
+  }
+  error?: string
+}
+
 async function trainFluxModel(zipUrl: string, triggerWord: string, modelName: string, userId: string): Promise<string> {
-  let currentTraining: any = null // Добавляем переменную для хранения текущей тренировки
+  let currentTraining: TrainingResponse | null = null
 
   try {
     if (!process.env.REPLICATE_USERNAME) {
@@ -293,69 +302,41 @@ async function ensureSupabaseAuth(): Promise<void> {
 
 export async function trainFluxModelConversation(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
-
   const images: { buffer: Buffer; filename: string }[] = []
-  let userId = ctx.from?.id.toString()
-  let username = ctx.from?.username || ctx.from?.id.toString()
+  const userId = ctx.from?.id.toString()
+  const username = ctx.from?.username || ctx.from?.id.toString()
+  let isCancelled = false
 
-  // Проверяем, передан ли ID клиента в команде
-  const clientId = ctx.message?.text?.split(" ")[1]
-  if (clientId) {
-    // Проверяем, что текущий пользователь имеет права админстратора
-    const isAdmin = process.env.ADMIN_IDS?.split(",").includes(userId || "")
-    if (!isAdmin) {
-      await ctx.reply(isRu ? "❌ У вас нет прав для тренировки моделей других пользователей" : "❌ You don't have permission to train models for other users")
-      return
-    }
-
-    // Проверяем существование пользователя в базе
-    try {
-      console.log("Checking user with ID:", clientId)
-
-      const { data: user, error } = await supabase.from("users").select("telegram_id, username").eq("telegram_id", clientId).single()
-
-      if (error) {
-        console.error("Database error:", error)
-        await ctx.reply(isRu ? "❌ Ошибка при поиске пользователя в базе данных" : "❌ Error searching for user in database")
-        return
-      }
-
-      if (!user) {
-        console.log("No user found with ID:", clientId)
-        await ctx.reply(
-          isRu
-            ? `❌ Пользователь с ID ${clientId} не найден. Пользователь должен быть зарегистрирован в боте.`
-            : `❌ User with ID ${clientId} not found. User must be registered in the bot.`,
-        )
-        return
-      }
-
-      userId = user.telegram_id
-      username = user.username || user.telegram_id
-      await ctx.reply(isRu ? `✅ Тренировка модели для пользователя: ${username} (${userId})` : `✅ Training model for user: ${username} (${userId})`)
-    } catch (error) {
-      console.error("Error checking user:", error)
-      await ctx.reply(isRu ? "❌ Ошибка при проверке пользователя" : "❌ Error checking user")
-      return
-    }
-  }
-
+  // Проверяем наличие userId
   if (!userId) {
     await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
     return
   }
 
   try {
-    // Запрашиваем изображения
+    // Запрашиваем изображения с кнопкой отмены
     await ctx.reply(
       isRu
         ? "Пожалуйста, отправьте изображения для обучения модели (минимум 10 изображений). Отправьте /done когда закончите."
         : "Please send images for model training (minimum 10 images). Send /done when finished.",
+      {
+        reply_markup: {
+          inline_keyboard: [[{ text: isRu ? "❌ Отменить" : "❌ Cancel", callback_data: "cancel_training" }]],
+        },
+      },
     )
 
-    // Соираем изображения
-    while (true) {
+    // Вместо conversation.on используем проверку в цикле
+    while (!isCancelled) {
       const msg = await conversation.wait()
+
+      // Проверяем callback_query
+      if (msg.callbackQuery?.data === "cancel_training") {
+        isCancelled = true
+        await msg.answerCallbackQuery()
+        await ctx.reply(isRu ? "❌ Генерация отменена" : "❌ Generation cancelled")
+        break
+      }
 
       if (msg.message?.text === "/done") {
         if (images.length < 10) {
@@ -409,6 +390,10 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
       }
     }
 
+    if (isCancelled) {
+      return
+    }
+
     // Создаем ZIP архив
     await ctx.reply(isRu ? "⏳ Создаю архив..." : "⏳ Creating archive...")
     const zipPath = await createImagesZip(images)
@@ -416,7 +401,7 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
     // Проверяем авторизацию перед загрузкой
     await ensureSupabaseAuth()
 
-    // Загружаем архив в Supabase
+    // Загружаем архив в Supabase (userId уже проверен выше)
     await ctx.reply(isRu ? "⏳ Загружаю архив..." : "⏳ Uploading archive...")
     const zipUrl = await uploadToSupabase(zipPath, userId)
 
