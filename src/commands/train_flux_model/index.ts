@@ -200,20 +200,15 @@ async function trainFluxModel(zipUrl: string, triggerWord: string, modelName: st
       destination,
       input: {
         steps: 5000,
-        lora_rank: 16,
+        lora_rank: 20,
         optimizer: "adamw8bit",
         batch_size: 1,
-        resolution: "512,512,512", // Изменили разрешение на более стабильное
+        resolution: "512,768,1024",
         autocaption: true,
         input_images: zipUrl,
         trigger_word: triggerWord,
-        learning_rate: 0.0001, // Уменьшили learning rate
+        learning_rate: 0.0004,
         wandb_project: "flux_train_replicate",
-        wandb_save_interval: 100,
-        caption_dropout_rate: 0.1, // Увеличили dropout rate
-        cache_latents_to_disk: true, // Включили кэширование
-        wandb_sample_interval: 100,
-        model_name: "stabilityai/stable-diffusion-xl-base-1.0", // Указали конкретную модель
       } as TrainingInput,
     })
 
@@ -298,6 +293,7 @@ async function ensureSupabaseAuth(): Promise<void> {
 
 export async function trainFluxModelConversation(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
+
   const images: { buffer: Buffer; filename: string }[] = []
   let userId = ctx.from?.id.toString()
   let username = ctx.from?.username || ctx.from?.id.toString()
@@ -442,7 +438,7 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
     // Запрашиваем trigger word
     await ctx.reply(
       isRu
-        ? "Введите trigger word - уникальное слово, которое будет активирова��ь вашу модель (например: TOK или CYBRPNK)"
+        ? "Введите trigger word - уникальное слово, которое будет активировать вашу модель (например: TOK или CYBRPNK)"
         : "Enter trigger word - unique word that will activate your model (e.g. TOK or CYBRPNK)",
     )
 
@@ -469,6 +465,6 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
     )
   } catch (error) {
     console.error("Error in train_flux_model conversation:", error)
-    await ctx.reply(isRu ? "❌ Произошла ошибка. ��ожалуйста, попробуйте еще раз." : "❌ An error occurred. Please try again.")
+    await ctx.reply(isRu ? "❌ Произошла ошибка. Пожалуйста, попробуйте еще раз." : "❌ An error occurred. Please try again.")
   }
 }
