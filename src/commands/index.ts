@@ -174,6 +174,10 @@ composer.command("caption_for_ai_news", async (ctx) => {
   await ctx.conversation.enter("createCaptionForNews")
 })
 
+composer.command("train_flux_model", async (ctx) => {
+  await ctx.conversation.enter("trainFluxModelConversation")
+})
+
 composer.command("model", model)
 // composer.command("neurocoder01", neurocoder01);
 // composer.command("neurocoder02", neurocoder02);

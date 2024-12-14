@@ -37,6 +37,7 @@ import { textToVideoConversation } from "./commands/text_to_video"
 import imageToVideo from "./commands/image_to_video"
 import image_to_video from "./commands/image_to_video"
 import { imageToPromptConversation } from "./commands/image_to_prompt"
+import { trainFluxModelConversation } from "./commands/train_flux_model"
 
 interface SessionData {
   melimi00: {
@@ -130,6 +131,18 @@ if (process.env.NODE_ENV === "production") {
       command: "image_to_prompt",
       description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
     },
+    {
+      command: "train_flux_model",
+      description: "🎨 Train FLUX model / Обучить модель FLUX",
+    },
+    {
+      command: "invite",
+      description: "Invite a friend / Пригласить друга",
+    },
+    {
+      command: "train_flux_model",
+      description: "🎨 Train FLUX model / Обучить модель FLUX",
+    },
   ])
 }
 
@@ -153,6 +166,7 @@ bot.use(createConversation(textToImageConversation))
 bot.use(createConversation(textToVideoConversation))
 bot.use(createConversation<MyContextWithSession>(imageToVideo))
 bot.use(createConversation(imageToPromptConversation))
+bot.use(createConversation(trainFluxModelConversation))
 
 bot.command("start", start)
 bot.use(customMiddleware)
@@ -241,7 +255,7 @@ bot.on("callback_query:data", async (ctx) => {
         await ctx.replyWithInvoice(
           isRu ? "Цифровой аватар" : "Digital avatar",
           isRu
-            ? "Представьте, у вас есть возможность создать уникальную цифровую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим лицом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
+            ? "Представьте, у вас есть возможность создать уникальную цифровую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим л��цом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
             : "Imagine you have the opportunity to create a unique digital copy of yourself! I can train the AI on your photos so that you can receive images with your face and body in any style and setting — from fantastic worlds to fashion photo sessions. This is a great opportunity for a personal brand or just for fun!",
           "avatar",
           "XTR",
@@ -346,7 +360,7 @@ bot.on("callback_query:data", async (ctx) => {
         },
       })
     } else if (data.startsWith("generate_")) {
-      // Сразу отвечаем на callback query в начале
+      // Сразу отвечаем на callback query �� начале
       await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
 
       const [_, count, promptId] = data.split("_")
@@ -543,7 +557,7 @@ bot.on("callback_query:data", async (ctx) => {
     const loadingMessage = await ctx.reply(isRu ? "⏳ Начинаю генерацию изображений..." : "⏳ Starting image generation...")
 
     // Удаляем сообщение о загрузке в любом случае
-    await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMessage.message_id).catch(console.error) // и��норируем ошибку если сообщение уже удалено
+    await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMessage.message_id).catch(console.error) // и����норируем ошибку если сообщение уже удалено
   }
 })
 
@@ -570,6 +584,10 @@ bot.command("text_to_image", async (ctx) => {
 
 bot.command("image_to_prompt", async (ctx) => {
   await ctx.conversation.enter("imageToPromptConversation")
+})
+
+bot.command("train_flux_model", async (ctx) => {
+  await ctx.conversation.enter("trainFluxModelConversation")
 })
 
 export { bot }
