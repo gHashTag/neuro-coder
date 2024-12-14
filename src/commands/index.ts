@@ -2,7 +2,7 @@ import { Composer } from "grammy"
 import { MyContext } from "../utils/types"
 
 import circle from "./circle"
-import hello from "./hello"
+
 import clipmaker from "./clipmaker"
 import leela from "./leela"
 
@@ -11,12 +11,9 @@ import neuro_broker from "./neuro_broker"
 import { invite } from "./invite"
 import { buy } from "./buy"
 import selectModelComposer from "./select_model"
+import { neuroPhotoConversation } from "./neuro_photo"
 
 const composer = new Composer<MyContext>()
-
-// composer.command("start", start)
-
-composer.command("hello", hello)
 
 composer.command("clipmaker", clipmaker)
 
@@ -180,6 +177,10 @@ composer.command("train_flux_model", async (ctx) => {
 
 composer.command("image_to_video", async (ctx) => {
   await ctx.conversation.enter("imageToVideo")
+})
+
+composer.command("neuro_photo", async (ctx) => {
+  await ctx.conversation.enter("neuroPhotoConversation")
 })
 
 composer.use(selectModelComposer)

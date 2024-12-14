@@ -2,7 +2,7 @@ import { replicate } from "../core/replicate"
 import axios from "axios"
 import { incrementGeneratedImages, getAspectRatio, savePrompt } from "../core/supabase/ai"
 
-interface GenerationResult {
+export interface GenerationResult {
   image: string | Buffer
   prompt_id: number | null
 }
@@ -29,7 +29,7 @@ interface ModelConfig {
   getInput: (prompt: string, aspect_ratio: string) => ModelInput
 }
 
-type ApiResponse = string | string[] | { output: string }
+export type ApiResponse = string | string[] | { output: string }
 
 const modelConfigs: Record<string, ModelConfig> = {
   flux: {
@@ -106,14 +106,14 @@ const modelConfigs: Record<string, ModelConfig> = {
   },
 }
 
-async function processApiResponse(output: ApiResponse): Promise<string> {
+export async function processApiResponse(output: ApiResponse): Promise<string> {
   if (typeof output === "string") return output
   if (Array.isArray(output) && output[0]) return output[0]
   if (output && typeof output === "object" && "output" in output) return output.output
   throw new Error(`Некорректный ответ от API: ${JSON.stringify(output)}`)
 }
 
-async function fetchImage(url: string): Promise<Buffer> {
+export async function fetchImage(url: string): Promise<Buffer> {
   const response = await axios.get(url, {
     responseType: "arraybuffer",
     validateStatus: (status) => status === 200,

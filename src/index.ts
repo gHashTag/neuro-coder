@@ -15,9 +15,9 @@ import createCaptionForNews from "./commands/сaptionForNews"
 import { get100AnfiVesnaConversation } from "./commands/get100"
 import { soulConversation } from "./commands/soul"
 import { voiceConversation } from "./commands/voice"
-import { getPrompt, incrementLimit, setModel } from "./core/supabase/ai"
+import { getPrompt, incrementLimit, setModel, setAspectRatio } from "./core/supabase/ai"
 import { InputFile } from "grammy/types"
-import { inviterConversation } from "./commands/inviter"
+import { invite } from "./commands/invite"
 
 import { answerAi } from "./core/openai/requests"
 import textToSpeech from "./commands/textToSpeech"
@@ -37,6 +37,7 @@ import { textToVideoConversation } from "./commands/text_to_video"
 import imageToVideo from "./commands/image_to_video"
 import { imageToPromptConversation } from "./commands/image_to_prompt"
 import { trainFluxModelConversation } from "./commands/train_flux_model"
+import { neuroPhotoConversation } from "./commands/neuro_photo"
 
 interface SessionData {
   melimi00: {
@@ -88,7 +89,7 @@ if (process.env.NODE_ENV === "production") {
     },
     {
       command: "voice",
-      description: "🎤 Add voice to avatar / Добавить аватару голос",
+      description: "���� Add voice to avatar / Добавить аватару голос",
     },
     {
       command: "text_to_speech",
@@ -142,6 +143,10 @@ if (process.env.NODE_ENV === "production") {
       command: "train_flux_model",
       description: "🎨 Train FLUX model / Обучить модель FLUX",
     },
+    {
+      command: "neuro_photo",
+      description: "🤖 Generate your photos / Сгенерировать ваши фото",
+    },
   ])
 }
 
@@ -154,7 +159,7 @@ bot.use(createConversation(createCaptionForNews))
 bot.use(createConversation(get100AnfiVesnaConversation))
 bot.use(createConversation(soulConversation))
 bot.use(createConversation(voiceConversation))
-bot.use(createConversation(inviterConversation))
+bot.command("invite", invite)
 bot.use(createConversation(lipSyncConversation))
 bot.use(createConversation(createBackgroundVideo))
 bot.use(createConversation(leeSolarNumerolog))
@@ -166,6 +171,7 @@ bot.use(createConversation(textToVideoConversation))
 bot.use(createConversation(imageToVideo))
 bot.use(createConversation(imageToPromptConversation))
 bot.use(createConversation(trainFluxModelConversation))
+bot.use(createConversation(neuroPhotoConversation))
 
 bot.command("start", start)
 bot.use(customMiddleware)
@@ -252,12 +258,34 @@ bot.on("callback_query:data", async (ctx) => {
     const data = ctx.callbackQuery.data
     await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
 
+    if (data === "change_size") {
+      await ctx.reply(isRu ? "Выберите размер изображения:" : "Choose image size:", {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: "1:1", callback_data: "size_1:1" },
+              { text: "16:9", callback_data: "size_16:9" },
+              { text: "9:16", callback_data: "size_9:16" },
+            ],
+          ],
+        },
+      })
+      return
+    }
+
+    if (data.startsWith("size_")) {
+      const size = data.replace("size_", "")
+      await setAspectRatio(ctx.from?.id.toString() || "", size)
+      await ctx.reply(isRu ? `✅ Размер изображения изменен на ${size}` : `✅ Image size changed to ${size}`)
+      return
+    }
+
     if (data.startsWith("buy")) {
       if (data.endsWith("avatar")) {
         await ctx.replyWithInvoice(
           isRu ? "Цифровой аватар" : "Digital avatar",
           isRu
-            ? "Представьте, у вас есть возможность создать уникальную цифровую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим лцом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
+            ? "Представьте, у вас есть возможность создать уникальную цифовую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим лцом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
             : "Imagine you have the opportunity to create a unique digital copy of yourself! I can train the AI on your photos so that you can receive images with your face and body in any style and setting — from fantastic worlds to fashion photo sessions. This is a great opportunity for a personal brand or just for fun!",
           "avatar",
           "XTR",
@@ -288,7 +316,7 @@ bot.on("callback_query:data", async (ctx) => {
       if (data.endsWith("student")) {
         await ctx.replyWithInvoice(
           isRu ? "НейроУченик" : "NeuroStudent",
-          isRu ? "Вы получите подписку уровня 'НейроУченик'" : "You will receive a subscription to the 'NeuroStudent' level",
+          isRu ? "��ы получите подписку уровня 'НейроУченик'" : "You will receive a subscription to the 'NeuroStudent' level",
           "student",
           "XTR",
           [{ label: "Цена", amount: 5655 }],
@@ -348,7 +376,7 @@ bot.on("callback_query:data", async (ctx) => {
         console.error("Ошибка при сохранении улучшенного промпта:", error)
         await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
         console.error("Ошибка при сохранении улучшенного промпта:", error)
-        await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
+        await ctx.reply(isRu ? "Ошибк�� при сохранении улучшенного промпта" : "Error saving improved prompt")
         return
       }
 
@@ -521,7 +549,7 @@ bot.on("callback_query:data", async (ctx) => {
       const result = await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id.toString())
       console.log("result4", result)
       if (!result) {
-        throw new Error("Не удалось сгенерировать изображение")
+        throw new Error("Не удалось с��енерировать изображение")
       }
 
       // Отправляем новое изображение
@@ -566,7 +594,7 @@ bot.on("callback_query:data", async (ctx) => {
 bot.catch((err) => {
   const ctx = err.ctx
   const isRu = ctx.from?.language_code === "ru"
-  console.error(`Ошибка пи обработке обновления ${ctx.update.update_id}:`)
+  console.error(`Ошибка пи об��аботке обновле��ия ${ctx.update.update_id}:`)
   console.error("error", err.error)
   ctx
     .reply(
@@ -590,6 +618,37 @@ bot.command("image_to_prompt", async (ctx) => {
 
 bot.command("train_flux_model", async (ctx) => {
   await ctx.conversation.enter("trainFluxModelConversation")
+})
+
+// Обработчик кнопки изменения размера
+bot.callbackQuery("change_size", async (ctx) => {
+  const isRu = ctx.from?.language_code === "ru"
+  await ctx.reply(isRu ? "Выберите размер изображения:" : "Choose image size:", {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: "1:1", callback_data: "size_1:1" },
+          { text: "16:9", callback_data: "size_16:9" },
+          { text: "9:16", callback_data: "size_9:16" },
+        ],
+      ],
+    },
+  })
+})
+
+// Обработчик выбора размера
+bot.callbackQuery(/^size_(.+)$/, async (ctx) => {
+  const isRu = ctx.from?.language_code === "ru"
+  const size = ctx.match[1]
+  const userId = ctx.from?.id.toString()
+
+  if (!userId) {
+    await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
+    return
+  }
+
+  await setAspectRatio(userId, size)
+  await ctx.reply(isRu ? `✅ Размер изображения изменен на ${size}` : `✅ Image size changed to ${size}`)
 })
 
 export { bot }
