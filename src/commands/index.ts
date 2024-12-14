@@ -178,6 +178,10 @@ composer.command("train_flux_model", async (ctx) => {
   await ctx.conversation.enter("trainFluxModelConversation")
 })
 
+composer.command("image_to_video", async (ctx) => {
+  await ctx.conversation.enter("imageToVideo")
+})
+
 composer.use(selectModelComposer)
 
 export default composer

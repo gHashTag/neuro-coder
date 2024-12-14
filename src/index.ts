@@ -108,7 +108,7 @@ if (process.env.NODE_ENV === "production") {
     },
     {
       command: "ainews",
-      description: "📰 Create AI news caption / Создать описа��ие AI новости",
+      description: "📰 Create AI news caption / Создать описание AI новости",
     },
     {
       command: "text_to_image",
@@ -163,7 +163,7 @@ bot.use(createConversation(subtitles))
 bot.use(createConversation(createAinews))
 bot.use(createConversation(textToImageConversation))
 bot.use(createConversation(textToVideoConversation))
-bot.use(createConversation<MyContextWithSession>(imageToVideo))
+bot.use(createConversation(imageToVideo))
 bot.use(createConversation(imageToPromptConversation))
 bot.use(createConversation(trainFluxModelConversation))
 
@@ -278,7 +278,7 @@ bot.on("callback_query:data", async (ctx) => {
       if (data.endsWith("base")) {
         await ctx.replyWithInvoice(
           isRu ? "НейроБаза" : "NeuroBase",
-          isRu ? "Вы получите подписку уровня 'Не��роБаза'" : "You will receive a subscription to the 'NeuroBase' level",
+          isRu ? "Вы получите подписку уровня 'НейроБаза'" : "You will receive a subscription to the 'NeuroBase' level",
           "base",
           "XTR",
           [{ label: "Цена", amount: 565 }],
@@ -318,7 +318,7 @@ bot.on("callback_query:data", async (ctx) => {
       const promptId = data.split("_")[2]
       const promptData = await getPrompt(promptId)
       if (!promptData) {
-        await ctx.reply(isRu ? "Не удалось найти информаци�� о промпте" : "Could not find prompt information")
+        await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
         await ctx.answerCallbackQuery()
         return
       }
@@ -345,10 +345,10 @@ bot.on("callback_query:data", async (ctx) => {
         .single()
 
       if (error || !savedPrompt) {
-        console.error("Ошибка при сохранении улучшенного ��ромпта:", error)
+        console.error("Ошибка при сохранении улучшенного промпта:", error)
         await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
         console.error("Ошибка при сохранении улучшенного промпта:", error)
-        await ctx.reply(isRu ? "Ошибка при сохранении улучшенно��о промпта" : "Error saving improved prompt")
+        await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
         return
       }
 
@@ -372,7 +372,7 @@ bot.on("callback_query:data", async (ctx) => {
         return
       }
 
-      const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
+      const generatingMessage = await ctx.reply(isRu ? "⏳ ��енерация..." : "⏳ Generating...")
 
       try {
         const numImages = parseInt(count)
@@ -513,7 +513,7 @@ bot.on("callback_query:data", async (ctx) => {
         .single()
 
       if (!lastPrompt) {
-        await ctx.reply("Не н��йден предыдущий промпт для повторной генерации")
+        await ctx.reply("Не найден предыдущий промпт для повторной генерации")
         return
       }
 

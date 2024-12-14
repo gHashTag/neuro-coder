@@ -83,7 +83,15 @@ export const getReferalsCount = async (telegram_id: string) => {
   return data?.length
 }
 
-interface ModelTraining {
+// Определяем тип для обновлений и экспортируем его
+export type ModelTrainingUpdate = {
+  status?: string
+  error?: string
+  model_url?: string
+  replicate_training_id?: string
+}
+
+export interface ModelTraining {
   user_id: string
   model_name: string
   trigger_word: string
@@ -91,6 +99,7 @@ interface ModelTraining {
   model_url?: string
   replicate_training_id?: string
   status?: string
+  error?: string
 }
 
 export const createModelTraining = async (training: ModelTraining) => {
@@ -98,7 +107,7 @@ export const createModelTraining = async (training: ModelTraining) => {
   if (error) throw new Error(`Ошибка при создании записи о тренировке: ${error.message}`)
 }
 
-export const updateModelTraining = async (user_id: string, model_name: string, updates: Partial<ModelTraining>) => {
+export const updateModelTraining = async (user_id: string, model_name: string, updates: ModelTrainingUpdate) => {
   const { error } = await supabase.from("model_trainings").update(updates).eq("user_id", user_id).eq("model_name", model_name).eq("status", "processing")
   if (error) throw new Error(`Ошибка при обновлении записи о тренировке: ${error.message}`)
 }

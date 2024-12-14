@@ -112,3 +112,5 @@ public/
 src/commands/createBackgroundVideo/temp/
 
 *.mp4
+
+tmp/

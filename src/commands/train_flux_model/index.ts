@@ -7,7 +7,7 @@ import { createWriteStream } from "fs"
 
 import { supabase } from "../../core/supabase"
 import { replicate } from "../../core/replicate"
-import { createModelTraining, updateModelTraining } from "../../core/supabase"
+import { createModelTraining, updateModelTraining, ModelTrainingUpdate } from "../../core/supabase"
 
 // Добавляем интерфейс для ошибки API
 interface ApiError extends Error {
@@ -69,6 +69,31 @@ async function createImagesZip(images: { buffer: Buffer; filename: string }[]): 
   }
 }
 
+async function cleanupOldArchives(userId: string) {
+  try {
+    // Получаем список всех файлов в папке пользователя
+    const { data: files, error } = await supabase.storage.from("ai-training").list(`training/${userId}`)
+
+    if (error) {
+      console.error("Error listing files:", error)
+      return
+    }
+
+    // Оставляем только последний архив, удаляем остальные
+    if (files && files.length > 1) {
+      // Сортируем файлы по дате создания (самые новые первые)
+      const sortedFiles = files.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+      // Удаляем все кроме последнего
+      for (const file of sortedFiles.slice(1)) {
+        await supabase.storage.from("ai-training").remove([`training/${userId}/${file.name}`])
+      }
+    }
+  } catch (error) {
+    console.error("Error cleaning up old archives:", error)
+  }
+}
+
 async function uploadToSupabase(zipPath: string, userId: string): Promise<string> {
   try {
     const zipBuffer = await fs.readFile(zipPath)
@@ -90,6 +115,10 @@ async function uploadToSupabase(zipPath: string, userId: string): Promise<string
     }
 
     const { data: publicUrl } = supabase.storage.from("ai-training").getPublicUrl(filePath)
+
+    // Очищаем старые архивы
+    await cleanupOldArchives(userId)
+
     return publicUrl.publicUrl
   } catch (error) {
     console.error("Error in uploadToSupabase:", error)
@@ -115,6 +144,8 @@ interface TrainingInput {
 }
 
 async function trainFluxModel(zipUrl: string, triggerWord: string, modelName: string, userId: string): Promise<string> {
+  let currentTraining: any = null // Добавляем переменную для хранения текущей тренировки
+
   try {
     if (!process.env.REPLICATE_USERNAME) {
       throw new Error("REPLICATE_USERNAME is not set")
@@ -165,62 +196,87 @@ async function trainFluxModel(zipUrl: string, triggerWord: string, modelName: st
     })
 
     // Создаем тренировку в Replicate
-    const training = await replicate.trainings.create("ostris", "flux-dev-lora-trainer", "e440909d3512c31646ee2e0c7d6f6f4923224863a6a10c494606e79fb5844497", {
+    currentTraining = await replicate.trainings.create("ostris", "flux-dev-lora-trainer", "e440909d3512c31646ee2e0c7d6f6f4923224863a6a10c494606e79fb5844497", {
       destination,
       input: {
-        steps: 1000,
+        steps: 5000,
         lora_rank: 16,
         optimizer: "adamw8bit",
         batch_size: 1,
-        resolution: "512,768,1024",
+        resolution: "512,512,512", // Изменили разрешение на более стабильное
         autocaption: true,
         input_images: zipUrl,
         trigger_word: triggerWord,
-        learning_rate: 0.0004,
+        learning_rate: 0.0001, // Уменьшили learning rate
         wandb_project: "flux_train_replicate",
         wandb_save_interval: 100,
-        caption_dropout_rate: 0.05,
-        cache_latents_to_disk: false,
+        caption_dropout_rate: 0.1, // Увеличили dropout rate
+        cache_latents_to_disk: true, // Включили кэширование
         wandb_sample_interval: 100,
+        model_name: "stabilityai/stable-diffusion-xl-base-1.0", // Указали конкретную модель
       } as TrainingInput,
     })
 
     // Обновляем запись с ID тренировки
     await updateModelTraining(userId, modelName, {
-      replicate_training_id: training.id,
+      replicate_training_id: currentTraining.id,
     })
 
     // Ждем завершения тренировки
-    let status = training.status
+    let status = currentTraining.status
     while (status !== "succeeded" && status !== "failed") {
       await new Promise((resolve) => setTimeout(resolve, 10000))
-      const updatedTraining = await replicate.trainings.get(training.id)
+      const updatedTraining = await replicate.trainings.get(currentTraining.id)
       status = updatedTraining.status
       console.log(`Training status: ${status}`)
+
+      // Добавляем логирование деталей тренировки
+      if (updatedTraining.error) {
+        console.error("Training error details from Replicate:", {
+          error: updatedTraining.error,
+          status: updatedTraining.status,
+          id: updatedTraining.id,
+        })
+      }
 
       // Обновляем статус в базе
       await updateModelTraining(userId, modelName, { status })
     }
 
     if (status === "failed") {
-      await updateModelTraining(userId, modelName, { status: "failed" })
-      throw new Error("Training failed")
+      // Получаем детали ошибки
+      const failedTraining = await replicate.trainings.get(currentTraining.id)
+      console.error("Training failed details:", {
+        error: failedTraining.error,
+        status: failedTraining.status,
+        id: failedTraining.id,
+        urls: failedTraining.urls,
+      })
+
+      await updateModelTraining(userId, modelName, {
+        status: "failed",
+        error: failedTraining.error || "Unknown error",
+      } as ModelTrainingUpdate)
+
+      throw new Error(`Training failed: ${failedTraining.error || "Unknown error"}`)
     }
 
     // Обновляем URL модели
     await updateModelTraining(userId, modelName, {
       status: "completed",
-      model_url: training.urls.get,
+      model_url: currentTraining.urls.get,
     })
 
-    return training.urls.get
+    return currentTraining.urls.get
   } catch (error) {
     console.error("Training error details:", {
       error,
       username: process.env.REPLICATE_USERNAME,
       modelName,
       triggerWord,
+      trainingId: currentTraining?.id,
     })
+
     if ((error as ApiError).response?.status === 404) {
       throw new Error(`Ошибка при создании или доступе к модели. Проверьте REPLICATE_USERNAME (${process.env.REPLICATE_USERNAME}) и права доступа.`)
     }
@@ -249,7 +305,7 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
   // Проверяем, передан ли ID клиента в команде
   const clientId = ctx.message?.text?.split(" ")[1]
   if (clientId) {
-    // Проверяем, что текущий пользователь имеет права администратора
+    // Проверяем, что текущий пользователь имеет права админстратора
     const isAdmin = process.env.ADMIN_IDS?.split(",").includes(userId || "")
     if (!isAdmin) {
       await ctx.reply(isRu ? "❌ У вас нет прав для тренировки моделей других пользователей" : "❌ You don't have permission to train models for other users")
@@ -301,7 +357,7 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
         : "Please send images for model training (minimum 10 images). Send /done when finished.",
     )
 
-    // Собираем изображения
+    // Соираем изображения
     while (true) {
       const msg = await conversation.wait()
 
@@ -386,7 +442,7 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
     // Запрашиваем trigger word
     await ctx.reply(
       isRu
-        ? "Введите trigger word - уникальное слово, которое будет активировать вашу модель (например: TOK или CYBRPNK)"
+        ? "Введите trigger word - уникальное слово, которое будет активирова��ь вашу модель (например: TOK или CYBRPNK)"
         : "Enter trigger word - unique word that will activate your model (e.g. TOK or CYBRPNK)",
     )
 
@@ -413,6 +469,6 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
     )
   } catch (error) {
     console.error("Error in train_flux_model conversation:", error)
-    await ctx.reply(isRu ? "❌ Произошла ошибка. Пожалуйста, попробуйте еще раз." : "❌ An error occurred. Please try again.")
+    await ctx.reply(isRu ? "❌ Произошла ошибка. ��ожалуйста, попробуйте еще раз." : "❌ An error occurred. Please try again.")
   }
 }
