@@ -11,9 +11,6 @@
     "noImplicitAny": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "paths": {
-      "@/*": ["src/*"]
-    }
   },
   "include": ["src/**/*", "api/**/*"]
 }

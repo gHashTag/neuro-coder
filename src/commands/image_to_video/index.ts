@@ -1,5 +1,5 @@
 import { Conversation, ConversationFlavor } from "@grammyjs/conversations"
-import { MyContext } from "@/utils/types"
+import { MyContext } from "../../utils/types"
 import Replicate from "replicate"
 import { writeFile } from "node:fs/promises"
 import { InputFile } from "grammy"
