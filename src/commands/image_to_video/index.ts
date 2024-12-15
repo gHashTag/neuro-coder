@@ -4,6 +4,7 @@ import Replicate from "replicate"
 import { writeFile } from "node:fs/promises"
 import { InputFile } from "grammy"
 import axios from "axios"
+import { InlineKeyboard } from "grammy"
 
 type MyConversationType = MyContext & ConversationFlavor
 
@@ -24,8 +25,28 @@ async function retry<T>(fn: () => Promise<T>, attempts = 3, delay = 1000): Promi
 
 async function imageToVideo(conversation: Conversation<MyConversationType>, ctx: MyConversationType) {
   const isRu = ctx.from?.language_code === "ru"
-  await ctx.reply(isRu ? "Пожалуйста, отправьте изображение" : "Please send an image")
 
+  // Создаем инлайн клавиатуру с кнопками выбора сервиса
+  const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper")
+
+  // Отправляем сообщение с кнопками
+  await ctx.reply(isRu ? "Выберите сервис для генерации видео:" : "Choose video generation service:", { reply_markup: keyboard })
+
+  // Ждем ответ пользователя
+  const serviceMsg = await conversation.wait()
+  const service = serviceMsg.callbackQuery?.data
+
+  if (!["minimax", "haiper"].includes(service || "")) {
+    await ctx.reply(isRu ? "Пожалуйста, выберите сервис используя кнопки" : "Please choose a service using the buttons")
+    return
+  }
+
+  // Отвечаем на callback query
+  if (serviceMsg.callbackQuery) {
+    await ctx.api.answerCallbackQuery(serviceMsg.callbackQuery.id)
+  }
+
+  await ctx.reply(isRu ? "Пожалуйста, отправьте изображение" : "Please send an image")
   const imageMsg = await conversation.wait()
 
   if (!imageMsg.message?.photo) {
@@ -53,25 +74,49 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
       return
     }
 
-    // Скачиваем изображение
     const imageUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${filePath}`
-    const imageBuffer = await downloadFile(imageUrl)
 
-    const replicate = new Replicate({
-      auth: process.env.REPLICATE_API_TOKEN,
-    })
+    let videoUrl: string | undefined
 
-    const input = {
-      prompt: promptMsg.message.text,
-      first_frame_image: imageBuffer,
+    if (service === "minimax") {
+      // Minimax логика
+      const replicate = new Replicate({
+        auth: process.env.REPLICATE_API_TOKEN,
+      })
+
+      const imageBuffer = await downloadFile(imageUrl)
+      const minimaxResult = await retry(async () => {
+        return await replicate.run("minimax/video-01", {
+          input: {
+            prompt: promptMsg.message?.text,
+            first_frame_image: imageBuffer,
+          },
+        })
+      })
+
+      videoUrl = typeof minimaxResult === "string" ? minimaxResult : undefined
+    } else {
+      // Haiper логика
+      const replicate = new Replicate({
+        auth: process.env.REPLICATE_API_TOKEN,
+      })
+
+      const haiperResult = await retry(async () => {
+        return await replicate.run("haiper-ai/haiper-video-2", {
+          input: {
+            prompt: promptMsg.message?.text || "",
+            duration: 6,
+            aspect_ratio: "16:9",
+            use_prompt_enhancer: true,
+            frame_image_url: imageUrl,
+          },
+        })
+      })
+
+      videoUrl = typeof haiperResult === "string" ? haiperResult : undefined
     }
 
-    const videoUrl = await retry(async () => {
-      return await replicate.run("minimax/video-01", { input })
-    })
-    console.log(videoUrl, "videoUrl")
-
-    if (typeof videoUrl === "string") {
+    if (videoUrl) {
       await ctx.reply(isRu ? "Загружаю видео..." : "Uploading video...")
       const videoBuffer = await downloadFile(videoUrl)
       const tempFilePath = `temp_${Date.now()}.mp4`
