@@ -27,7 +27,7 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
   const isRu = ctx.from?.language_code === "ru"
 
   // Создаем инлайн клавиатуру с кнопками выбора сервиса
-  const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper")
+  const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper").text("Ray", "ray")
 
   // Отправляем сообщение с кнопками
   await ctx.reply(isRu ? "Выберите сервис для генерации видео:" : "Choose video generation service:", { reply_markup: keyboard })
@@ -36,7 +36,7 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
   const serviceMsg = await conversation.wait()
   const service = serviceMsg.callbackQuery?.data
 
-  if (!["minimax", "haiper"].includes(service || "")) {
+  if (!["minimax", "haiper", "ray"].includes(service || "")) {
     await ctx.reply(isRu ? "Пожалуйста, выберите сервис используя кнопки" : "Please choose a service using the buttons")
     return
   }
@@ -95,7 +95,7 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
       })
 
       videoUrl = typeof minimaxResult === "string" ? minimaxResult : undefined
-    } else {
+    } else if (service === "haiper") {
       // Haiper логика
       const replicate = new Replicate({
         auth: process.env.REPLICATE_API_TOKEN,
@@ -114,6 +114,24 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
       })
 
       videoUrl = typeof haiperResult === "string" ? haiperResult : undefined
+    } else {
+      // Ray логика
+      const replicate = new Replicate({
+        auth: process.env.REPLICATE_API_TOKEN,
+      })
+
+      const rayResult = await retry(async () => {
+        return await replicate.run("luma/ray", {
+          input: {
+            prompt: promptMsg.message?.text || "",
+            aspect_ratio: "16:9",
+            loop: false,
+            start_image_url: imageUrl,
+          },
+        })
+      })
+
+      videoUrl = typeof rayResult === "string" ? rayResult : undefined
     }
 
     if (videoUrl) {
