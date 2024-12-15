@@ -6,7 +6,7 @@ import { InputFile } from "grammy"
 import { pulse } from "../../helpers"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
 import { savePrompt } from "../../core/supabase/ai"
-import { generateNeuroImage } from "src/helpers/generateNeuroImage"
+import { generateNeuroImage } from "../../helpers/generateNeuroImage"
 
 type MyConversation = Conversation<MyContext & ConversationFlavor>
 
