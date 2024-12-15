@@ -27,7 +27,7 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
   const isRu = ctx.from?.language_code === "ru"
 
   // Создаем инлайн клавиатуру с кнопками выбора сервиса
-  const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper").text("Ray", "ray")
+  const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper").text("Ray", "ray").text("I2VGen-XL", "i2vgen")
 
   // Отправляем сообщение с кнопками
   await ctx.reply(isRu ? "Выберите сервис для генерации видео:" : "Choose video generation service:", { reply_markup: keyboard })
@@ -36,7 +36,7 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
   const serviceMsg = await conversation.wait()
   const service = serviceMsg.callbackQuery?.data
 
-  if (!["minimax", "haiper", "ray"].includes(service || "")) {
+  if (!["minimax", "haiper", "ray", "i2vgen"].includes(service || "")) {
     await ctx.reply(isRu ? "Пожалуйста, выберите сервис используя кнопки" : "Please choose a service using the buttons")
     return
   }
@@ -114,7 +114,7 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
       })
 
       videoUrl = typeof haiperResult === "string" ? haiperResult : undefined
-    } else {
+    } else if (service === "ray") {
       // Ray логика
       const replicate = new Replicate({
         auth: process.env.REPLICATE_API_TOKEN,
@@ -132,6 +132,35 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
       })
 
       videoUrl = typeof rayResult === "string" ? rayResult : undefined
+    } else {
+      // Проверяем ориентацию фото
+      const photo = imageMsg.message.photo[imageMsg.message.photo.length - 1]
+      if (photo.width < photo.height) {
+        await ctx.reply(
+          isRu
+            ? "⚠️ I2VGen-XL не работает с вертикальными фото. Вертикальные фото могут дать некачественный результат."
+            : "⚠️ I2VGen-XL does not work with vertical photos. Vertical photos may give poor results.",
+        )
+      }
+
+      // I2VGen-XL логика
+      const replicate = new Replicate({
+        auth: process.env.REPLICATE_API_TOKEN,
+      })
+
+      const i2vgenResult = await retry(async () => {
+        return await replicate.run("ali-vilab/i2vgen-xl:5821a338d00033abaaba89080a17eb8783d9a17ed710a6b4246a18e0900ccad4", {
+          input: {
+            image: imageUrl,
+            prompt: promptMsg.message?.text || "",
+            max_frames: 16,
+            guidance_scale: 9,
+            num_inference_steps: 50,
+          },
+        })
+      })
+
+      videoUrl = typeof i2vgenResult === "string" ? i2vgenResult : undefined
     }
 
     if (videoUrl) {
