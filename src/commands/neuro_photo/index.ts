@@ -4,9 +4,9 @@ import { supabase } from "../../core/supabase"
 
 import { InputFile } from "grammy"
 import { pulse } from "../../helpers"
-import { buttonHandlers } from "../../helpers/buttonHandlers"
 import { savePrompt } from "../../core/supabase/ai"
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
+import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
 
 type MyConversation = Conversation<MyContext & ConversationFlavor>
 
@@ -106,7 +106,7 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
       await pulse(ctx, pulseImage, fullPrompt, `/${userModel.model_name}`)
 
       // Показываем кнопки для дальнейших действий
-      await buttonHandlers(ctx, savedPrompt.toString())
+      await buttonNeuroHandlers(ctx, savedPrompt.toString())
     } finally {
       // Удаляем сообщение о загрузке
       await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMsg.message_id).catch(console.error)

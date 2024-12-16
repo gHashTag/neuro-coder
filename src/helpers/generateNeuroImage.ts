@@ -2,81 +2,92 @@ import { replicate } from "../core/replicate"
 import { getAspectRatio, savePrompt } from "../core/supabase/ai"
 import { processApiResponse, fetchImage, ApiResponse } from "./generateImage"
 
-// Определяем тип результата без null для prompt_id
-export interface GenerationPhotoResult {
-  image: Buffer
-  prompt_id: number
+interface SavePromptResult {
+  prompt_id: number | null
 }
 
-export async function generateNeuroImage(prompt: string, model_type: string, telegram_id: string): Promise<GenerationPhotoResult> {
+export interface GenerationResult {
+  image: string | Buffer
+  prompt_id: number | null
+}
+
+export async function generateNeuroImage(prompt: string, model_type: string, telegram_id: string): Promise<GenerationResult | null> {
+  console.log("Starting generateNeuroImage with:", { prompt, model_type, telegram_id })
+
   try {
     const aspect_ratio = await getAspectRatio(telegram_id)
+    console.log("Got aspect ratio:", aspect_ratio)
+
     let output: ApiResponse = ""
     let retries = 1
 
-    // Создаем input для запроса с учетом aspect_ratio
+    // Создаем input для запроса
     const input = {
       prompt,
       negative_prompt:
         "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
       num_inference_steps: 28,
       guidance_scale: 3.5,
-      // Устанавливаем размеры в зависимости от aspect_ratio
       ...(aspect_ratio === "1:1"
         ? { width: 1024, height: 1024 }
         : aspect_ratio === "16:9"
         ? { width: 1365, height: 768 }
         : aspect_ratio === "9:16"
         ? { width: 768, height: 1365 }
-        : { width: 1024, height: 1024 }), // дефолтный размер
+        : { width: 1024, height: 1024 }),
       sampler: "flowmatch",
       seed: 42,
       num_outputs: 1,
-      aspect_ratio, // Добавляем aspect_ratio в параметры
+      aspect_ratio,
     }
 
-    console.log("Using model:", model_type)
-    console.log("Input:", input)
-    console.log("Aspect ratio:", aspect_ratio)
+    console.log("Created input:", input)
+
+    // Используем захардкоженный URL модели вместо model_type из базы
+    const MODEL_URL = "ghashtag/neuro_coder_flux-dev-lora:5ff9ea5918427540563f09940bf95d6efc16b8ce9600e82bb17c2b188384e355"
+    console.log("Using model URL:", MODEL_URL)
 
     while (retries > 0) {
       try {
-        // @ts-expect-error Replicate API возвращает string | string[] но не типизирован корректно
-        output = await replicate.run(model_type, { input })
-        console.log("Replicate output:", output)
+        console.log("Attempting to run model, attempt:", 4 - retries)
+        // @ts-expect-error Replicate API типы
+        output = await replicate.run(MODEL_URL, { input })
+        console.log("Got output from replicate:", output)
 
         const imageUrl = await processApiResponse(output)
-        console.log("Image URL:", imageUrl)
+        console.log("Processed image URL:", imageUrl)
 
         if (!imageUrl || imageUrl.endsWith("empty.zip")) {
           throw new Error(`Invalid image URL: ${imageUrl}`)
         }
 
         const imageBuffer = await fetchImage(imageUrl)
-        console.log("Image buffer size:", imageBuffer.length)
+        console.log("Fetched image buffer, size:", imageBuffer.length)
 
-        if (!imageBuffer || imageBuffer.length === 0) {
-          throw new Error("Empty image buffer received")
-        }
+        const prompt_id = await savePrompt(prompt, model_type, telegram_id)
+        console.log("Saved prompt with id:", prompt_id)
 
-        // Сохраняем промпт и получаем id
-        const prompt_id = await savePrompt(prompt, model_type, imageUrl, telegram_id)
-        if (!prompt_id) {
+        if (prompt_id === null) {
           throw new Error("Failed to save prompt")
         }
 
-        return { image: imageBuffer, prompt_id }
+        console.log("Returning successful result with prompt_id:", prompt_id)
+        return {
+          image: imageBuffer,
+          prompt_id,
+        }
       } catch (error) {
-        console.error(`Попытка ${4 - retries} не удалась:`, error)
+        console.error(`Generation attempt ${4 - retries} failed:`, error)
         retries--
         if (retries === 0) throw error
+        console.log("Waiting before next attempt...")
         await new Promise((resolve) => setTimeout(resolve, 2000))
       }
     }
 
-    throw new Error("Все попытки генерации изображения исчерпаны")
+    throw new Error("All generation attempts exhausted")
   } catch (error) {
-    console.error("Ошибка при генерации изображения:", error)
-    throw error
+    console.error("Fatal error in generateNeuroImage:", error)
+    return null
   }
 }

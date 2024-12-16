@@ -1,77 +1,79 @@
-# grammY Vercel boilerplate
+# Neuro Coder Bot
 
-[grammY](https://grammy.dev/) boilerplate to develop and host telegram bots on [Vercel](https://vercel.com/).
+Многофункциональный Telegram бот для работы с нейросетями, генерации изображений, видео и текста.
 
-## Features
+## Команды бота
 
-- Typescript support
-- Linting and formatting preconfigured
-- Development friendly environment with Nodemon
+### Основные команды
+- `/start` - Запустить бота и получить приветственное сообщение
+- `/help` - Получить справку по командам бота
+- `/buy` - Купить подписку для расширенного доступа
+- `/select_model` - Выбрать модель для генерации текста
+- `/invite` - Пригласить друга и получить бонусы
+- `/imagesize` - Изменить размер генерируемых изображений (1:1, 16:9, 9:16)
 
-## Development
+### Генерация изображений
+- `/text_to_image` - Создать изображение из текстового описания
+- `/image_to_prompt` - Получить промпт (описание) из изображения
+- `/neuro_photo` - Сгенерировать фотореалистичные изображения
+- `/train_flux_model` - Обучить модель FLUX на ваших фотографиях
 
-```bash
-# Copy the .env example and change the BOT_TOKEN to match yours
-$ cp .env.example .env
-# Install the dependencies
-$ npm install
-# Run the development environment
-$ npm run dev
-```
+### Работа с видео
+- `/text_to_video` - Создать видео из текстового описания
+- `/image_to_video` - Преобразовать изображение в видео с движением
+  - Поддерживает несколько моделей:
+    - Minimax - для плавной анимации
+    - Haiper - для креативных трансформаций
+    - Ray - для реалистичных движений
+    - I2VGen-XL - для высококачественных видео (только горизонтальные изображения)
+- `/b_roll` - Создать B-roll видео
+- `/lipsync` - Синхронизировать движение губ с аудио
+- `/subtitles` - Добавить субтитры к видео
 
-## Deployment
+### Работа с аудио и голосом
+- `/text_to_speech` - Преобразовать текст в речь
+- `/voice` - Добавить голос к аватару
+- `/avatar` - Создать и настроить цифрового аватара
 
-#### Terminal
+### Работа с текстом и новостями
+- `/ainews` - Создать AI новостную заметку
+- `/caption_for_ai_news` - Создать описание для AI новостей
 
-```bash
-# Install vercel cli if you don't have it yet
-$ npm i -g vercel
-# Deploy the project
-$ vercel --prod
-```
+## Как использовать бота
 
-#### Vercel
+1. **Начало работы**
+   - Запустите бота командой `/start`
+   - Выберите предпочитаемый язык (Русский/English)
+   - Ознакомьтесь с доступными командами через `/help`
 
-On your project's page, go to Settings > Environment Variables and add the following variables:
+2. **Настройка**
+   - Установите желаемый размер изображений через `/imagesize`
+   - Выберите предпочитаемую модель через `/select_model`
 
-| Name        | Value            |
-| ----------- | ---------------- |
-| `BOT_TOKEN` | _your bot token_ |
+3. **Генерация контента**
+   - Используйте соответствующие команды для создания нужного типа контента
+   - Следуйте инструкциям бота для каждой команды
+   - Дождитесь завершения генерации
 
-> You can also set the webhook URL manually accessing `https://api.telegram.org/bot<bot_token>/setWebhook?url=<webhook_url>` on your browser
+4. **Улучшение результатов**
+   - Используйте кнопки улучшения промптов
+   - Экспериментируйте с разными моделями
+   - Настраивайте параметры генерации
 
-Finally, you should see a "Hello, world!" from the bot when typing `/hello` in chat.
+## Примечания
 
-## Using Express instead of Vercel's API
+- Некоторые функции доступны только с подпиской
+- Для лучших результатов используйте четкие и подробные описания
+- При генерации видео из изображений учитывайте ограничения моделей
+- Соблюдайте рекомендуемые форматы и размеры файлов
 
-By default `grammy-vercel-boilerplate` does not use extra dependencies, but in case you want to use Express, first add it as a dependency
+## Подписки
 
-```sh
-$ npm install express
-```
+- НейроСтарт - базовый доступ
+- НейроБаза - расширенный доступ
+- НейроУченик - продвинутый доступ
+- НейроЭксперт - полный доступ ко всем функциям
 
-And then edit the contents of `api/index.ts` to
+## Поддержка
 
-```js
-require("../src/index")
-
-import express from "express"
-import { webhookCallback } from "grammy"
-
-import bot from "../src/core/bot"
-
-const app = express()
-
-app.use(express.json())
-app.use(`/api/index`, webhookCallback(bot))
-
-export default app
-```
-
-## Contributing
-
-Pull requests are welcome. If you have any suggestions, you can also create an [issue](https://github.com/neumanf/grammy-vercel-boilerplate/issues).
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
+При возникновении вопросов или проблем используйте команду `/help` или обратитесь к администратору бота.

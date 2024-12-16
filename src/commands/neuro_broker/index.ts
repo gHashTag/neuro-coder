@@ -132,9 +132,16 @@ const createReels = async (ctx: Context): Promise<void> => {
 
     const images = newArray.map((img) => img.imagePath)
 
-    const languages = ["en", "ru", "zh", "ar"]
+    const languages = ["en", "ru", "zh", "ar"] as const
+
     for (const lang of languages) {
-      const voiceOver = stepsData[0].voiceOver[lang]
+      // Добавляем проверку на существование voiceOver
+      const voiceOver = stepsData[0]?.voiceOver?.[lang as keyof (typeof stepsData)[0]["voiceOver"]]
+      if (!voiceOver) {
+        console.error(`No voiceover found for language: ${lang}`)
+        continue
+      }
+
       const audioFile1 = `../audio/audio${3}.mp3`
       const audioStream2 = await createAudioFileFromText({ text: voiceOver, voice_id: "PVKVligmzACf89A0Cegd" })
       const audioPath = path.join(__dirname, `../${audioStream2}`)
