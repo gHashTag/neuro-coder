@@ -3,7 +3,7 @@ import { MyContextWithSession } from "./types"
 
 const production = async (bot: Bot<MyContextWithSession>): Promise<void> => {
   try {
-    await bot.api.deleteWebhook()
+    await bot.api.deleteWebhook({ drop_pending_updates: true })
     console.log("Old webhook deleted")
 
     await new Promise((resolve) => setTimeout(resolve, 2000))
@@ -16,11 +16,10 @@ const production = async (bot: Bot<MyContextWithSession>): Promise<void> => {
 
     if (success) {
       console.log(`Webhook successfully set to ${webhookUrl}`)
+      console.log("Bot is running in webhook mode")
     } else {
       throw new Error("Failed to set webhook")
     }
-
-    console.log("Bot is running in webhook mode")
   } catch (e) {
     console.error("Error in production setup:", e)
     throw e

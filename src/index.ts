@@ -35,7 +35,7 @@ import imageToVideo from "./commands/image_to_video"
 import { imageToPromptConversation } from "./commands/image_to_prompt"
 import { trainFluxModelConversation } from "./commands/train_flux_model"
 import { neuroPhotoConversation } from "./commands/neuro_photo"
-// import { sequentialize } from "@grammyjs/runner"
+import { sequentialize } from "@grammyjs/runner"
 import neuroQuest from "./commands/neuro_quest"
 
 import { handleAspectRatioChange, handleBuy, handleChangeSize } from "./handlers"
@@ -59,21 +59,25 @@ bot.use(session({ initial: () => ({}) }))
 
 console.log(`Starting bot in ${process.env.NODE_ENV} mode`)
 
-// Запускаем бот в соответствующем режиме
+// В production режиме НЕ запускаем bot.start() и runner
 if (process.env.NODE_ENV === "development") {
   development(bot).catch(console.error)
 } else {
+  // В production только настраиваем webhook
   production(bot).catch(console.error)
 }
 
-// Добавляем sequentialize middleware для правильной обработки сообщений от одного пользователя
-// bot.use(
-//   sequentialize((ctx) => {
-//     const chat = ctx.chat?.id.toString()
-//     const user = ctx.from?.id.toString()
-//     return [chat, user].filter((con): con is string => con !== undefined)
-//   }),
-// )
+// Убираем runner в production
+if (process.env.NODE_ENV === "development") {
+  // Добавляем sequentialize middleware только в development
+  bot.use(
+    sequentialize((ctx) => {
+      const chat = ctx.chat?.id.toString()
+      const user = ctx.from?.id.toString()
+      return [chat, user].filter((con): con is string => con !== undefined)
+    }),
+  )
+}
 
 if (process.env.NODE_ENV === "production") {
   bot.api.setMyCommands([
