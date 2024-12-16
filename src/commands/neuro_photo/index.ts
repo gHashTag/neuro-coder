@@ -1,5 +1,4 @@
-import { Conversation, ConversationFlavor } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext, MyConversation } from "../../utils/types"
 import { supabase } from "../../core/supabase"
 
 import { InputFile } from "grammy"
@@ -7,8 +6,6 @@ import { pulse } from "../../helpers"
 import { savePrompt } from "../../core/supabase/ai"
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
 import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
-
-type MyConversation = Conversation<MyContext & ConversationFlavor>
 
 interface UserModel {
   model_name: string

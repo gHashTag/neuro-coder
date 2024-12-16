@@ -1,129 +1,121 @@
-import { Conversation, ConversationFlavor } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
 import { InlineKeyboard } from "grammy"
+import { MyContext, MyConversation } from "../../utils/types"
+import { handleLevel1, handleLevel2, handleLevel3, handleLevel4, handleQuestComplete, handleQuestRules } from "./handlers"
 
-type MyConversationType = MyContext & ConversationFlavor
-
-async function neuroQuest(conversation: Conversation<MyConversationType>, ctx: MyConversationType) {
+export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   console.log("🎮 Starting Neuro Quest for user:", ctx.from?.id)
 
-  // Шаг 1: Приветствие
-  await ctx.reply(
-    isRu
-      ? "🎮 Добро пожаловать в Нейро-Квест!\n\nЯ помогу вам освоить все возможности бота в формате увлекательной игры. Готовы начать?"
-      : "🎮 Welcome to Neuro-Quest!\n\nI'll help you master all the bot's features in an exciting game format. Ready to start?",
-    {
-      reply_markup: new InlineKeyboard()
-        .text(isRu ? "🚀 Начать приключение" : "🚀 Start adventure", "quest_start")
-        .text(isRu ? "❌ Пропустить" : "❌ Skip", "quest_skip"),
-    },
-  )
+  // Приветствие
+  await ctx.replyWithPhoto("https://dmrooqbmxdhdyblqzswu.supabase.co/storage/v1/object/public/neuro_coder/bot/ava-16-9.jpg", {
+    caption: isRu
+      ? `🎮 Привет! Я НейроКодер - ваш персональный ассистент по созданию контента для соцсетей.
 
-  try {
-    console.log("Waiting for start response...")
-    const startResponse = await conversation.waitFor("callback_query:data")
-    console.log("Received start response:", startResponse.callbackQuery.data)
-    await ctx.api.answerCallbackQuery(startResponse.callbackQuery.id)
+🤖 Я помогу вам создавать:
+• Вирусные посты
+• Креативные видео
+• Уникальные изображения
+• Продающие тексты
+• Озвучку и субтитры
 
-    if (startResponse.callbackQuery.data === "quest_skip") {
-      console.log("User skipped the quest")
-      await ctx.reply(isRu ? "👋 Вы всегда можете начать квест заново командой /start" : "👋 You can always restart the quest with /start command")
-      return
+🎯 Давайте пройдем квест и научимся:
+
+1️⃣ Базовые настройки
+• Выбор модели ИИ для вашего стиля
+• Настройка языка и формата контента
+• Управление подпиской
+
+2️⃣ Создание визуального контента
+• Генерация трендовых изображений
+• Создание уникальных артов
+• Обработка фото в вашем стиле
+
+3️⃣ Продвинутая работа с видео
+• Создание рилс и шортс
+• Добавление эффектов движения
+• Генерация B-roll контента
+• Синхронизация губ с аудио
+
+4️⃣ Аудио и текст
+• Озвучка постов
+• Создание субтитров
+• Генерация продающих текстов
+
+💡 Каждый уровень даст вам навыки для создания профессионального контента.
+
+Готовы стать профи в создании контента?`
+      : `👋 Hi! I'm NeuroCoder - your personal assistant for social media content creation.
+
+🤖 I'll help you create:
+• Viral posts
+• Creative videos
+• Unique images
+• Sales copy
+• Voiceovers and subtitles
+
+🎯 Let's complete this quest and learn:
+
+1️⃣ Basic Setup
+• Choosing AI model for your style
+• Setting language and content format
+• Managing subscription
+
+2️⃣ Visual Content Creation
+• Generating trending images
+• Creating unique art
+• Processing photos in your style
+
+3️⃣ Advanced Video Work
+• Creating reels and shorts
+• Adding motion effects
+• Generating B-roll content
+• Lip sync with audio
+
+4️⃣ Audio and Text
+• Post voiceovers
+• Creating subtitles
+• Generating sales copy
+
+💡 Each level will give you skills for creating professional content.
+
+Ready to become a content creation pro?`,
+    reply_markup: new InlineKeyboard()
+      .text(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "quest_start")
+      .row()
+      .text(isRu ? "💎 Купить подписку" : "💎 Buy subscription", "buy_subscription"),
+  })
+
+  // Обработка ответов пользователя
+  while (true) {
+    const response = await conversation.waitFor("callback_query:data")
+    await ctx.api.answerCallbackQuery(response.callbackQuery.id)
+
+    const action = response.callbackQuery.data
+
+    switch (action) {
+      case "quest_rules":
+        await handleQuestRules(ctx)
+        break
+      case "level_2":
+        await handleLevel2(ctx)
+        break
+      case "level_3":
+        await handleLevel3(ctx)
+        break
+      case "level_4":
+        await handleLevel4(ctx)
+        break
+      case "quest_complete":
+        await handleQuestComplete(ctx)
+        return
+      case "buy_subscription":
+        await ctx.conversation.enter("buySubscription")
+        return
+      case "quest_start":
+      default:
+        await handleLevel1(ctx)
+        break
     }
-
-    // Шаг 2: Генерация изображения
-    console.log("Starting image generation step")
-    await ctx.reply(
-      isRu
-        ? "🎨 Первое задание: давайте создадим изображение!\n\nИспользуйте команду /text_to_image и опишите что-нибудь простое, например 'космический котик'"
-        : "🎨 First task: let's create an image!\n\nUse the /text_to_image command and describe something simple, like 'space cat'",
-    )
-
-    // Просто ждем следующее сообщение после команды
-    let msg = await conversation.wait()
-    while (!msg.message?.text?.startsWith("/text_to_image")) {
-      msg = await conversation.wait()
-    }
-    console.log("Text to image command received")
-
-    // Переходим к следующему шагу после небольшой паузы
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    // Шаг 3: Улучшение промпта
-    await ctx.reply(
-      isRu
-        ? "✨ После генерации изображения вы можете улучшить результат, используя кнопку 'Улучшить промпт' под изображением. Давайте перейдем к следующему шагу."
-        : "✨ After generating an image, you can improve the result using the 'Improve prompt' button under the image. Let's move to the next step.",
-    )
-
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-
-    // Шаг 4: Создание видео
-    await ctx.reply(
-      isRu
-        ? "🎥 Из любого изображения можно создать видео! Используйте кнопку 'Сгенерировать видео' под изображением, когда захотите сделать его анимированным. Идем дальше!"
-        : "🎥 You can create a video from any image! Use the 'Generate video' button under the image when you want to animate it. Let's continue!",
-    )
-
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-
-    // Шаг 5: Общение с ИИ
-    await ctx.reply(
-      isRu
-        ? "🤖 Я также умею общаться! Просто напишите мне любой вопрос, и я постараюсь на него ответить. Попробуйте прямо сейчас!"
-        : "🤖 I can also chat! Just write me any question and I'll try to answer it. Try it now!",
-    )
-
-    // Ждем любое текстовое сообщение
-    msg = await conversation.wait()
-    while (!msg.message?.text || msg.message.text.startsWith("/")) {
-      msg = await conversation.wait()
-    }
-    console.log("Chat message received")
-
-    // Шаг 6: Настройка размера
-    await ctx.reply(
-      isRu
-        ? "⚙️ И последнее: вы можете настроить размер генерируемых изображений командой /imagesize. Попробуйте!"
-        : "⚙️ And lastly: you can configure the size of generated images with the /imagesize command. Try it!",
-    )
-
-    msg = await conversation.wait()
-    while (!msg.message?.text?.startsWith("/imagesize")) {
-      msg = await conversation.wait()
-    }
-    console.log("Imagesize command received")
-
-    // Завершение квеста
-    await ctx.reply(
-      isRu
-        ? "🎉 Поздравляем! Вы узнали основные возможности бота!\n\n" +
-            "• Генерация изображений (/text_to_image)\n" +
-            "• Улучшение результатов\n" +
-            "• Создание видео\n" +
-            "• Общение с ИИ\n" +
-            "• Настройка параметров (/imagesize)\n\n" +
-            "Используйте /help для просмотра всех команд.\n" +
-            "Удачи в творчестве! 🚀"
-        : "🎉 Congratulations! You've learned the main features!\n\n" +
-            "• Image generation (/text_to_image)\n" +
-            "• Result improvement\n" +
-            "• Video creation\n" +
-            "• AI chat\n" +
-            "• Settings configuration (/imagesize)\n\n" +
-            "Use /help to see all commands.\n" +
-            "Good luck with your creations! 🚀",
-      {
-        reply_markup: new InlineKeyboard()
-          .text(isRu ? "🎁 Получить бонус" : "🎁 Get bonus", "quest_bonus")
-          .text(isRu ? "💫 Улучшить подписку" : "💫 Upgrade subscription", "quest_upgrade"),
-      },
-    )
-    console.log("Quest completed for user:", ctx.from?.id)
-  } catch (error) {
-    console.error("Quest error:", error)
-    await ctx.reply(isRu ? "Произошла ошибка. Используйте /start для перезапуска квеста." : "An error occurred. Use /start to restart the quest.")
   }
 }
 

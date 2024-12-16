@@ -1,5 +1,4 @@
 import { Composer } from "grammy"
-import { MyContextWithSession } from "../utils/types"
 
 import { clipmaker } from "./clipmaker"
 import leela from "./leela"
@@ -8,13 +7,14 @@ import neuro_broker from "./neuro_broker"
 import { invite } from "./invite"
 import { buy } from "./buy"
 import selectModelComposer from "./select_model"
+import { MyContext } from "../utils/types"
 
-const composer = new Composer<MyContextWithSession>()
+const composer = new Composer<MyContext>()
 
-composer.command("clipmaker", (ctx: MyContextWithSession) => clipmaker(ctx))
+composer.command("clipmaker", (ctx: MyContext) => clipmaker(ctx))
 
-composer.command("leela", (ctx: MyContextWithSession) => leela(ctx))
-composer.command("neuro_broker", (ctx: MyContextWithSession) => neuro_broker(ctx))
+composer.command("leela", (ctx: MyContext) => leela(ctx))
+composer.command("neuro_broker", (ctx: MyContext) => neuro_broker(ctx))
 
 composer.command("caption_for_ai_news", async (ctx) => {
   await ctx.conversation.enter("createCaptionForNews")

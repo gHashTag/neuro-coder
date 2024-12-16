@@ -1,6 +1,5 @@
 import { Context, SessionFlavor } from "grammy"
-import { FileFlavor } from "@grammyjs/files"
-import { ConversationFlavor } from "@grammyjs/conversations"
+import { Conversation, ConversationFlavor } from "@grammyjs/conversations"
 
 interface SessionData {
   melimi00: {
@@ -22,6 +21,8 @@ export interface Step {
   }
 }
 
-export type MyContext = Context & FileFlavor<Context> & ConversationFlavor
+export type MyContext = Context & ConversationFlavor
+
+export type MyConversation = Conversation<MyContext & ConversationFlavor>
 
 export type MyContextWithSession = MyContext & SessionFlavor<SessionData>

@@ -1,10 +1,10 @@
-import { MyContextWithSession, Step } from "../../utils/types"
 import { InputFile } from "grammy"
 import { promises as fs } from "fs"
 import { createSlideshow, generateImagesForMeditation, getMeditationSteps, translateText } from "../../helpers"
 import { InputMediaPhoto } from "grammy/types"
+import { MyContext, Step } from "../../utils/types"
 
-export async function clipmaker(ctx: MyContextWithSession) {
+export async function clipmaker(ctx: MyContext) {
   try {
     // Отправляем уведомление пользователю, что бот печатает
     await ctx.replyWithChatAction("typing")
@@ -62,7 +62,7 @@ export async function clipmaker(ctx: MyContextWithSession) {
     const englishImages = await generateImagesForMeditation(stepsData, "en")
     console.log(englishImages, "englishImages")
 
-    // Создаем группу медиа для отпра��ки изображений
+    // Создаем группу медиа для отправки изображений
     const englishMediaGroup: InputMediaPhoto[] = englishImages.map((image) => ({
       type: "photo",
       media: new InputFile(image.imagePath),

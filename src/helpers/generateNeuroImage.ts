@@ -1,10 +1,11 @@
+import { models } from "src/commands/constants"
 import { replicate } from "../core/replicate"
 import { getAspectRatio, savePrompt } from "../core/supabase/ai"
 import { processApiResponse, fetchImage, ApiResponse } from "./generateImage"
 
 export interface GenerationResult {
   image: string | Buffer
-  prompt_id: number | null
+  prompt_id: number
 }
 
 export async function generateNeuroImage(prompt: string, model_type: string, telegram_id: string): Promise<GenerationResult | null> {
@@ -16,6 +17,11 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
 
     let output: ApiResponse = ""
     let retries = 1
+
+    const model = models[model_type]
+    if (!model) {
+      throw new Error(`Model ${model_type} not found`)
+    }
 
     // Создаем input для запроса
     const input = {
@@ -39,8 +45,7 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
 
     console.log("Created input:", input)
 
-    // Используем захардкоженный URL модели вместо model_type из базы
-    const MODEL_URL = "ghashtag/neuro_coder_flux-dev-lora:5ff9ea5918427540563f09940bf95d6efc16b8ce9600e82bb17c2b188384e355"
+    const MODEL_URL = model.key
     console.log("Using model URL:", MODEL_URL)
 
     while (retries > 0) {
@@ -60,11 +65,12 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
         const imageBuffer = await fetchImage(imageUrl)
         console.log("Fetched image buffer, size:", imageBuffer.length)
 
-        const prompt_id = await savePrompt(prompt, model_type, telegram_id)
+        const prompt_id = await savePrompt(prompt, MODEL_URL, telegram_id)
         console.log("Saved prompt with id:", prompt_id)
 
         if (prompt_id === null) {
-          throw new Error("Failed to save prompt")
+          console.error("Failed to save prompt")
+          return null
         }
 
         console.log("Returning successful result with prompt_id:", prompt_id)

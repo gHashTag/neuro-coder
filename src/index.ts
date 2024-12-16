@@ -83,10 +83,6 @@ if (process.env.NODE_ENV === "production") {
       description: "👥 Invite a friend / Пригласить друга",
     },
     {
-      command: "imagesize",
-      description: "🖼️ Change image size / Изменить размер генерируемого изображения",
-    },
-    {
       command: "avatar",
       description: "👤 Tell about yourself / Рассказать о себе",
     },
@@ -140,7 +136,7 @@ if (process.env.NODE_ENV === "production") {
     },
     {
       command: "invite",
-      description: "Invite a friend / Пригласить друга",
+      description: "👥 Invite a friend / Пригласить друга",
     },
     {
       command: "train_flux_model",
@@ -492,7 +488,7 @@ bot.on("callback_query:data", async (ctx) => {
     } else if (data.startsWith("generate_image_")) {
       const prompt = data.replace("generate_image_", "")
 
-      // Отправляем сообщ��ние о начале генерации
+      // Отправляем сообщение о начале генерации
       const generatingMsg = await ctx.reply(isRu ? "⏳ Генерирую изображение..." : "⏳ Generating image...")
 
       try {
@@ -527,7 +523,7 @@ bot.on("callback_query:data", async (ctx) => {
         console.error("Error generating image:", error)
         await ctx.reply(
           isRu
-            ? "❌ Произошла ошибка при генерации изображения. Пожалуйста, попробуйте позже."
+            ? "❌ Произошла ошибка при генерации изображен��я. Пожалуйста, попробуйте позже."
             : "❌ An error occurred while generating the image. Please try again later.",
         )
       } finally {
@@ -553,7 +549,7 @@ bot.on("callback_query:data", async (ctx) => {
         return
       }
 
-      // Генер��руем н��вое изображение с тем же промптом
+      // Генеруем новое изображение с тем же промптом
       const result = await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id.toString())
       console.log("result4", result)
       if (!result) {
@@ -584,7 +580,7 @@ bot.on("callback_query:data", async (ctx) => {
       })
     }
 
-    // Добав��яем обр��ботчики для нейро-кнопок
+    // Добавляем обрботчики для нейро-кнопок
     if (data.startsWith("neuro_generate_")) {
       console.log("Received neuro_generate_ callback with data:", data)
 
@@ -592,7 +588,7 @@ bot.on("callback_query:data", async (ctx) => {
       console.log("Split parts:", parts)
 
       const count = parts[2]
-      const promptId = parts[3] // UUID будет последней частью
+      const promptId = parts[3] // UUID будет последней ча��тью
       console.log("Extracted count and promptId:", { count, promptId })
 
       let generatingMessage: { message_id: number } | null = null
@@ -738,7 +734,7 @@ bot.on("callback_query:data", async (ctx) => {
         await ctx.replyWithPhoto(photoToSend)
         console.log("Photo sent")
 
-        // ��оказываем кнопки для дальнейших действий
+        // Показываем кнопки для дальнейших действий
         console.log("Adding neuro buttons for prompt_id:", result.prompt_id)
         await buttonNeuroHandlers(ctx, result.prompt_id?.toString() || "")
       } catch (error) {
@@ -795,7 +791,7 @@ bot.catch((err) => {
   ctx
     .reply(
       isRu
-        ? "Извините, поизшла ошбка ри обработке вашго запроса. Пожалуйста, попробуйте позже."
+        ? "Извините, позшла ошбка ри обработке вашго запроса. Пожалуйста, попробуйте позже."
         : "Sorry, an error occurred while processing your request. Please try again later.",
     )
     .catch((e) => {

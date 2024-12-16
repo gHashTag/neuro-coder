@@ -5,6 +5,7 @@ import { getGeneratedImages } from "../../core/supabase/ai"
 import { InputFile } from "grammy"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
 import { generateImage } from "../../helpers/generateImage"
+import { generateNeuroImage } from "src/helpers/generateNeuroImage"
 
 export const generateMoreImagesButtons = async (ctx: MyContext, prompt_id: string | number | null) => {
   try {
@@ -89,7 +90,18 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
     const fileUrl = message.document ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : ""
     console.log(fileUrl)
     const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
-    const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from.id.toString())
+    if (!text) {
+      throw new Error("Text is required")
+    }
+    if (!model_type) {
+      throw new Error("Model type is required")
+    }
+    const result = await generateNeuroImage(text, model_type, ctx.from.id.toString())
+    if (!result) {
+      throw new Error("Failed to generate image")
+    }
+
+    const { image, prompt_id } = result
 
     if (!image) {
       throw new Error("Не удалось получить изображение")
@@ -99,13 +111,12 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
 
     // Отправляем изображение
     const photoToSend = Buffer.isBuffer(image) ? new InputFile(image) : image
-    await ctx.replyWithPhoto(photoToSend)
+    await ctx.replyWithPhoto(photoToSend, {
+      caption: isRu ? "🎨 Изображение сгенерировано!" : "🎨 Image generated!",
+    })
 
-    // Показываем кнопки только если есть prompt_id
-    if (count < limit && prompt_id !== null) {
-      await ctx.reply(isRu ? `ℹ️ Осталось ${limit - count} использований` : `ℹ️ ${limit - count} uses left`)
-      buttonHandlers(ctx, prompt_id.toString())
-    }
+    // Показываем кнопки для дальнейших действий
+    await buttonHandlers(ctx, prompt_id?.toString() || "")
   } catch (error) {
     console.error("Error in generateImageConversation:", error)
     await ctx.reply(isRu ? `❌ Произошла ошибка: ${error}` : `❌ An error occurred: ${error}`)
