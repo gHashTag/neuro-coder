@@ -334,7 +334,7 @@ bot.on("callback_query:data", async (ctx) => {
     try {
       await ctx.answerCallbackQuery()
     } catch (e) {
-      console.error("Не удалось от��етить на callback query:", e)
+      console.error("Не удалось ответить на callback query:", e)
     }
     await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")
   }
@@ -369,7 +369,7 @@ bot.command("train_flux_model", async (ctx) => {
   await ctx.conversation.enter("trainFluxModelConversation")
 })
 
-// Обработчик кнопки изменения ��азмера
+// Обработчик кнопки изменения азамера
 bot.callbackQuery("change_size", async (ctx) => {
   const isRu = ctx.from?.language_code === "ru"
   await ctx.reply(isRu ? "Выберите размер изображения:" : "Choose image size:", {

@@ -19,6 +19,8 @@ const production = async (bot: Bot<MyContextWithSession>): Promise<void> => {
     } else {
       throw new Error("Failed to set webhook")
     }
+
+    console.log("Bot is running in webhook mode")
   } catch (e) {
     console.error("Error in production setup:", e)
     throw e
