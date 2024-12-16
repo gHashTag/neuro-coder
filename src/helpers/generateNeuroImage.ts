@@ -18,11 +18,6 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
     let output: ApiResponse = ""
     let retries = 1
 
-    const model = models[model_type]
-    if (!model) {
-      throw new Error(`Model ${model_type} not found`)
-    }
-
     // Создаем input для запроса
     const input = {
       prompt,
@@ -45,14 +40,11 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
 
     console.log("Created input:", input)
 
-    const MODEL_URL = model.key
-    console.log("Using model URL:", MODEL_URL)
-
     while (retries > 0) {
       try {
         console.log("Attempting to run model, attempt:", 4 - retries)
         // @ts-expect-error Replicate API типы
-        output = await replicate.run(MODEL_URL, { input })
+        output = await replicate.run(model_type, { input })
         console.log("Got output from replicate:", output)
 
         const imageUrl = await processApiResponse(output)
@@ -65,7 +57,7 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
         const imageBuffer = await fetchImage(imageUrl)
         console.log("Fetched image buffer, size:", imageBuffer.length)
 
-        const prompt_id = await savePrompt(prompt, MODEL_URL, telegram_id)
+        const prompt_id = await savePrompt(prompt, model_type, telegram_id)
         console.log("Saved prompt with id:", prompt_id)
 
         if (prompt_id === null) {

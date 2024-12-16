@@ -3,7 +3,7 @@ import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard, InputFile } from "grammy"
 import { generateImage } from "../../helpers/generateImage"
 
-async function get100AnfiVesnaConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
+async function get100Conversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const keyboard = new InlineKeyboard().text("Отменить генерацию", "cancel")
   const model_type = "dpbelarusx"
   console.log(model_type)
@@ -46,4 +46,4 @@ async function get100AnfiVesnaConversation(conversation: Conversation<MyContext>
   return
 }
 
-export { get100AnfiVesnaConversation }
+export { get100Conversation }

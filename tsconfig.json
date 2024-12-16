@@ -12,5 +12,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
   },
+  "baseUrl": "./src",
   "include": ["src/**/*", "api/**/*"]
 }
+    
