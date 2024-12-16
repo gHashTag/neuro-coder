@@ -57,8 +57,14 @@ bot.api.config.use(hydrateFiles(bot.token))
 
 bot.use(session({ initial: () => ({}) }))
 
-console.log(process.env.NODE_ENV, "process.env.NODE_ENV")
-process.env.NODE_ENV === "development" ? development(bot) : production(bot)
+console.log(`Starting bot in ${process.env.NODE_ENV} mode`)
+
+// Запускаем бот в соответствующем режиме
+if (process.env.NODE_ENV === "development") {
+  development(bot).catch(console.error)
+} else {
+  production(bot).catch(console.error)
+}
 
 // Добавляем sequentialize middleware для правильной обработки сообщений от одного пользователя
 // bot.use(
@@ -328,7 +334,7 @@ bot.on("callback_query:data", async (ctx) => {
     try {
       await ctx.answerCallbackQuery()
     } catch (e) {
-      console.error("Не удалось ответить на callback query:", e)
+      console.error("Не удалось от��етить на callback query:", e)
     }
     await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")
   }
@@ -363,7 +369,7 @@ bot.command("train_flux_model", async (ctx) => {
   await ctx.conversation.enter("trainFluxModelConversation")
 })
 
-// Обработчик кнопки изменения размера
+// Обработчик кнопки изменения ��азмера
 bot.callbackQuery("change_size", async (ctx) => {
   const isRu = ctx.from?.language_code === "ru"
   await ctx.reply(isRu ? "Выберите размер изображения:" : "Choose image size:", {
