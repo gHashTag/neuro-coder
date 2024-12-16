@@ -2,10 +2,6 @@ import { replicate } from "../core/replicate"
 import { getAspectRatio, savePrompt } from "../core/supabase/ai"
 import { processApiResponse, fetchImage, ApiResponse } from "./generateImage"
 
-interface SavePromptResult {
-  prompt_id: number | null
-}
-
 export interface GenerationResult {
   image: string | Buffer
   prompt_id: number | null

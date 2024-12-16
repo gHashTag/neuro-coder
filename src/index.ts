@@ -1,12 +1,11 @@
 require("dotenv").config()
 
-import { Bot } from "grammy"
+import { InlineKeyboard } from "grammy"
 import commands from "./commands"
 import { development, production } from "./utils/launch"
-import { MyContext } from "./utils/types"
 import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
-import { session, SessionFlavor } from "grammy"
+import { session } from "grammy"
 import { imageSizeConversation } from "./commands/imagesize"
 import { customMiddleware, pulse, upgradePrompt } from "./helpers"
 import { generateImageConversation } from "./commands/generateImage"
@@ -33,22 +32,17 @@ import createAinews from "./commands/ainews"
 import { buttonHandlers } from "./helpers/buttonHandlers"
 import { textToImageConversation } from "./commands/text_to_image"
 import { generateImage } from "./helpers/generateImage"
+import { generateNeuroImage } from "./helpers/generateNeuroImage"
 import { textToVideoConversation } from "./commands/text_to_video"
 import imageToVideo from "./commands/image_to_video"
 import { imageToPromptConversation } from "./commands/image_to_prompt"
 import { trainFluxModelConversation } from "./commands/train_flux_model"
 import { neuroPhotoConversation } from "./commands/neuro_photo"
+// import { sequentialize } from "@grammyjs/runner"
+import neuroQuest from "./commands/neuro_quest"
+import { buttonNeuroHandlers } from "./helpers/buttonNeuroHandlers"
 
-interface SessionData {
-  melimi00: {
-    videos: string[]
-    texts: string[]
-  }
-}
-
-type MyContextWithSession = MyContext & SessionFlavor<SessionData>
-
-const bot = new Bot<MyContextWithSession>(process.env.BOT_TOKEN || "")
+import bot from "./core/bot"
 
 bot.api.config.use(hydrateFiles(bot.token))
 
@@ -56,6 +50,15 @@ bot.use(session({ initial: () => ({}) }))
 
 console.log(process.env.NODE_ENV, "process.env.NODE_ENV")
 process.env.NODE_ENV === "development" ? development(bot) : production(bot)
+
+// Добавляем sequentialize middleware для правильной обработки сообщений от одного пользователя
+// bot.use(
+//   sequentialize((ctx) => {
+//     const chat = ctx.chat?.id.toString()
+//     const user = ctx.from?.id.toString()
+//     return [chat, user].filter((con): con is string => con !== undefined)
+//   }),
+// )
 
 if (process.env.NODE_ENV === "production") {
   bot.api.setMyCommands([
@@ -89,11 +92,11 @@ if (process.env.NODE_ENV === "production") {
     },
     {
       command: "voice",
-      description: "���� Add voice to avatar / Добавить аватару голос",
+      description: "🎤 Add voice to avatar / Добавить аватару голос",
     },
     {
       command: "text_to_speech",
-      description: "🎤 Convert text to speech / П��еобразовать текст в речь",
+      description: "🎤 Convert text to speech / Преобразовать текст в речь",
     },
     {
       command: "lipsync",
@@ -172,8 +175,12 @@ bot.use(createConversation(imageToVideo))
 bot.use(createConversation(imageToPromptConversation))
 bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))
+bot.use(createConversation(neuroQuest))
 
-bot.command("start", start)
+bot.command("start", async (ctx) => {
+  await start(ctx)
+})
+
 bot.use(customMiddleware)
 bot.use(commands)
 
@@ -323,7 +330,7 @@ bot.on("callback_query:data", async (ctx) => {
       if (data.endsWith("student")) {
         await ctx.replyWithInvoice(
           isRu ? "НейроУченик" : "NeuroStudent",
-          isRu ? "��ы получите подписку уровня 'НейроУченик'" : "You will receive a subscription to the 'NeuroStudent' level",
+          isRu ? "Вы получите подписку уровня 'НейроУченик'" : "You will receive a subscription to the 'NeuroStudent' level",
           "student",
           "XTR",
           [{ label: "Цена", amount: 5655 }],
@@ -754,7 +761,7 @@ bot.on("callback_query:data", async (ctx) => {
       const promptData = await getPrompt(promptId)
 
       if (!promptData) {
-        await ctx.reply(isRu ? "Не уда��ось найти информацию о промпте" : "Could not find prompt information")
+        await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
         return
       }
 
@@ -783,16 +790,16 @@ bot.on("callback_query:data", async (ctx) => {
 bot.catch((err) => {
   const ctx = err.ctx
   const isRu = ctx.from?.language_code === "ru"
-  console.error(`Ошибка пи оббоке ��бновлеия ${ctx.update.update_id}:`)
+  console.error(`Ошибка при обработке обновления ${ctx.update.update_id}:`)
   console.error("error", err.error)
   ctx
     .reply(
       isRu
-        ? "Извините, поизшла ошбка ��ри обработке ваш��го запроса. Пожалуйста, попробуйте позже."
+        ? "Извините, поизшла ошбка ри обработке вашго запроса. Пожалуйста, попробуйте позже."
         : "Sorry, an error occurred while processing your request. Please try again later.",
     )
     .catch((e) => {
-      console.error("Ошибка отправки сообщения об ошибке по��ьзователю:", e)
+      console.error("Ошибка отправки сообщения об ошибке поьзователю:", e)
     })
 })
 
