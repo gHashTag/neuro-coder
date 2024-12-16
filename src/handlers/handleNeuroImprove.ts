@@ -1,7 +1,7 @@
-import { getPrompt } from "src/core/supabase/ai"
-import { upgradePrompt } from "src/helpers"
-import { supabase } from "src/core/supabase"
-import { MyContext } from "src/utils/types"
+import { getPrompt } from "../core/supabase/ai"
+import { upgradePrompt } from "../helpers"
+import { supabase } from "../core/supabase"
+import { MyContext } from "../utils/types"
 import { InlineKeyboard } from "grammy"
 
 export async function handleNeuroImprove(ctx: MyContext, data: string, isRu: boolean) {

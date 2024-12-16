@@ -3,7 +3,7 @@ import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../constants/messages"
 
 // src/handlers/changeSize.ts
 import { MyContextWithSession } from "../utils/types"
-import { setAspectRatio } from "src/core/supabase/ai"
+import { setAspectRatio } from "../core/supabase/ai"
 
 interface AspectRatioHandlerParams {
   ctx: MyContextWithSession

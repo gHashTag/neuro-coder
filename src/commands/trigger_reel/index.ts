@@ -1,18 +1,13 @@
-import { Context, InputFile } from "grammy"
+import { getTriggerReel } from "../../helpers"
 
-import { promises as fs } from "fs"
-import path from "path"
-import { createSlideshow, generateImagesForMeditation, getMeditationSteps, translateText, getTriggerReel } from "../../helpers"
-import { Step } from "src/utils/types"
-import { InputMediaPhoto } from "grammy/types"
 import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "src/utils/types"
+import { MyContext } from "../../utils/types"
 
 const createTriggerReel = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   try {
     const isRu = ctx.from?.language_code === "ru"
     await ctx.replyWithChatAction("typing")
-    const greetingMessage = await ctx.reply(
+    await ctx.reply(
       isRu
         ? "📱 Привет! Введите URL сайта, который вы хотите превратить в тригер рил."
         : "📱 Hello! Write a URL of the site you want to turn into a trigger reel.",

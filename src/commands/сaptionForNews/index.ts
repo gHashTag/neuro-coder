@@ -1,18 +1,12 @@
-import { Context, InputFile } from "grammy"
-
-import { promises as fs } from "fs"
-import path from "path"
-import { createSlideshow, generateImagesForMeditation, translateText, getCaptionForNews } from "../../helpers"
-import { Step } from "src/utils/types"
-import { InputMediaPhoto } from "grammy/types"
 import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "src/utils/types"
+import { MyContext } from "../../utils/types"
+import { getCaptionForNews } from "../../helpers"
 
 const createCaptionForNews = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   try {
     const isRu = ctx.from?.language_code === "ru"
     await ctx.replyWithChatAction("typing")
-    const greetingMessage = await ctx.reply(
+    await ctx.reply(
       isRu
         ? "🎥 Привет! Введите текст, который вы хотите превратить в описание для роликов."
         : "🎥 Hello! Write a text you want to turn into a caption for videos.",

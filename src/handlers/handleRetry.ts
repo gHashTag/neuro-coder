@@ -1,8 +1,8 @@
 import { InputFile } from "grammy/types"
-import { supabase } from "src/core/supabase"
-import { pulse } from "src/helpers"
-import { generateImage } from "src/helpers/generateImage"
-import { MyContext } from "src/utils/types"
+import { supabase } from "../core/supabase"
+import { pulse } from "../helpers"
+import { generateImage } from "../helpers/generateImage"
+import { MyContext } from "../utils/types"
 
 export async function handleRetry(ctx: MyContext, isRu: boolean) {
   if (!ctx || !ctx.from) {

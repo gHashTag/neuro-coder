@@ -1,7 +1,7 @@
-import { upgradePrompt } from "src/helpers"
-import { getPrompt } from "src/core/supabase/ai"
-import { MyContext } from "src/utils/types"
-import { supabase } from "src/core/supabase"
+import { upgradePrompt } from "../helpers"
+import { getPrompt } from "../core/supabase/ai"
+import { MyContext } from "../utils/types"
+import { supabase } from "../core/supabase"
 
 export async function handleImprove(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {

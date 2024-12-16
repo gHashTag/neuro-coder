@@ -1,8 +1,8 @@
 import { InputFile } from "grammy/types"
-import { getPrompt } from "src/core/supabase/ai"
-import { buttonNeuroHandlers } from "src/helpers/buttonNeuroHandlers"
-import { generateNeuroImage } from "src/helpers/generateNeuroImage"
-import { MyContext } from "src/utils/types"
+import { getPrompt } from "../core/supabase/ai"
+import { buttonNeuroHandlers } from "../helpers/buttonNeuroHandlers"
+import { generateNeuroImage } from "../helpers/generateNeuroImage"
+import { MyContext } from "../utils/types"
 
 export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
