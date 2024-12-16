@@ -1,8 +1,8 @@
 require("../src/index")
 
 import express from "express"
-import { webhookCallback } from "grammy"
-
+import { webhookCallback, Context, session } from "grammy"
+import { run, sequentialize } from "@grammyjs/runner"
 import bot from "../src/core/bot"
 import { supabase } from "../src/core/supabase"
 
@@ -18,6 +18,16 @@ app.listen(port, () => {
 
 app.use(express.json())
 app.use(`/api/index`, webhookCallback(bot, "express"))
+
+// Build a unique identifier for the `Context` object.
+function getSessionKey(ctx: Context) {
+  return ctx.chat?.id.toString()
+}
+
+// Sequentialize before accessing session data!
+bot.use(sequentialize(getSessionKey))
+bot.use(session({ getSessionKey }))
+run(bot)
 
 app.post("/api/synclabs-webhook", async (req, res) => {
   try {
