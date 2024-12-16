@@ -228,11 +228,7 @@ bot.on("message:text", async (ctx) => {
     // Получаем модель пользователя
     const userModel = await getUserModel(ctx.from?.id.toString() || "")
 
-    const response = await answerAi(
-      userModel, // используем модель из базы данных
-      ctx.message.text,
-      ctx.from?.language_code || "en",
-    )
+    const response = await answerAi(userModel, ctx.message.text, ctx.from?.language_code || "en")
 
     // Проверяем, что ответ не null
     if (!response) {
@@ -353,10 +349,15 @@ bot.on("callback_query:data", async (ctx) => {
       return
     }
     if (data.startsWith("generate_improved_")) {
-      // Обработка улучшенного промпта
+      console.log("Starting generate_improved_ handler")
       const promptId = data.split("_")[2]
+      console.log("Prompt ID from callback:", promptId)
+
       const promptData = await getPrompt(promptId)
+      console.log("Prompt data:", promptData)
+
       if (!promptData) {
+        console.log("No prompt data found")
         await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
         await ctx.answerCallbackQuery()
         return
@@ -364,44 +365,33 @@ bot.on("callback_query:data", async (ctx) => {
 
       await ctx.reply(isRu ? "⏳ Начинаю улучшение промпта..." : "⏳ Starting prompt improvement...")
 
-      // Улучшаем промпт
-      const improvedPrompt = await upgradePrompt(promptData.prompt)
-      if (!improvedPrompt) {
-        await ctx.reply(isRu ? "Не удалось улучшить промпт" : "Failed to improve prompt")
-        return
+      try {
+        console.log("Generating neuro image...")
+        const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString())
+        console.log("Generation result with prompt_id:", result?.prompt_id)
+
+        if (!result) {
+          throw new Error("Failed to generate neuro image")
+        }
+
+        const photoToSend = Buffer.isBuffer(result.image) ? new InputFile(result.image) : result.image
+        console.log("Sending photo...")
+        await ctx.replyWithPhoto(photoToSend)
+        console.log("Photo sent")
+
+        console.log("Adding neuro buttons with prompt_id:", result.prompt_id)
+        await buttonNeuroHandlers(ctx, result.prompt_id?.toString() || "")
+        console.log("Neuro buttons added")
+      } catch (error) {
+        console.error("Error in generate_improved_ handler:", error)
+        await ctx.reply(
+          isRu
+            ? "Произошла ошибка при генерации улучшенного изображения. Пожалуйста, попробуйте позже."
+            : "An error occurred while generating improved image. Please try again later.",
+        )
       }
-
-      // Сохраняем улучшенный промпт в базу данных
-      const { data: savedPrompt, error } = await supabase
-        .from("prompts_history")
-        .insert({
-          prompt: improvedPrompt,
-          model_type: promptData.model_type,
-          telegram_id: ctx.from.id.toString(),
-          improved_from: promptId,
-        })
-        .select()
-        .single()
-
-      if (error || !savedPrompt) {
-        console.error("Ошибка при сохранении улучшенного промпта:", error)
-        await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
-        console.error("Ошибка при сохранении улучшенного промпта:", error)
-        await ctx.reply(isRu ? "Ошибк�� при сохранении улучшенного промпта" : "Error saving improved prompt")
-        return
-      }
-
-      // Показываем улучшенный промпт и спрашиваем подтверждение
-      await ctx.reply(isRu ? `Улучшенный промпт:\n${improvedPrompt}\n\nСгенерировать изображение?` : `Improved prompt:\n${improvedPrompt}\n\nGenerate image?`, {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: isRu ? "✅ Да" : "✅ Yes", callback_data: `generate_improved_${savedPrompt.prompt_id}` }],
-            [{ text: isRu ? "❌ Нет" : "❌ No", callback_data: "cancel" }],
-          ],
-        },
-      })
     } else if (data.startsWith("generate_")) {
-      // Сразу отвечаем на callback query �� начале
+      // Сразу отвечаем на callback query  начале
       await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
 
       const [_, count, promptId] = data.split("_")
@@ -552,15 +542,15 @@ bot.on("callback_query:data", async (ctx) => {
         .single()
 
       if (!lastPrompt) {
-        await ctx.reply("Не найден предыдущий промпт для повторно�� генерации")
+        await ctx.reply("Не найден предыдущий промпт для повторной генерации")
         return
       }
 
-      // Генерируем новое изображение с тем же промптом
+      // Генер��руем н��вое изображение с тем же промптом
       const result = await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id.toString())
       console.log("result4", result)
       if (!result) {
-        throw new Error("Не удалось с��енерировать изображение")
+        throw new Error("Не удалось сенерирвать изображение")
       }
 
       // Отправляем новое изображение
@@ -586,6 +576,199 @@ bot.on("callback_query:data", async (ctx) => {
         },
       })
     }
+
+    // Добав��яем обр��ботчики для нейро-кнопок
+    if (data.startsWith("neuro_generate_")) {
+      console.log("Received neuro_generate_ callback with data:", data)
+
+      const parts = data.split("_")
+      console.log("Split parts:", parts)
+
+      const count = parts[2]
+      const promptId = parts[3] // UUID будет последней частью
+      console.log("Extracted count and promptId:", { count, promptId })
+
+      let generatingMessage: { message_id: number } | null = null
+
+      try {
+        const promptData = await getPrompt(promptId)
+        console.log("Retrieved prompt data:", promptData)
+
+        if (!promptData) {
+          console.log("No prompt data found for ID:", promptId)
+          await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+          return
+        }
+
+        generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
+
+        try {
+          const numImages = parseInt(count)
+          console.log("Generating", numImages, "images")
+
+          for (let i = 0; i < numImages; i++) {
+            console.log(`Starting generation of image ${i + 1}/${numImages}`)
+            const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString())
+
+            if (!result) {
+              console.error("Generation returned null result")
+              throw new Error("Failed to generate neuro image")
+            }
+
+            console.log("Generation successful, sending photo...")
+            const photoToSend = Buffer.isBuffer(result.image) ? new InputFile(result.image) : result.image
+            await ctx.replyWithPhoto(photoToSend)
+
+            if (numImages > 1) {
+              await ctx.reply(isRu ? `⏳ Сгенерировано ${i + 1} из ${numImages}...` : `⏳ Generated ${i + 1} of ${numImages}...`)
+            }
+          }
+
+          console.log("All images generated, showing buttons with promptId:", promptId)
+          await buttonNeuroHandlers(ctx, promptId)
+        } catch (error) {
+          console.error("Error in generation loop:", error)
+          throw error
+        }
+      } catch (error) {
+        console.error("Error in neuro_generate_ handler:", error)
+        await ctx.reply(
+          isRu
+            ? "Произошла ошибка при генерации изображения. Пожалуйста, попробуйте озже."
+            : "An error occurred while generating the image. Please try again later.",
+        )
+      } finally {
+        if (generatingMessage) {
+          await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id).catch((e) => console.error("Error deleting message:", e))
+        }
+      }
+    } else if (data.startsWith("neuro_improve_")) {
+      console.log("Starting neuro_improve handler")
+      const promptId = data.replace("neuro_improve_", "")
+      console.log("Prompt ID:", promptId)
+
+      const promptData = await getPrompt(promptId)
+      console.log("Original prompt data:", promptData)
+
+      if (!promptData) {
+        await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+        return
+      }
+
+      await ctx.reply(isRu ? "⏳ Начинаю улучшение промпта..." : "⏳ Starting prompt improvement...")
+
+      try {
+        const improvedPrompt = await upgradePrompt(promptData.prompt)
+        console.log("Improved prompt:", improvedPrompt)
+
+        if (!improvedPrompt) {
+          await ctx.reply(isRu ? "Не удалось улучшить промпт" : "Failed to improve prompt")
+          return
+        }
+
+        // Сохраняем улучшенный промпт в базу данных
+        const { data: savedPrompt, error } = await supabase
+          .from("prompts_history")
+          .insert({
+            prompt: improvedPrompt,
+            model_type: promptData.model_type,
+            telegram_id: ctx.from.id.toString(),
+            improved_from: promptId,
+          })
+          .select()
+          .single()
+
+        if (error || !savedPrompt) {
+          throw new Error("Failed to save improved prompt")
+        }
+
+        // Показываем улучшенный промпт и спрашиваем подтверждение
+        await ctx.reply(
+          isRu ? `Улучшенный промпт:\n${improvedPrompt}\n\nСгенерировать изображение?` : `Improved prompt:\n${improvedPrompt}\n\nGenerate image?`,
+          {
+            reply_markup: new InlineKeyboard()
+              .text(isRu ? "✅ Да" : "✅ Yes", `neuro_generate_improved_${savedPrompt.prompt_id}`)
+              .row()
+              .text(isRu ? "❌ Нет" : "❌ No", "neuro_cancel"),
+          },
+        )
+      } catch (error) {
+        console.error("Error improving neuro prompt:", error)
+        await ctx.reply(
+          isRu
+            ? "Произошла ошибка при улучшении промпта. Пожалуйста, попробуйте позже."
+            : "An error occurred while improving the prompt. Please try again later.",
+        )
+      }
+    } else if (data.startsWith("neuro_generate_improved_")) {
+      console.log("Starting generation of improved prompt")
+      const promptId = data.replace("neuro_generate_improved_", "")
+      console.log("Generating with prompt ID:", promptId)
+
+      let generatingMessage: { message_id: number } | null = null
+
+      try {
+        const promptData = await getPrompt(promptId)
+        console.log("Retrieved prompt data:", promptData)
+
+        if (!promptData) {
+          await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+          return
+        }
+
+        generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
+
+        // Генерируем одно изображение с улучшенным промптом
+        const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString())
+        console.log("Generation result:", result)
+
+        if (!result) {
+          throw new Error("Failed to generate neuro image")
+        }
+
+        const photoToSend = Buffer.isBuffer(result.image) ? new InputFile(result.image) : result.image
+        console.log("Sending photo...")
+        await ctx.replyWithPhoto(photoToSend)
+        console.log("Photo sent")
+
+        // ��оказываем кнопки для дальнейших действий
+        console.log("Adding neuro buttons for prompt_id:", result.prompt_id)
+        await buttonNeuroHandlers(ctx, result.prompt_id?.toString() || "")
+      } catch (error) {
+        console.error("Error generating improved image:", error)
+        await ctx.reply(
+          isRu
+            ? "Произошла ошибка при генерации изображения. Пожалуйста, попробуйте позже."
+            : "An error occurred while generating the image. Please try again later.",
+        )
+      } finally {
+        if (generatingMessage) {
+          await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id).catch((e) => console.error("Error deleting message:", e))
+        }
+      }
+    } else if (data === "neuro_cancel") {
+      await ctx.reply(isRu ? "❌ Генерация отменена" : "❌ Generation cancelled")
+    } else if (data.startsWith("neuro_video_")) {
+      // Обработка создания видео из нейро-изображения
+      const promptId = data.replace("neuro_video_", "")
+      const promptData = await getPrompt(promptId)
+
+      if (!promptData) {
+        await ctx.reply(isRu ? "Не уда��ось найти информацию о промпте" : "Could not find prompt information")
+        return
+      }
+
+      try {
+        await ctx.conversation.enter("imageToVideo")
+      } catch (error) {
+        console.error("Error starting video generation:", error)
+        await ctx.reply(
+          isRu
+            ? "Произошла ошибка при запуске генерации видео. Пожалуйста, попробуйте позже."
+            : "An error occurred while starting video generation. Please try again later.",
+        )
+      }
+    }
   } catch (error) {
     console.error("Ошибка при обработке callback query:", error)
     try {
@@ -600,20 +783,20 @@ bot.on("callback_query:data", async (ctx) => {
 bot.catch((err) => {
   const ctx = err.ctx
   const isRu = ctx.from?.language_code === "ru"
-  console.error(`Ошибка пи обаботке обновлеия ${ctx.update.update_id}:`)
+  console.error(`Ошибка пи оббоке ��бновлеия ${ctx.update.update_id}:`)
   console.error("error", err.error)
   ctx
     .reply(
       isRu
-        ? "Извините, поиз��шла ошбка при обработке вашего запроса. Пожалуйста, попробуйте позже."
+        ? "Извините, поизшла ошбка ��ри обработке ваш��го запроса. Пожалуйста, попробуйте позже."
         : "Sorry, an error occurred while processing your request. Please try again later.",
     )
     .catch((e) => {
-      console.error("Ошибка отправки сообщения об ошибке пользователю:", e)
+      console.error("Ошибка отправки сообщения об ошибке по��ьзователю:", e)
     })
 })
 
-// Регистрир��ем команду
+// Регистрирем команду
 bot.command("text_to_image", async (ctx) => {
   await ctx.conversation.enter("textToImageConversation")
 })
