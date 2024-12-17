@@ -25,7 +25,7 @@ async function getJoyCaption(imageUrl: string): Promise<string> {
           "long", // Длина: длинное описание
           ["Describe the image in detail, including colors, style, mood, and composition."], // Инструкции
           "", // Не используем name_input
-          "", // Не используе�� custom_prompt
+          "", // Не используем custom_prompt
         ],
       },
       {
@@ -120,12 +120,20 @@ export const imageToPromptConversation = async (conversation: MyConversation, ct
       const escapedPrompt = escapeMarkdown(prompt)
       await ctx.reply(`\`\`\`\n${escapedPrompt}\n\`\`\``, { parse_mode: "MarkdownV2" })
     } catch (error) {
-      console.error("Error processing image:", error)
-      await ctx.reply(
-        isRu
-          ? "❌ Произошла ошибка при обработке изображения. Пожалуйста, попробуйте позже."
-          : "❌ An error occurred while processing the image. Please try again later.",
-      )
+      if (error.message?.includes("timeout")) {
+        await ctx.reply(
+          isRu
+            ? "⌛ Извините, обработка заняла слишком много времени. Пожалуйста, попробуйте еще раз."
+            : "⌛ Sorry, processing took too long. Please try again.",
+        )
+      } else {
+        console.error("Error processing image:", error)
+        await ctx.reply(
+          isRu
+            ? "❌ Произошла ошибка при обработке изображения. Пожалуйста, попробуйте позже."
+            : "❌ An error occurred while processing the image. Please try again later.",
+        )
+      }
     }
   } catch (error) {
     console.error("Error in image_to_prompt conversation:", error)
