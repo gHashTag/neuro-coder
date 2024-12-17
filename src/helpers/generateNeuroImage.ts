@@ -1,4 +1,3 @@
-import { models } from "src/commands/constants"
 import { replicate } from "../core/replicate"
 import { getAspectRatio, savePrompt } from "../core/supabase/ai"
 import { processApiResponse, fetchImage, ApiResponse } from "./generateImage"
@@ -24,7 +23,7 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
       negative_prompt:
         "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
       num_inference_steps: 28,
-      guidance_scale: 3.5,
+      guidance_scale: 7,
       ...(aspect_ratio === "1:1"
         ? { width: 1024, height: 1024 }
         : aspect_ratio === "16:9"
@@ -33,7 +32,6 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
         ? { width: 768, height: 1365 }
         : { width: 1024, height: 1024 }),
       sampler: "flowmatch",
-      seed: 42,
       num_outputs: 1,
       aspect_ratio,
     }
@@ -58,6 +56,7 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
         console.log("Fetched image buffer, size:", imageBuffer.length)
 
         const prompt_id = await savePrompt(prompt, model_type, telegram_id)
+
         console.log("Saved prompt with id:", prompt_id)
 
         if (prompt_id === null) {

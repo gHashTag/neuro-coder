@@ -120,7 +120,7 @@ export const imageToPromptConversation = async (conversation: MyConversation, ct
       const escapedPrompt = escapeMarkdown(prompt)
       await ctx.reply(`\`\`\`\n${escapedPrompt}\n\`\`\``, { parse_mode: "MarkdownV2" })
     } catch (error) {
-      if (error.message?.includes("timeout")) {
+      if (error instanceof Error && error.message?.includes("timeout")) {
         await ctx.reply(
           isRu
             ? "⌛ Извините, обработка заняла слишком много времени. Пожалуйста, попробуйте еще раз."

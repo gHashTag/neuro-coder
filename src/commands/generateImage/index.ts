@@ -4,6 +4,7 @@ import { InlineKeyboard } from "grammy"
 import { getGeneratedImages } from "../../core/supabase/ai"
 import { InputFile } from "grammy"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
+
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
 
 export const generateMoreImagesButtons = async (ctx: MyContext, prompt_id: string | number | null) => {
@@ -49,7 +50,7 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
   try {
     const keyboard = new InlineKeyboard().text(isRu ? "❌ Отменить генерацию" : "❌ Cancel generation", "cancel")
     const model_type = ctx.message?.text?.slice(1)
-    console.log(model_type)
+
     const greetingMessage = await ctx.reply(
       isRu
         ? "👋 Привет! Напишите промпт на английском для генерации изображения. Если вы хотите использовать какой-то референс, то прикрепите изображение к сообщению."

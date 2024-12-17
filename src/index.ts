@@ -299,15 +299,19 @@ bot.on("callback_query:data", async (ctx) => {
     }
 
     if (data.startsWith("generate_improved_")) {
+      console.log("generate_improved_", data)
       await handleGenerateImproved(ctx, data, isRu)
       return
     } else if (data.startsWith("generate_")) {
+      console.log("generate_", data)
       await handleGenerate(ctx, data, isRu)
       return
     } else if (data.startsWith("improve_")) {
+      console.log("improve_", data)
       await handleImprove(ctx, data, isRu)
       return
     } else if (data.startsWith("generate_image_")) {
+      console.log("generate_image_", data)
       await handleGenerateImage(ctx, data, isRu)
       return
     }

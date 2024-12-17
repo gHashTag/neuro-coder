@@ -23,7 +23,7 @@ async function getLatestUserModel(userId: string): Promise<UserModel | null> {
     .order("created_at", { ascending: false })
     .limit(1)
     .single()
-  console.log(data, "data")
+  console.log(data, "getLatestUserModel: data")
   if (error) {
     console.error("Error getting user model:", error)
     return null
@@ -62,7 +62,7 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
     }
 
     // Запрашиваем промпт
-    await ctx.reply(isRu ? `Опишите, какую фотографию вы хотите сгенерировать` : `Describe what kind of photo you want to generate.`)
+    await ctx.reply(isRu ? `📸 Опишите, какую фотографию вы хотите сгенерировать` : `📸Describe what kind of photo you want to generate.`)
 
     const promptMsg = await conversation.wait()
     const promptText = promptMsg.message?.text
@@ -74,12 +74,6 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
 
     // Добавляем trigger word к промпту
     const fullPrompt = `Fashionable ${userModel.trigger_word}, ${promptText}`
-
-    const savedPrompt = await savePrompt(fullPrompt, userModel.model_name, userId)
-    if (!savedPrompt) {
-      await ctx.reply(isRu ? "❌ Ошибка при сохранении промпта" : "Error saving prompt")
-      return
-    }
 
     // Отправляем сообщение о начале генерации
     const loadingMsg = await ctx.reply(isRu ? "⏳ Генерирую изображение..." : "⏳ Generating image...")
@@ -103,7 +97,7 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
       await pulse(ctx, pulseImage, fullPrompt, `/${userModel.model_name}`)
 
       // Показываем кнопки для дальнейших действий
-      await buttonNeuroHandlers(ctx, savedPrompt.toString())
+      await buttonNeuroHandlers(ctx, result.prompt_id.toString())
     } finally {
       // Удаляем сообщение о загрузке
       await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMsg.message_id).catch(console.error)
