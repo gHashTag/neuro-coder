@@ -25,7 +25,7 @@ async function getJoyCaption(imageUrl: string): Promise<string> {
           "long", // Длина: длинное описание
           ["Describe the image in detail, including colors, style, mood, and composition."], // Инструкции
           "", // Не используем name_input
-          "", // Не используем custom_prompt
+          "", // Не используе�� custom_prompt
         ],
       },
       {
@@ -78,7 +78,7 @@ async function getJoyCaption(imageUrl: string): Promise<string> {
   }
 }
 
-export async function imageToPromptConversation(conversation: MyConversation, ctx: MyContext) {
+export const imageToPromptConversation = async (conversation: MyConversation, ctx: MyContext) => {
   const isRu = ctx.from?.language_code === "ru"
 
   console.log("Starting image_to_prompt conversation")

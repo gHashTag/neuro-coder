@@ -23,7 +23,7 @@ async function getLatestUserModel(userId: string): Promise<UserModel | null> {
     .order("created_at", { ascending: false })
     .limit(1)
     .single()
-
+  console.log(data, "data")
   if (error) {
     console.error("Error getting user model:", error)
     return null

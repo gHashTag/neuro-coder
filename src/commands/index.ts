@@ -176,6 +176,10 @@ composer.command("neuro_photo", async (ctx) => {
   await ctx.conversation.enter("neuroPhotoConversation")
 })
 
+composer.command("image_to_prompt", async (ctx) => {
+  await ctx.conversation.enter("imageToPromptConversation")
+})
+
 composer.use(selectModelComposer)
 
 export default composer
