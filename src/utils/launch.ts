@@ -8,7 +8,7 @@ const production = async (bot: Bot<MyContextWithSession>): Promise<void> => {
 
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    const webhookUrl = `${process.env.VERCEL_URL}/api/webhook`
+    const webhookUrl = `${process.env.VERCEL_URL}/api/index`
     const success = await bot.api.setWebhook(webhookUrl, {
       drop_pending_updates: true,
       allowed_updates: ["message", "callback_query"],
