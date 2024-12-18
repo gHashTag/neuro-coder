@@ -25,7 +25,7 @@ export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
   // Приветствие
   await ctx.replyWithPhoto("https://dmrooqbmxdhdyblqzswu.supabase.co/storage/v1/object/public/neuro_coder/bot/ava-16-9.jpg", {
     caption: isRu
-      ? `🎮 Привет! Я НейроКодер - ваш персональный ассистент по созданию контента для соцсетей.
+      ? `🎮 Привет! Я НейроБлогер - ваш персональный ассистент по созданию контента для соцсетей.
 
 🤖 Я помогу вам создавать:
 • Вирусные посты
@@ -60,7 +60,7 @@ export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
 💡 Каждый уровень даст вам навыки для создания профессионального контента.
 
 Готовы стать профи в создании контента?`
-      : `👋 Hi! I'm NeuroCoder - your personal assistant for social media content creation.
+      : `👋 Hi! I'm NeuroBlogger - your personal assistant for social media content creation.
 
 🤖 I'll help you create:
 • Viral posts
