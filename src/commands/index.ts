@@ -180,6 +180,10 @@ composer.command("image_to_prompt", async (ctx) => {
   await ctx.conversation.enter("imageToPromptConversation")
 })
 
+composer.command("help", async (ctx) => {
+  await ctx.conversation.enter("helpConversation")
+})
+
 composer.use(selectModelComposer)
 
 export default composer

@@ -143,12 +143,12 @@ if (process.env.NODE_ENV === "production") {
       description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
     },
     {
-      command: "train_flux_model",
-      description: "🎨 Train FLUX model / Обучить модель FLUX",
-    },
-    {
       command: "invite",
       description: "👥 Invite a friend / Пригласить друга",
+    },
+    {
+      command: "train_flux_model",
+      description: "🎨 Train FLUX model / Обучить модель FLUX",
     },
     {
       command: "train_flux_model",
@@ -341,7 +341,7 @@ bot.catch((err) => {
   ctx
     .reply(
       isRu
-        ? "Извините, позшла ошбка ри обработке вашго запроса. Пожалуйста, попробуйте позже."
+        ? "Извините, позшла ошnибка ри обработке вашго запроса. Пожалуйста, попробуйте позже."
         : "Sorry, an error occurred while processing your request. Please try again later.",
     )
     .catch((e) => {
