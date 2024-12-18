@@ -69,7 +69,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // Убираем runner в production
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "production") {
   // Добавляем sequentialize middleware только в development
   bot.use(
     sequentialize((ctx) => {
