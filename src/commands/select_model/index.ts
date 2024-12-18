@@ -27,7 +27,7 @@ async function getAvailableModels(): Promise<string[]> {
 }
 
 composer.command("select_model", async (ctx) => {
-  const lang = ctx.from?.language_code === "ru"
+  const isRu = ctx.from?.language_code === "ru"
 
   try {
     const models = await getAvailableModels()
@@ -44,10 +44,15 @@ composer.command("select_model", async (ctx) => {
       keyboard.row()
     }
 
-    await ctx.reply(lang ? "🧠 Выберите модель ИИ\n\nДоступные модели:" : "🧠 Select AI Model\n\nAvailable models:", { reply_markup: keyboard })
+    await ctx.reply(
+      isRu
+        ? "🧠 Выберите модель ИИ\n\nМодель ИИ — это как мозг компьютера, который помогает ему понимать и выполнять задачи. Выберите одну из доступных моделей, чтобы бот мог лучше выполнять ваши запросы. Доступные модели:"
+        : "🧠 Select AI Model\n\nAn AI model is like a computer's brain that helps it understand and perform tasks. Choose one of the available models so the bot can better handle your requests. Available models:",
+      { reply_markup: keyboard },
+    )
   } catch (error) {
     console.error("Error creating model selection menu:", error)
-    await ctx.reply(lang ? "❌ Ошибка при получении списка моделей" : "❌ Error fetching models list")
+    await ctx.reply(isRu ? "❌ Ошибка при получении списка моделей" : "❌ Error fetching models list")
   }
 })
 

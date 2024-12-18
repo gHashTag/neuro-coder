@@ -1,6 +1,22 @@
 import { InlineKeyboard } from "grammy"
 import { MyContext, MyConversation } from "../../utils/types"
-import { handleLevel1, handleLevel2, handleLevel3, handleLevel4, handleQuestComplete, handleQuestRules } from "./handlers"
+import {
+  handleLevel1,
+  handleLevel10,
+  handleLevel11,
+  handleLevel12,
+  handleLevel13,
+  handleLevel2,
+  handleLevel3,
+  handleLevel4,
+  handleLevel5,
+  handleLevel6,
+  handleLevel7,
+  handleLevel8,
+  handleLevel9,
+  handleQuestComplete,
+  handleQuestRules,
+} from "./handlers"
 
 export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
@@ -104,6 +120,33 @@ Ready to become a content creation pro?`,
         break
       case "level_4":
         await handleLevel4(ctx)
+        break
+      case "level_5":
+        await handleLevel5(ctx)
+        break
+      case "level_6":
+        await handleLevel6(ctx)
+        break
+      case "level_7":
+        await handleLevel7(ctx)
+        break
+      case "level_8":
+        await handleLevel8(ctx)
+        break
+      case "level_9":
+        await handleLevel9(ctx)
+        break
+      case "level_10":
+        await handleLevel10(ctx)
+        break
+      case "level_11":
+        await handleLevel11(ctx)
+        break
+      case "level_12":
+        await handleLevel12(ctx)
+        break
+      case "level_13":
+        await handleLevel13(ctx)
         break
       case "quest_complete":
         await handleQuestComplete(ctx)
