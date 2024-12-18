@@ -17,4 +17,5 @@ export const buttonHandlers = async (ctx: MyContext, promptId: string) => {
       ],
     },
   })
+  return
 }

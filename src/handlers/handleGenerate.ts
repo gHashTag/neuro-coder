@@ -48,7 +48,7 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
     console.error("Ошибка при генерации:", error)
     await ctx.reply(isRu ? "Произошла ошибка при генерации. Пожалуйста, попробуйте позже." : "An error occurred during generation. Please try again later.")
   } finally {
-    buttonHandlers(ctx, promptId)
+    await buttonHandlers(ctx, promptId)
     await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id).catch((e) => console.error("Ошибка при удалении сообщения о генерации:", e))
   }
 }

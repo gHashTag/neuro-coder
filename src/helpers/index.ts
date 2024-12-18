@@ -620,7 +620,7 @@ export async function generateImagesForMeditation(steps: Step[], language: "en" 
 async function downloadImage(url: string, outputPath: string): Promise<string> {
   try {
     const response = await axios.get(url, { responseType: "arraybuffer" })
-    fs.writeFile(outputPath, response.data)
+    await fs.writeFile(outputPath, response.data)
     console.log("Image downloaded successfully:", outputPath)
     return outputPath // Возвращаем путь к загруженному изображению
   } catch (error) {

@@ -6,60 +6,132 @@ interface BuyParams {
   isRu: boolean
 }
 
+// Start of Selection
 export async function handleBuy({ ctx, data, isRu }: BuyParams) {
-  if (data.endsWith("avatar")) {
+  const starCost = 0.016
+
+  if (data.endsWith("up_100")) {
+    const dollarAmount = (100 * starCost).toFixed(2)
     await ctx.replyWithInvoice(
-      isRu ? "Цифровой аватар" : "Digital avatar",
+      isRu ? "100 ⭐️" : "100 ⭐️",
       isRu
-        ? "Представьте, у вас есть возможность создать уникальную цифровую копию себя! Я могу обучить ИИ на ваших фотографиях, чтобы вы в любой момент могли получать изображения с вашим лицом и телом в любом образе и окружении — от фантастических миров до модных фотосессий. Это отличная возможность для личного бренда или просто для развлечения!"
-        : "Imagine you have the opportunity to create a unique digital copy of yourself! I can train the AI on your photos so that you can receive images with your face and body in any style and setting — from fantastic worlds to fashion photo sessions. This is a great opportunity for a personal brand or just for fun!",
-      "avatar",
+        ? `💬 Получите 100 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\nn\Используйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
+        : `💬 Receive 100 stars 🌟 This is equivalent to $${dollarAmount} 💵\n💫 Use the stars for various features of our bot and enjoy new possibilities!`,
+      "100",
       "XTR",
-      [{ label: "Цена", amount: 5645 }],
+      [{ label: "Цена", amount: 100 }],
     )
     return
   }
 
-  if (data.endsWith("start")) {
+  if (data.endsWith("up_500")) {
+    const dollarAmount = (500 * starCost).toFixed(2)
     await ctx.replyWithInvoice(
-      isRu ? "НейроСтарт" : "NeuroStart",
-      isRu ? "Вы получите подписку уровня 'НейроСтарт'" : "You will receive a subscription to the 'NeuroStart' level",
-      "start",
+      isRu ? "500 ⭐️" : "500 ⭐️",
+      isRu
+        ? `💬 Получите 500 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\n💫 Используйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
+        : `💬 Receive 500 stars 🌟 This is equivalent to $${dollarAmount} 💵\n💫 Use the stars for various features of our bot and enjoy new possibilities!`,
+      "500",
       "XTR",
-      [{ label: "Цена", amount: 55 }],
+      [{ label: "Цена", amount: 500 }],
     )
     return
   }
 
-  if (data.endsWith("base")) {
+  if (data.endsWith("up_1000")) {
+    const dollarAmount = (1000 * starCost).toFixed(2)
     await ctx.replyWithInvoice(
-      isRu ? "НейроБаза" : "NeuroBase",
-      isRu ? "Вы получите подписку уровня 'НейроБаза'" : "You will receive a subscription to the 'NeuroBase' level",
-      "base",
+      isRu ? "1000 ⭐️" : "1000 ⭐️",
+      isRu
+        ? `💬 Получите 1000 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\n💫 Используйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
+        : `💬 Receive 1000 stars 🌟 This is equivalent to $${dollarAmount} 💵\n💫 Use the stars for various features of our bot and enjoy new possibilities!`,
+      "1000",
       "XTR",
-      [{ label: "Цена", amount: 565 }],
+      [{ label: "Цена", amount: 1000 }],
     )
     return
   }
 
-  if (data.endsWith("student")) {
+  if (data.endsWith("up_2000")) {
+    const dollarAmount = (2000 * starCost).toFixed(2)
     await ctx.replyWithInvoice(
-      isRu ? "НейроУченик" : "NeuroStudent",
-      isRu ? "Вы получите подписку уровня 'НейроУченик'" : "You will receive a subscription to the 'NeuroStudent' level",
-      "student",
+      isRu ? "2000 ⭐️" : "2000 ⭐️",
+      isRu
+        ? `💬 Получите 2000 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\n💫 Используйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
+        : `💬 Receive 2000 stars 🌟 This is equivalent to $${dollarAmount} 💵\n💫 Use the stars for various features of our bot and enjoy new possibilities!`,
+      "2000",
       "XTR",
-      [{ label: "Цена", amount: 5655 }],
+      [{ label: "Цена", amount: 2000 }],
     )
     return
   }
 
-  if (data.endsWith("expert")) {
+  if (data.endsWith("up_5000")) {
+    const dollarAmount = (5000 * starCost).toFixed(2)
     await ctx.replyWithInvoice(
-      isRu ? "НейроЭксперт" : "NeuroExpert",
-      isRu ? "Вы получите подписку уровня 'НейроЭксперт'" : "You will receive a subscription to the 'NeuroExpert' level",
-      "expert",
+      isRu ? "5000 ⭐️" : "5000 ⭐️",
+      isRu
+        ? `💬 Получите 5000 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\n💫 Используйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
+        : `💬 Receive 5000 stars 🌟 This is equivalent to $${dollarAmount} 💵\n💫 Use the stars for various features of our bot and enjoy new possibilities!`,
+      "5000",
       "XTR",
-      [{ label: "Цена", amount: 16955 }],
+      [{ label: "Цена", amount: 5000 }],
+    )
+    return
+  }
+
+  if (data.endsWith("up_10000")) {
+    const dollarAmount = (10000 * starCost).toFixed(2)
+    await ctx.replyWithInvoice(
+      isRu ? "10000 ⭐️" : "10000 ⭐️",
+      isRu
+        ? `💬 Получите 10000 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\n💫 Используйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
+        : `💬 Receive 10000 stars 🌟 This is equivalent to $${dollarAmount} 💵\n💫 Use the stars for various features of our bot and enjoy new possibilities!`,
+      "10000",
+      "XTR",
+      [{ label: "Цена", amount: 10000 }],
+    )
+    return
+  }
+
+  if (data.endsWith("up_20000")) {
+    const dollarAmount = (20000 * starCost).toFixed(2)
+    await ctx.replyWithInvoice(
+      isRu ? "20000 ⭐️" : "20000 ⭐️",
+      isRu
+        ? `💬 Получите 20000 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\n💫 Используйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
+        : `💬 Receive 20000 stars 🌟 This is equivalent to $${dollarAmount} 💵\n💫 Use the stars for various features of our bot and enjoy new possibilities!`,
+      "20000",
+      "XTR",
+      [{ label: "Цена", amount: 20000 }],
+    )
+    return
+  }
+
+  if (data.endsWith("up_50000")) {
+    const dollarAmount = (50000 * starCost).toFixed(2)
+    await ctx.replyWithInvoice(
+      isRu ? "50000 ⭐️" : "50000 ⭐️",
+      isRu
+        ? `💬 Получите 50000 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\n💫 Используйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
+        : `💬 Receive 50000 stars 🌟 This is equivalent to $${dollarAmount} 💵\n💫 Use the stars for various features of our bot and enjoy new possibilities!`,
+      "50000",
+      "XTR",
+      [{ label: "Цена", amount: 50000 }],
+    )
+    return
+  }
+
+  if (data.endsWith("up_100000")) {
+    const dollarAmount = (100000 * starCost).toFixed(2)
+    await ctx.replyWithInvoice(
+      isRu ? "100000 ⭐️" : "100000 ⭐️",
+      isRu
+        ? `💬 Получите 100000 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\n💫 Используйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
+        : `💬 Receive 100000 stars 🌟 This is equivalent to $${dollarAmount} 💵\n💫 Use the stars for various features of our bot and enjoy new possibilities!`,
+      "100000",
+      "XTR",
+      [{ label: "Цена", amount: 100000 }],
     )
     return
   }
