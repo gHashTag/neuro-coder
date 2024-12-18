@@ -87,7 +87,7 @@ if (process.env.NODE_ENV === "production") {
     },
     {
       command: "help",
-      description: "❓ Help / ��омощь",
+      description: "❓ Help / Помощь",
     },
     {
       command: "buy",

@@ -5,8 +5,8 @@ import { InlineKeyboard, InputFile } from "grammy"
 import { getGeneratedImages } from "../../core/supabase/ai"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
 import { generateImage } from "../../helpers/generateReplicateImage"
-import { models } from "src/core/replicate"
-import { supabase } from "src/core/supabase"
+import { models } from "../../core/replicate"
+import { supabase } from "../../core/supabase"
 
 async function getUserBalance(userId: number): Promise<number> {
   const { data, error } = await supabase.from("users").select("balance").eq("telegram_id", userId).single()
@@ -20,7 +20,7 @@ async function getUserBalance(userId: number): Promise<number> {
     throw new Error("Не удалось получить баланс пользователя")
   }
 
-  return data.balance
+  return data?.balance || 0
 }
 
 // Функция для обновления баланса пользователя
@@ -35,12 +35,11 @@ async function updateUserBalance(userId: string, newBalance: number): Promise<vo
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
+  if (!ctx || !ctx.from || !ctx.from.id || !ctx.chat?.id) {
+    await ctx.reply(isRu ? "❌ Произошла ошибка" : "❌ An error occurred")
+    return
+  }
   try {
-    if (!ctx.from?.id) {
-      await ctx.reply(isRu ? "❌ Произошла ошибка" : "❌ An error occurred")
-      return
-    }
-
     // Показываем меню выбора модели
     await ctx.reply(isRu ? "🎨 Выберите модель для генерации:" : "🎨 Choose generation model:", {
       reply_markup: {
