@@ -35,7 +35,7 @@ import imageToVideo from "./commands/image_to_video"
 import { imageToPromptConversation } from "./commands/image_to_prompt"
 import { trainFluxModelConversation } from "./commands/train_flux_model"
 import { neuroPhotoConversation } from "./commands/neuro_photo"
-import { sequentialize } from "@grammyjs/runner"
+import { run, sequentialize } from "@grammyjs/runner"
 import neuroQuest from "./commands/neuro_quest"
 
 import { handleAspectRatioChange, handleBuy, handleChangeSize } from "./handlers"
@@ -60,7 +60,6 @@ bot.use(session({ initial: () => ({}) }))
 
 console.log(`Starting bot in ${process.env.NODE_ENV} mode`)
 
-// В production режиме НЕ запускаем bot.start() и runner
 if (process.env.NODE_ENV === "development") {
   development(bot).catch(console.error)
 } else {
@@ -68,7 +67,6 @@ if (process.env.NODE_ENV === "development") {
   production(bot).catch(console.error)
 }
 
-// Убираем runner в production
 if (process.env.NODE_ENV === "production") {
   // Добавляем sequentialize middleware только в development
   bot.use(
@@ -78,9 +76,8 @@ if (process.env.NODE_ENV === "production") {
       return [chat, user].filter((con): con is string => con !== undefined)
     }),
   )
-}
+  run(bot)
 
-if (process.env.NODE_ENV === "production") {
   bot.api.setMyCommands([
     {
       command: "start",
