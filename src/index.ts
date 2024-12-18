@@ -13,7 +13,7 @@ import createCaptionForNews from "./commands/сaptionForNews"
 import { get100Conversation } from "./commands/get100"
 import { soulConversation } from "./commands/soul"
 import { voiceConversation } from "./commands/voice"
-import { incrementLimit, setModel } from "./core/supabase/ai"
+import { setModel } from "./core/supabase/ai"
 
 import { invite } from "./commands/invite"
 
@@ -25,7 +25,7 @@ import { start } from "./commands/start"
 import leeSolarNumerolog from "./commands/lee_solar_numerolog"
 import leeSolarBroker from "./commands/lee_solar_broker"
 import { subtitles } from "./commands/subtitles"
-import { sendPaymentInfo } from "./core/supabase/payments"
+
 import { getUid, getUserModel } from "./core/supabase"
 import createAinews from "./commands/ainews"
 import { textToImageConversation } from "./commands/text_to_image"
@@ -52,6 +52,7 @@ import { handleNeuroGenerate } from "./handlers/handleNeuroGenerate"
 import { handleNeuroImprove } from "./handlers/handleNeuroImprove"
 import { handleNeuroGenerateImproved } from "./handlers/handleNeuroGenerateImproved"
 import { handleNeuroVideo } from "./handlers/handleNeuroVideo"
+import { incrementBalance } from "./helpers/incrementBalance"
 
 bot.api.config.use(hydrateFiles(bot.token))
 
@@ -126,20 +127,12 @@ if (process.env.NODE_ENV === "production") {
       description: "🎥 Create subtitles / Создать субтитры",
     },
     {
-      command: "ainews",
-      description: "📰 Create AI news caption / Создать описание AI новости",
-    },
-    {
       command: "text_to_image",
       description: "🎨 Generate image from text / Сгенерировать изображение из текста",
     },
     {
       command: "text_to_video",
       description: "🎥 Generate video from text / Сгенерировать видео из текста",
-    },
-    {
-      command: "caption_for_ai_news",
-      description: "📝 Create AI news caption / Создать описание для AI новостей",
     },
     {
       command: "image_to_video",
@@ -205,38 +198,30 @@ bot.on("pre_checkout_query", (ctx) => {
 })
 
 bot.on("message:successful_payment", async (ctx) => {
-  // const lang = ctx.from?.language_code === "ru"
+  const isRu = isRussian(ctx)
   console.log("ctx 646(succesful_payment)", ctx)
-  const level = ctx.message.successful_payment.invoice_payload
-  if (level === "avatar") {
-    await incrementLimit({ telegram_id: ctx.from?.id.toString() || "", amount: 400 })
-  }
+
+  // Укажите стоимость одной звезды
+  const starCost = 0.016
+
+  // Получите сумму платежа в долларах
+  const paymentAmount = ctx.message.successful_payment.total_amount / 100 // Предполагается, что сумма в центах
+
+  // Рассчитайте количество звезд, которые пользователь получит
+  const stars = Math.floor(paymentAmount / starCost)
+
   if (!ctx.from?.id) throw new Error("No telegram id")
   const user_id = await getUid(ctx.from.id.toString())
   if (!user_id) throw new Error("No user_id")
-  await sendPaymentInfo(user_id, level)
-  // const levelForMessage =
-  //   level === "start"
-  //     ? lang
-  //       ? "НейроСтарт"
-  //       : "NeuroStart"
-  //     : level === "base"
-  //     ? lang
-  //       ? "НейроБаза"
-  //       : "NeuroBase"
-  //     : level === "student"
-  //     ? lang
-  //       ? "НейроУченик"
-  //       : "NeuroStudent"
-  //     : lang
-  //     ? "НейроЭксперт"
-  //     : "NeuroExpert"
-  // await ctx.reply(lang ? "🤝 Спасибо за окупку!" : "🤝 Thank you for the purchase!")
-  // const textToPost = lang
-  //   ? `🪙 @${ctx.from.username} спасибо за покупку уровня ${levelForMessage}!`
-  //   : `🪙 @${ctx.from.username} thank you for the purchase level ${levelForMessage}!`
-  // await ctx.api.sendMessage(mediaChatId(lang), textToPost)
-  return
+
+  // Увеличиваем баланс пользователя на количество звезд
+  await incrementBalance({ telegram_id: ctx.from.id.toString(), amount: stars })
+
+  await ctx.reply(
+    isRu
+      ? `💫 Ваш баланс пополнен на ${stars} звезд! (Стоимость звезды: $${starCost})`
+      : `💫 Your balance has been replenished by ${stars} stars! (Cost per star: $${starCost})`,
+  )
 })
 
 bot.on("message:text", async (ctx) => {

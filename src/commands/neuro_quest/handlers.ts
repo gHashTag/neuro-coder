@@ -124,6 +124,7 @@ Now you know all the main features of the bot. Keep experimenting and creating a
 
 Use /buy to get extended access to bot features.`,
   )
+  return
 }
 
 export async function handleQuestRules(ctx: MyContext) {
