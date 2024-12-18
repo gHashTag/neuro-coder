@@ -377,20 +377,4 @@ bot.command("train_flux_model", async (ctx) => {
   await ctx.conversation.enter("trainFluxModelConversation")
 })
 
-// Обработчик кнопки изменения азамера
-bot.callbackQuery("change_size", async (ctx) => {
-  const isRu = ctx.from?.language_code === "ru"
-  await ctx.reply(isRu ? "Выберите размер изображения:" : "Choose image size:", {
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: "1:1", callback_data: "size_1:1" },
-          { text: "16:9", callback_data: "size_16:9" },
-          { text: "9:16", callback_data: "size_9:16" },
-        ],
-      ],
-    },
-  })
-})
-
 export { bot }

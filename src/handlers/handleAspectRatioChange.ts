@@ -13,7 +13,7 @@ export async function handleAspectRatioChange({ ctx }: AspectRatioHandlerParams)
       throw new Error("No callback query data")
     }
 
-    const size = ctx.callbackQuery.data.replace("size_", "")
+    const aspect_ratio = ctx.callbackQuery.data.replace("size_", "")
     const userId = ctx.from?.id.toString()
     const isRu = isRussian(ctx)
 
@@ -22,8 +22,8 @@ export async function handleAspectRatioChange({ ctx }: AspectRatioHandlerParams)
       return
     }
 
-    await setAspectRatio(userId, size)
-    await ctx.reply(isRu ? SUCCESS_MESSAGES.SIZE_CHANGED_RU(size) : SUCCESS_MESSAGES.SIZE_CHANGED_EN(size))
+    await setAspectRatio(userId, aspect_ratio)
+    await ctx.reply(isRu ? SUCCESS_MESSAGES.SIZE_CHANGED_RU(aspect_ratio) : SUCCESS_MESSAGES.SIZE_CHANGED_EN(aspect_ratio))
   } catch (error) {
     console.error("Error in aspect ratio handler:", error)
     throw error

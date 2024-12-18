@@ -103,7 +103,7 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
     }
 
     // Отправляем текущий баланс
-    await ctx.reply(isRu ? `Ваш текущий баланс: $${currentBalance}` : `Your current balance: $${currentBalance}`)
+    await ctx.reply(isRu ? `💵 Ваш текущий баланс: $${currentBalance.toFixed(2)}` : `💵 Your current balance: $${currentBalance.toFixed(2)}`)
 
     const keyboard = new InlineKeyboard().text(isRu ? "❌ Отменить генерацию" : "❌ Cancel generation", "cancel")
 
@@ -150,8 +150,8 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
 
     await ctx.reply(
       isRu
-        ? `Изображение сгенерировано. Стоимость: $${price}. Ваш новый баланс: $${newBalance}`
-        : `Image generated. Cost: $${price}. Your new balance: $${newBalance}`,
+        ? `Изображение сгенерировано. Стоимость: $${price}.\n💵 Ваш новый баланс: $${newBalance.toFixed(2)}`
+        : `Image generated. Cost: $${price}.\n💵 Your new balance: $${newBalance.toFixed(2)}`,
     )
 
     const info = await getGeneratedImages(ctx.from.id.toString() || "")

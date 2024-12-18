@@ -29,6 +29,7 @@ export const generateImage = async (prompt: string, model_type: string, telegram
   try {
     await incrementGeneratedImages(telegram_id)
     const aspect_ratio = await getAspectRatio(telegram_id)
+    console.log(aspect_ratio, "aspect_ratio")
 
     const modelConfig = models[model_type]
     console.log(modelConfig, "modelConfig")
@@ -37,6 +38,7 @@ export const generateImage = async (prompt: string, model_type: string, telegram
     }
 
     const input = modelConfig.getInput(`${modelConfig.word} ${prompt}`, aspect_ratio)
+    console.log(input, "input")
     let output: ApiResponse = ""
     let retries = 3
 
