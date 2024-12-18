@@ -76,7 +76,6 @@ if (process.env.NODE_ENV === "production") {
       return [chat, user].filter((con): con is string => con !== undefined)
     }),
   )
-  run(bot)
 
   bot.api.setMyCommands([
     {

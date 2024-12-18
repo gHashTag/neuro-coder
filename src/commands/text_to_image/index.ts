@@ -157,7 +157,7 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
     const { count, limit } = info
 
     if (count < limit) {
-      buttonHandlers(ctx, prompt_id?.toString() || "")
+      await buttonHandlers(ctx, prompt_id?.toString() || "")
     }
   } catch (error) {
     console.error("Error in generateImageConversation:", error)

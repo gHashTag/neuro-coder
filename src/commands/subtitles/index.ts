@@ -12,10 +12,7 @@ export async function subtitles(conversation: Conversation<MyContext>, ctx: MyCo
   const isRu = ctx.from?.language_code === "ru"
 
   try {
-    await ctx.reply(
-      isRu ? "Отправьте URL видео для создания субтитров" : "Send video URL for subtitles creation",
-      { reply_markup: { force_reply: true } }
-    )
+    await ctx.reply(isRu ? "Отправьте URL видео для создания субтитров" : "Send video URL for subtitles creation", { reply_markup: { force_reply: true } })
 
     const videoUrlMsg = await conversation.wait()
     const videoUrl = videoUrlMsg.message?.text
@@ -63,8 +60,12 @@ export async function subtitles(conversation: Conversation<MyContext>, ctx: MyCo
     await ctx.replyWithChatAction("upload_video")
     await ctx.replyWithVideo(new InputFile(tempFilePath), {
       caption: isRu
-        ? `✅ Видео с субтитрами готово!\nДлительность: ${result[0].duration} сек\nРазмер: ${Math.round((result[0].fileSize / 1024 / 1024) * 100) / 100} МБ\nСсылка на видео: ${videoFileUrl}`
-        : `✅ Video with subtitles is ready!\nDuration: ${result[0].duration} sec\nSize: ${Math.round((result[0].fileSize / 1024 / 1024) * 100) / 100} MB\nVideo link: ${videoFileUrl}`,
+        ? `✅ Видео с субтитрами готово!\nДлительность: ${result[0].duration} сек\nРазмер: ${
+            Math.round((result[0].fileSize / 1024 / 1024) * 100) / 100
+          } МБ\nСсылка на видео: ${videoFileUrl}`
+        : `✅ Video with subtitles is ready!\nDuration: ${result[0].duration} sec\nSize: ${
+            Math.round((result[0].fileSize / 1024 / 1024) * 100) / 100
+          } MB\nVideo link: ${videoFileUrl}`,
     })
 
     // Удаляем временный файл
