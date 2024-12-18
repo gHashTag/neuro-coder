@@ -38,7 +38,7 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
 
       for (let i = 0; i < numImages; i++) {
         console.log(`Starting generation of image ${i + 1}/${numImages}`)
-        const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString())
+        const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString(), ctx)
 
         if (!result) {
           console.error("Generation returned null result")

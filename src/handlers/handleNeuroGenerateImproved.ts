@@ -27,7 +27,7 @@ export async function handleNeuroGenerateImproved(ctx: MyContext, data: string, 
     generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
 
     // Генерируем одно изображение с улучшенным промптом
-    const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString())
+    const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString(), ctx)
     console.log("Generation result:", result)
 
     if (!result) {

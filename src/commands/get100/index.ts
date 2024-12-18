@@ -1,7 +1,7 @@
 import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard, InputFile } from "grammy"
-import { generateImage } from "../../helpers/generateImage"
+import { generateImage } from "../../helpers/generateReplicateImage"
 
 async function get100Conversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const keyboard = new InlineKeyboard().text("Отменить генерацию", "cancel")

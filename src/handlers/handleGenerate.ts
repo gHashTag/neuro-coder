@@ -10,9 +10,14 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
     await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
     return
   }
-  // Сразу отвечаем на callback query  начале
-  await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
-
+  if (ctx.callbackQuery && ctx.callbackQuery.id) {
+    await ctx.answerCallbackQuery({
+      text: isRu ? "Генерация началась" : "Generation started",
+      show_alert: false,
+    })
+  } else {
+    console.error("Отсутствует ID callback query")
+  }
   const [_, count, promptId] = data.split("_")
   const promptData = await getPrompt(promptId)
   if (!promptData) {
@@ -26,7 +31,7 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
     const numImages = parseInt(count)
     for (let i = 0; i < numImages; i++) {
       console.log("Generating image 1")
-      const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString())
+      const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString(), ctx)
       if (!result) {
         await ctx.reply(isRu ? "Ошибка при генерации изображения" : "Error generating image")
         continue

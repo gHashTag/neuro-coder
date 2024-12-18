@@ -96,7 +96,7 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
     if (!model_type) {
       throw new Error("Model type is required")
     }
-    const result = await generateNeuroImage(text, model_type, ctx.from.id.toString())
+    const result = await generateNeuroImage(text, model_type, ctx.from.id.toString(), ctx)
     if (!result) {
       throw new Error("Failed to generate image")
     }

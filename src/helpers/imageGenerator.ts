@@ -1,5 +1,5 @@
 import { MyContext } from "../utils/types"
-import { generateImage } from "./generateImage"
+import { generateImage } from "./generateReplicateImage"
 
 export const generateImages = async (ctx: MyContext, text: string, modelType: string, count: number) => {
   const images: string[] = []

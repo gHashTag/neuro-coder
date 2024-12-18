@@ -1,6 +1,6 @@
 import { InputFile } from "grammy/types"
 import { pulse } from "../helpers"
-import { generateImage } from "../helpers/generateImage"
+import { generateImage } from "../helpers/generateReplicateImage"
 import { MyContext } from "../utils/types"
 
 export async function handleGenerateImage(ctx: MyContext, data: string, isRu: boolean) {

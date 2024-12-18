@@ -26,3 +26,8 @@ export type MyContext = Context & ConversationFlavor
 export type MyConversation = Conversation<MyContext & ConversationFlavor>
 
 export type MyContextWithSession = MyContext & SessionFlavor<SessionData>
+
+export interface GenerationResult {
+  image: string | Buffer
+  prompt_id: number
+}

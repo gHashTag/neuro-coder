@@ -1,13 +1,9 @@
 import { replicate } from "../core/replicate"
 import { getAspectRatio, savePrompt } from "../core/supabase/ai"
-import { processApiResponse, fetchImage, ApiResponse } from "./generateImage"
+import { processApiResponse, fetchImage, ApiResponse } from "./generateReplicateImage"
+import { GenerationResult } from "../utils/types"
 
-export interface GenerationResult {
-  image: string | Buffer
-  prompt_id: number
-}
-
-export async function generateNeuroImage(prompt: string, model_type: string, telegram_id: string): Promise<GenerationResult | null> {
+export async function generateNeuroImage(prompt: string, model_type: string, telegram_id: string, ctx: any): Promise<GenerationResult | null> {
   console.log("Starting generateNeuroImage with:", { prompt, model_type, telegram_id })
 
   try {
@@ -80,7 +76,14 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
 
     throw new Error("All generation attempts exhausted")
   } catch (error) {
-    console.error("Fatal error in generateNeuroImage:", error)
+    if (error instanceof Error && error.message.includes("NSFW content detected")) {
+      console.error("NSFW контент обнаружен при генерации изображения.")
+      // Отправьте сообщение пользователю
+      await ctx.reply("Извините, генерация изображения не удалась из-за обнаружения неподходящего контента.")
+    } else {
+      console.error("Ошибка при генерации изображения:", error)
+      // Обработка других ошибок
+    }
     return null
   }
 }

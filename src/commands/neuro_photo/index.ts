@@ -79,7 +79,7 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
     const loadingMsg = await ctx.reply(isRu ? "⏳ Генерирую изображение..." : "⏳ Generating image...")
 
     try {
-      const result = await generateNeuroImage(fullPrompt, userModel.model_url, userId)
+      const result = await generateNeuroImage(fullPrompt, userModel.model_url, userId, ctx)
       console.log("Generation result:", result)
 
       if (!result || !result.image || (Buffer.isBuffer(result.image) && result.image.length === 0)) {
