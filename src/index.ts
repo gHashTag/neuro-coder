@@ -333,22 +333,6 @@ bot.on("callback_query:data", async (ctx) => {
   }
 })
 
-bot.catch((err) => {
-  const ctx = err.ctx
-  const isRu = ctx.from?.language_code === "ru"
-  console.error(`Ошибка при обработке обновления ${ctx.update.update_id}:`)
-  console.error("error", err.error)
-  ctx
-    .reply(
-      isRu
-        ? "Извините, позшла ошnибка ри обработке вашго запроса. Пожалуйста, попробуйте позже."
-        : "Sorry, an error occurred while processing your request. Please try again later.",
-    )
-    .catch((e) => {
-      console.error("Ошибка отправки сообщения об ошибке поьзователю:", e)
-    })
-})
-
 // Регистрирем команду
 bot.command("text_to_image", async (ctx) => {
   await ctx.conversation.enter("textToImageConversation")
@@ -360,6 +344,22 @@ bot.command("image_to_prompt", async (ctx) => {
 
 bot.command("train_flux_model", async (ctx) => {
   await ctx.conversation.enter("trainFluxModelConversation")
+})
+
+bot.catch((err) => {
+  const ctx = err.ctx
+  const isRu = ctx.from?.language_code === "ru"
+  console.error(`Ошибка при обработке обновления ${ctx.update.update_id}:`)
+  console.error("error", err.error)
+  ctx
+    .reply(
+      isRu
+        ? "Извините, произошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте позже."
+        : "Sorry, an error occurred while processing your request. Please try again later.",
+    )
+    .catch((e) => {
+      console.error("Ошибка отправки сообщения об ошибке поьзователю:", e)
+    })
 })
 
 export { bot }
