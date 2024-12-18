@@ -20,6 +20,7 @@ export async function buy(ctx: MyContext) {
           [{ text: isRu ? "Пополнить 20000 ⭐️" : "Top up 20000 ⭐️", callback_data: "top_up_20000" }],
           [{ text: isRu ? "Пополнить 50000 ⭐️" : "Top up 50000 ⭐️", callback_data: "top_up_50000" }],
           [{ text: isRu ? "Пополнить 100000 ⭐️" : "Top up 100000 ⭐️", callback_data: "top_up_100000" }],
+          [{ text: isRu ? "Что такое звезды❓" : "What are stars❓", web_app: { url: `https://telegram.org/blog/telegram-stars/${isRu ? "ru" : "en"}?ln=a` } }],
         ],
       },
       parse_mode: "HTML",
