@@ -31,12 +31,10 @@ import createAinews from "./commands/ainews"
 import { textToImageConversation } from "./commands/text_to_image"
 
 import { textToVideoConversation } from "./commands/text_to_video"
-import imageToVideo from "./commands/image_to_video"
+import { imageToVideoConversation } from "./commands/image_to_video"
 import { imageToPromptConversation } from "./commands/image_to_prompt"
 import { trainFluxModelConversation } from "./commands/train_flux_model"
 import { neuroPhotoConversation } from "./commands/neuro_photo"
-import { run, sequentialize } from "@grammyjs/runner"
-import neuroQuest from "./commands/neuro_quest"
 
 import { handleAspectRatioChange, handleBuy, handleChangeSize } from "./handlers"
 
@@ -53,6 +51,7 @@ import { handleNeuroImprove } from "./handlers/handleNeuroImprove"
 import { handleNeuroGenerateImproved } from "./handlers/handleNeuroGenerateImproved"
 import { handleNeuroVideo } from "./handlers/handleNeuroVideo"
 import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
+import neuroQuest from "./commands/neuro_quest"
 
 bot.api.config.use(hydrateFiles(bot.token))
 
@@ -175,7 +174,7 @@ bot.use(createConversation(subtitles))
 bot.use(createConversation(createAinews))
 bot.use(createConversation(textToImageConversation))
 bot.use(createConversation(textToVideoConversation))
-bot.use(createConversation(imageToVideo))
+bot.use(createConversation(imageToVideoConversation))
 bot.use(createConversation(imageToPromptConversation))
 bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))

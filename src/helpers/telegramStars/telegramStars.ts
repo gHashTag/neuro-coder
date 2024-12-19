@@ -6,6 +6,7 @@ const starCost = 0.016
 const imageGenerationCost = 0.12
 const textToVideoCost = 0.99
 const trainingCostInDollars = 15
+const imageToVideoCost = 0.99
 
 async function incrementBalance({ telegram_id, amount }: { telegram_id: string; amount: number }) {
   const { data, error } = await supabase.from("users").select("balance").eq("telegram_id", telegram_id).single()
@@ -87,4 +88,5 @@ export {
   sendBalanceMessage,
   textToVideoCost,
   sendCurrentBalanceMessage,
+  imageToVideoCost,
 }

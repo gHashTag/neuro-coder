@@ -1,19 +1,25 @@
-import { Conversation, ConversationFlavor } from "@grammyjs/conversations"
+import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
 import Replicate from "replicate"
 import { writeFile } from "node:fs/promises"
-import { InputFile } from "grammy"
+import { InputFile, InlineKeyboard } from "grammy"
 import axios from "axios"
-import { InlineKeyboard } from "grammy"
 
-type MyConversationType = MyContext & ConversationFlavor
+import {
+  imageToVideoCost,
+  sendBalanceMessage,
+  updateUserBalance,
+  sendCurrentBalanceMessage,
+  sendInsufficientStarsMessage,
+  getUserBalance,
+} from "../../helpers/telegramStars/telegramStars"
 
-async function downloadFile(url: string): Promise<Buffer> {
+export const downloadFile = async (url: string): Promise<Buffer> => {
   const response = await axios.get(url, { responseType: "arraybuffer" })
   return Buffer.from(response.data, "binary")
 }
 
-async function retry<T>(fn: () => Promise<T>, attempts = 3, delay = 1000): Promise<T> {
+export const retry = async <T>(fn: () => Promise<T>, attempts = 3, delay = 1000): Promise<T> => {
   try {
     return await fn()
   } catch (error) {
@@ -23,8 +29,18 @@ async function retry<T>(fn: () => Promise<T>, attempts = 3, delay = 1000): Promi
   }
 }
 
-async function imageToVideo(conversation: Conversation<MyConversationType>, ctx: MyConversationType) {
+export const imageToVideoConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
+  if (!ctx.from) {
+    throw new Error("User not found")
+  }
+  const currentBalance = await getUserBalance(ctx.from.id)
+  const price = imageToVideoCost
+  if (currentBalance < price) {
+    await sendInsufficientStarsMessage(ctx, isRu)
+    return
+  }
+  await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
 
   // Создаем инлайн клавиатуру с кнопками выбора сервиса
   const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper").text("Ray", "ray").text("I2VGen-XL", "i2vgen")
@@ -171,6 +187,8 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
 
       await ctx.replyWithVideo(new InputFile(tempFilePath))
       await ctx.reply(isRu ? "Видео успешно создано!" : "Video successfully created!")
+      await updateUserBalance(ctx.from.id, currentBalance - price)
+      await sendBalanceMessage(ctx, isRu, currentBalance - price)
     } else {
       await ctx.reply(isRu ? "Произошла ошибка при создании видео" : "An error occurred while creating the video")
     }
@@ -181,5 +199,3 @@ async function imageToVideo(conversation: Conversation<MyConversationType>, ctx:
     )
   }
 }
-
-export default imageToVideo
