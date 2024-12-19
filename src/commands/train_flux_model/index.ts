@@ -5,10 +5,9 @@ import * as path from "path"
 import archiver from "archiver"
 import { createWriteStream } from "fs"
 
-import { supabase } from "../../core/supabase"
 import { replicate } from "../../core/replicate"
-import { createModelTraining, updateModelTraining, ModelTrainingUpdate } from "../../core/supabase"
-import { getUserBalance, starCost, updateUserBalance } from "src/helpers/telegramStars/telegramStars"
+import { createModelTraining, updateModelTraining, ModelTrainingUpdate, supabase } from "../../core/supabase"
+import { getUserBalance, starCost, updateUserBalance } from "../../helpers/telegramStars/telegramStars"
 
 // Добавляем интерфейс для ошибки API
 interface ApiError extends Error {
