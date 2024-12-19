@@ -13,6 +13,7 @@ import {
   sendInsufficientStarsMessage,
   sendBalanceMessage,
   imageGenerationCost,
+  sendCurrentBalanceMessage,
 } from "../../helpers/telegramStars/telegramStars"
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
@@ -81,9 +82,7 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
       await sendInsufficientStarsMessage(ctx, isRu)
       return
     }
-
-    // Отправляем текущий баланс
-    await ctx.reply(isRu ? `Ваш текущий баланс: ${currentBalance.toFixed(5)} ⭐️` : `Your current balance: ${currentBalance.toFixed(5)} ⭐️`)
+    await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
 
     const keyboard = new InlineKeyboard().text(isRu ? "❌ Отменить генерацию" : "❌ Cancel generation", "cancel")
 

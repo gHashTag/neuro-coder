@@ -2,7 +2,14 @@ import { Conversation } from "@grammyjs/conversations"
 import { generateVideo } from "../../helpers/generateVideo"
 import { InputFile, InlineKeyboard } from "grammy"
 import type { MyContext } from "../../utils/types"
-import { textToVideoCost, sendInsufficientStarsMessage, getUserBalance, updateUserBalance, sendBalanceMessage } from "../../helpers/telegramStars/telegramStars"
+import {
+  textToVideoCost,
+  sendInsufficientStarsMessage,
+  getUserBalance,
+  updateUserBalance,
+  sendBalanceMessage,
+  sendCurrentBalanceMessage,
+} from "../../helpers/telegramStars/telegramStars"
 
 export const textToVideoConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   try {
@@ -16,6 +23,7 @@ export const textToVideoConversation = async (conversation: Conversation<MyConte
       await sendInsufficientStarsMessage(ctx, isRu)
       return
     }
+    await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
     // Создаем клавиатуру для выбора модели
     const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper")
 

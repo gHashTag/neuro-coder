@@ -70,6 +70,11 @@ const sendBalanceMessage = async (ctx: MyContext, isRu: boolean, newBalance: num
   )
 }
 
+const sendCurrentBalanceMessage = async (ctx: MyContext, isRu: boolean, currentBalance: number) => {
+  await ctx.reply(isRu ? `Ваш текущий баланс: ${currentBalance.toFixed(5)} ⭐️` : `Your current balance: ${currentBalance.toFixed(5)} ⭐️`)
+  return
+}
+
 export {
   incrementBalance,
   starCost,
@@ -81,4 +86,5 @@ export {
   imageGenerationCost,
   sendBalanceMessage,
   textToVideoCost,
+  sendCurrentBalanceMessage,
 }
