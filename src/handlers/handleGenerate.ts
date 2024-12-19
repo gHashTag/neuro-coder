@@ -31,7 +31,7 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
     const numImages = parseInt(count)
     for (let i = 0; i < numImages; i++) {
       console.log("Generating image 1")
-      const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString(), ctx)
+      const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx)
       if (!result) {
         await ctx.reply(isRu ? "Ошибка при генерации изображения" : "Error generating image")
         continue

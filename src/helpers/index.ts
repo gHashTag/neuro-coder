@@ -1371,7 +1371,7 @@ export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, 
     await createUser({ username, telegram_id: telegram_id.toString() })
 
     // Проверка наличия инвайтера
-    const { data: user, error } = await supabase.from("users").select("inviter").eq("telegram_id", telegram_id).maybeSingle()
+    const { data: user, error } = await supabase.from("users").select("inviter").eq("telegram_id", telegram_id.toString()).maybeSingle()
 
     if (error) {
       console.error(`Ошибка при проверке инвайтера: ${error.message}`)

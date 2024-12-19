@@ -60,7 +60,7 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
       },
     )
     const { message, callbackQuery } = await conversation.wait()
-    const info = await getGeneratedImages(ctx.from?.id.toString() || "")
+    const info = await getGeneratedImages(ctx.from?.id || 0)
     const { count, limit } = info
 
     if (count >= limit) {
@@ -96,7 +96,7 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
     if (!model_type) {
       throw new Error("Model type is required")
     }
-    const result = await generateNeuroImage(text, model_type, ctx.from.id.toString(), ctx)
+    const result = await generateNeuroImage(text, model_type, ctx.from.id, ctx)
     if (!result) {
       throw new Error("Failed to generate image")
     }

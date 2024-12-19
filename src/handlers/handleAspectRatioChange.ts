@@ -14,7 +14,7 @@ export async function handleAspectRatioChange({ ctx }: AspectRatioHandlerParams)
     }
 
     const aspect_ratio = ctx.callbackQuery.data.replace("size_", "")
-    const userId = ctx.from?.id.toString()
+    const userId = ctx.from?.id
     const isRu = isRussian(ctx)
 
     if (!userId) {

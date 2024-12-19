@@ -27,7 +27,7 @@ async function imageSizeConversation(conversation: Conversation<MyContext>, ctx:
     return
   }
 
-  const success = await setAspectRatio(ctx.from.id.toString(), aspectRatio || "9:16")
+  const success = await setAspectRatio(ctx.from.id, aspectRatio || "9:16")
 
   if (success) {
     await ctx.reply(`Соотношение сторон ${aspectRatio} успешно сохранено.`)

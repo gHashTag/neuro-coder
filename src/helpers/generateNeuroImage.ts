@@ -3,7 +3,7 @@ import { getAspectRatio, savePrompt } from "../core/supabase/ai"
 import { processApiResponse, fetchImage, ApiResponse } from "./generateReplicateImage"
 import { GenerationResult } from "../utils/types"
 
-export async function generateNeuroImage(prompt: string, model_type: string, telegram_id: string, ctx: any): Promise<GenerationResult | null> {
+export async function generateNeuroImage(prompt: string, model_type: string, telegram_id: number, ctx: any): Promise<GenerationResult | null> {
   console.log("Starting generateNeuroImage with:", { prompt, model_type, telegram_id })
 
   try {
@@ -51,7 +51,7 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
         const imageBuffer = await fetchImage(imageUrl)
         console.log("Fetched image buffer, size:", imageBuffer.length)
 
-        const prompt_id = await savePrompt(prompt, model_type, telegram_id)
+        const prompt_id = await savePrompt(prompt, model_type, imageUrl, telegram_id)
 
         console.log("Saved prompt with id:", prompt_id)
 

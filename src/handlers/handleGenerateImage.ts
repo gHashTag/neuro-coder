@@ -15,7 +15,7 @@ export async function handleGenerateImage(ctx: MyContext, data: string, isRu: bo
 
   try {
     console.log("Generating image 2")
-    const result = await generateImage(prompt, "sdxl", ctx.from.id.toString())
+    const result = await generateImage(prompt, "sdxl", ctx.from.id)
 
     if (!result) {
       throw new Error("Failed to generate image")

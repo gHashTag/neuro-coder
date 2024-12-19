@@ -6,7 +6,7 @@ import { getGeneratedImages } from "../../core/supabase/ai"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
 import { generateImage } from "../../helpers/generateReplicateImage"
 import { models } from "../../core/replicate"
-import { getUserBalance, updateUserBalance, starCost } from "../../helpers/telegramStars/telegramStars"
+import { getUserBalance, updateUserBalance, starCost, sendInsufficientStarsMessage } from "../../helpers/telegramStars/telegramStars"
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
@@ -70,9 +70,8 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
     // Получаем текущий баланс пользователя
     const currentBalance = await getUserBalance(ctx.from.id)
 
-    // Проверяем, достаточно ли средств
     if (currentBalance < price) {
-      await ctx.reply(isRu ? "Недостаточно средств для генерации изображения." : "Insufficient funds to generate the image.")
+      await sendInsufficientStarsMessage(ctx, isRu)
       return
     }
 
@@ -99,7 +98,7 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
 
     const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
 
-    const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from.id.toString())
+    const { image, prompt_id } = await generateImage(text || "", model_type || "", ctx.from.id)
 
     if (!image) {
       throw new Error("Не удалось получить изображение")
@@ -120,15 +119,15 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
 
     // Обновляем баланс пользователя
     const newBalance = currentBalance - price
-    await updateUserBalance(ctx.from.id.toString(), newBalance)
+    await updateUserBalance(ctx.from.id, newBalance)
 
     await ctx.reply(
       isRu
-        ? `Изображение сгенерировано.\nСтоимость: ${starCost.toFixed(2)} ⭐️.\nВаш новый баланс: ${(starCost * newBalance).toFixed(2)} ⭐️`
-        : `Image generated.\nCost: ${starCost.toFixed(2)} ⭐️.\nYour new balance: ${(starCost * newBalance).toFixed(2)} ⭐️`,
+        ? `Изображение сгенерировано.\nСтоимость: ${starCost.toFixed(2)} ⭐️.\nВаш новый баланс: ${newBalance.toFixed(2)} ⭐️`
+        : `Image generated.\nCost: ${starCost.toFixed(2)} ⭐️.\nYour new balance: ${newBalance.toFixed(2)} ⭐️`,
     )
 
-    const info = await getGeneratedImages(ctx.from.id.toString() || "")
+    const info = await getGeneratedImages(ctx.from.id || 0)
     const { count, limit } = info
 
     if (count < limit) {

@@ -3,9 +3,10 @@ import { supabase } from "../../core/supabase"
 
 import { InputFile } from "grammy"
 import { pulse } from "../../helpers"
-import { savePrompt } from "../../core/supabase/ai"
+
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
 import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
+import { getUserBalance, sendInsufficientStarsMessage, updateUserBalance } from "src/helpers/telegramStars/telegramStars"
 
 interface UserModel {
   model_name: string
@@ -14,7 +15,7 @@ interface UserModel {
   model_key?: `${string}/${string}:${string}`
 }
 
-async function getLatestUserModel(userId: string): Promise<UserModel | null> {
+async function getLatestUserModel(userId: number): Promise<UserModel | null> {
   const { data, error } = await supabase
     .from("model_trainings")
     .select("model_name, trigger_word, model_url")
@@ -38,13 +39,19 @@ async function getLatestUserModel(userId: string): Promise<UserModel | null> {
 
   return data as UserModel
 }
+const imageGenerationCost = 0.05
 
 export async function neuroPhotoConversation(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
-  const userId = ctx.from?.id.toString()
+  const userId = ctx.from?.id
 
   if (!userId) {
     await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
+    return
+  }
+  const currentBalance = await getUserBalance(userId)
+  if (currentBalance < imageGenerationCost) {
+    await sendInsufficientStarsMessage(ctx, isRu)
     return
   }
 
@@ -58,6 +65,15 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
           ? "❌ У вас нет обченных моделей. Используйте /train_flux_model чтобы создать свою модель."
           : "❌ You don't have any trained models. Use /train_flux_model to create your model.",
       )
+      return
+    }
+
+    // Получаем текущий баланс пользователя
+    const currentBalance = await getUserBalance(userId)
+
+    // Проверяем, достаточно ли звезд
+    if (currentBalance < imageGenerationCost) {
+      await ctx.reply(isRu ? "Недостаточно звезд для генерации изображения." : "Insufficient stars for image generation.")
       return
     }
 
@@ -91,6 +107,9 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
       console.log("Photo to send:", typeof photoToSend, photoToSend instanceof InputFile ? "InputFile" : "not InputFile")
 
       await ctx.replyWithPhoto(photoToSend)
+
+      // Снимаем звезды с баланса
+      await updateUserBalance(userId, currentBalance - imageGenerationCost)
 
       // Отправляем в pulse с правильным model_type
       const pulseImage = Buffer.isBuffer(result.image) ? `data:image/jpeg;base64,${result.image.toString("base64")}` : result.image

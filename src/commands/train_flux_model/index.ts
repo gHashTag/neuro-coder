@@ -7,7 +7,7 @@ import { createWriteStream } from "fs"
 
 import { replicate } from "../../core/replicate"
 import { createModelTraining, updateModelTraining, ModelTrainingUpdate, supabase } from "../../core/supabase"
-import { getUserBalance, starCost, updateUserBalance } from "../../helpers/telegramStars/telegramStars"
+import { getUserBalance, sendInsufficientStarsMessage, starCost, trainingCostInStars, updateUserBalance } from "../../helpers/telegramStars/telegramStars"
 
 // Добавляем интерфейс для ошибки API
 interface ApiError extends Error {
@@ -300,10 +300,6 @@ async function ensureSupabaseAuth(): Promise<void> {
   }
 }
 
-const trainingCostInDollars = 15
-
-const trainingCostInStars = Math.ceil(trainingCostInDollars / starCost)
-
 export async function trainFluxModelConversation(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   if (!ctx.from) {
@@ -319,14 +315,13 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
   // Получаем текущий баланс пользователя
   const currentBalance = await getUserBalance(ctx.from.id)
 
-  // Проверяем, достаточно ли звезд
   if (currentBalance < trainingCostInStars) {
-    await ctx.reply(isRu ? "Недостаточно звезд для обучения модели." : "Insufficient stars for model training.")
+    await sendInsufficientStarsMessage(ctx, isRu)
     return
   }
 
   // Снимаем звезды с баланса
-  await updateUserBalance(ctx.from.id.toString(), currentBalance - trainingCostInStars)
+  await updateUserBalance(ctx.from.id, currentBalance - trainingCostInStars)
 
   if (!userId) {
     await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")

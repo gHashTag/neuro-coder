@@ -13,7 +13,7 @@ export async function sendPaymentInfo(user_id: string, level: string): Promise<a
 
 export async function getPaymentsInfoByTelegramId(telegram_id: string): Promise<any> {
   // Получаем user_id по username из таблицы users
-  const { data: userData, error: userError } = await supabase.from("users").select("user_id").eq("telegram_id", telegram_id).single()
+  const { data: userData, error: userError } = await supabase.from("users").select("user_id").eq("telegram_id", telegram_id.toString()).single()
 
   if (userError) {
     console.error("Error fetching user ID:", userError)
@@ -57,7 +57,7 @@ export async function getPaymentsInfoByUsername(username: string): Promise<any> 
 
 export async function checkSubscriptionByTelegramId(telegram_id: string): Promise<string> {
   // Получаем user_id по telegram_id из таблицы users
-  const { data: userData, error: userError } = await supabase.from("users").select("user_id").eq("telegram_id", telegram_id).single()
+  const { data: userData, error: userError } = await supabase.from("users").select("user_id").eq("telegram_id", telegram_id.toString()).single()
 
   if (userError) {
     console.error("Ошибка при получении user_id:", userError)
@@ -101,7 +101,7 @@ export async function isLimitAi(telegram_id: string): Promise<boolean> {
   const today = new Date().toISOString().split("T")[0]
 
   // Получаем user_id по telegram_id из таблицы users
-  const { data: userData, error: userError } = await supabase.from("users").select("user_id").eq("telegram_id", telegram_id).single()
+  const { data: userData, error: userError } = await supabase.from("users").select("user_id").eq("telegram_id", telegram_id.toString()).single()
 
   if (userError) {
     console.error("Ошибка при получении user_id:", userError)
