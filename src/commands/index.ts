@@ -149,7 +149,7 @@ composer.command("subtitles", async (ctx) => {
 })
 
 composer.command("get100", async (ctx) => {
-  await ctx.conversation.enter("get100AnfiVesnaConversation")
+  await ctx.conversation.enter("get100Conversation")
 })
 
 composer.command("text_to_image", async (ctx) => {

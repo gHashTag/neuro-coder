@@ -1348,22 +1348,22 @@ export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, 
 
   const username = ctx.from?.username || ""
   const telegram_id = ctx.from?.id
-  const chatMember = await bot.api.getChatMember("@neuro_coder_ai", telegram_id || 0)
-  console.log(chatMember, "chatMember")
-  const isSubscribed = chatMember.status === "member" || chatMember.status === "administrator" || chatMember.status === "creator"
+  // const chatMember = await bot.api.getChatMember("@neuro_coder_ai", telegram_id || 0)
+  // console.log(chatMember, "chatMember")
+  // const isSubscribed = chatMember.status === "member" || chatMember.status === "administrator" || chatMember.status === "creator"
 
-  if (!isSubscribed) {
-    const isRu = ctx.from?.language_code === "ru"
-    await ctx.reply(
-      isRu ? "Пожалуйста, подпишитесь на наш канал, чтобы продолжить использование бота. 😊" : "Please subscribe to our channel to continue using the bot. 😊",
-      {
-        reply_markup: {
-          inline_keyboard: [[{ text: "Подписаться", url: `t.me/neuro_coder_ai` }]],
-        },
-      },
-    )
-    return
-  }
+  // if (!isSubscribed) {
+  //   const isRu = ctx.from?.language_code === "ru"
+  //   await ctx.reply(
+  //     isRu ? "Пожалуйста, подпишитесь на наш канал, чтобы продолжить использование бота. 😊" : "Please subscribe to our channel to continue using the bot. 😊",
+  //     {
+  //       reply_markup: {
+  //         inline_keyboard: [[{ text: "Подписаться", url: `t.me/neuro_coder_ai` }]],
+  //       },
+  //     },
+  //   )
+  //   return
+  // }
 
   if (telegram_id) {
     // Ваша логика здесь
