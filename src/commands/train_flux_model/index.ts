@@ -8,6 +8,7 @@ import { createWriteStream } from "fs"
 import { supabase } from "../../core/supabase"
 import { replicate } from "../../core/replicate"
 import { createModelTraining, updateModelTraining, ModelTrainingUpdate } from "../../core/supabase"
+import { getUserBalance, starCost, updateUserBalance } from "src/helpers/telegramStars/telegramStars"
 
 // Добавляем интерфейс для ошибки API
 interface ApiError extends Error {
@@ -300,13 +301,33 @@ async function ensureSupabaseAuth(): Promise<void> {
   }
 }
 
+const trainingCostInDollars = 15
+
+const trainingCostInStars = Math.ceil(trainingCostInDollars / starCost)
+
 export async function trainFluxModelConversation(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
+  if (!ctx.from) {
+    await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
+    return
+  }
+
   const userId = ctx.from?.id.toString()
   const username = ctx.from?.username
   const images: { buffer: Buffer; filename: string }[] = []
   let isCancelled = false
   let modelName = ""
+  // Получаем текущий баланс пользователя
+  const currentBalance = await getUserBalance(ctx.from.id)
+
+  // Проверяем, достаточно ли звезд
+  if (currentBalance < trainingCostInStars) {
+    await ctx.reply(isRu ? "Недостаточно звезд для обучения модели." : "Insufficient stars for model training.")
+    return
+  }
+
+  // Снимаем звезды с баланса
+  await updateUserBalance(ctx.from.id.toString(), currentBalance - trainingCostInStars)
 
   if (!userId) {
     await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
@@ -433,17 +454,16 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
 
     // Начинаем обучение
     await ctx.reply(isRu ? "⏳ Начинаю обучение модели..." : "⏳ Starting model training...")
+    await ctx.reply(
+      isRu
+        ? `✅ Обучение начато!\n\nВаша модель будет натренирована через 3-6 часов. После завершения вы сможете проверить её работу, используя команду /neuro_photo.`
+        : `✅ Training started!\n\nYour model will be trained in 3-6 hours. Once completed, you can check its performance using the /neuro_photo command.`,
+    )
 
-    const modelUrl = await trainFluxModel(zipUrl, triggerWord, modelName, userId)
+    await trainFluxModel(zipUrl, triggerWord, modelName, userId)
 
     // Очищаем временные файлы
     await fs.unlink(zipPath).catch(console.error)
-
-    await ctx.reply(
-      isRu
-        ? `✅ Обучение завершено!\n\nВаша модель доступна по адресу: ${modelUrl}\n\nДля генерации изображений используйте trigger word: ${triggerWord}`
-        : `✅ Training completed!\n\nYour model is available at: ${modelUrl}\n\nUse trigger word: ${triggerWord} for image generation`,
-    )
   } catch (error) {
     console.error("Error in train_flux_model conversation:", error)
     await ctx.reply(isRu ? "❌ Произошла ошибка. Пожалуйста, попробуйте еще раз." : "❌ An error occurred. Please try again.")

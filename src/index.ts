@@ -52,7 +52,7 @@ import { handleNeuroGenerate } from "./handlers/handleNeuroGenerate"
 import { handleNeuroImprove } from "./handlers/handleNeuroImprove"
 import { handleNeuroGenerateImproved } from "./handlers/handleNeuroGenerateImproved"
 import { handleNeuroVideo } from "./handlers/handleNeuroVideo"
-import { incrementBalance } from "./helpers/incrementBalance"
+import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
 
 bot.api.config.use(hydrateFiles(bot.token))
 
@@ -196,9 +196,6 @@ bot.on("pre_checkout_query", async (ctx) => {
 bot.on("message:successful_payment", async (ctx) => {
   const isRu = isRussian(ctx)
   console.log("ctx 646(succesful_payment)", ctx)
-
-  // Укажите стоимость одной звезды
-  const starCost = 0.016
 
   // Получите сумму платежа в долларах
   const paymentAmount = ctx.message.successful_payment.total_amount / 100 // Предполагается, что сумма в центах

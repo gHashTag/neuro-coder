@@ -6,32 +6,7 @@ import { getGeneratedImages } from "../../core/supabase/ai"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
 import { generateImage } from "../../helpers/generateReplicateImage"
 import { models } from "../../core/replicate"
-import { supabase } from "../../core/supabase"
-
-async function getUserBalance(userId: number): Promise<number> {
-  const { data, error } = await supabase.from("users").select("balance").eq("telegram_id", userId).single()
-
-  if (error) {
-    if (error.code === "PGRST116") {
-      console.error(`Пользователь с ID ${userId} не найден.`)
-      throw new Error("Пользователь не найден")
-    }
-    console.error("Ошибка при получении баланса:", error)
-    throw new Error("Не удалось получить баланс пользователя")
-  }
-
-  return data?.balance || 0
-}
-
-// Функция для обновления баланса пользователя
-async function updateUserBalance(userId: string, newBalance: number): Promise<void> {
-  const { error } = await supabase.from("users").update({ balance: newBalance }).eq("telegram_id", userId)
-
-  if (error) {
-    console.error("Ошибка при обновлении баланса:", error)
-    throw new Error("Не удалось обновить баланс пользователя")
-  }
-}
+import { getUserBalance, updateUserBalance, starCost } from "../../helpers/telegramStars/telegramStars"
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
@@ -90,8 +65,8 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
 
     const model_type = modelResponse.callbackQuery.data
     console.log(model_type, "model_type")
-    const price = Number(models[model_type].price)
-
+    const price = Number(models[model_type].price) * starCost
+    console.log(price, "price")
     // Получаем текущий баланс пользователя
     const currentBalance = await getUserBalance(ctx.from.id)
 
@@ -102,7 +77,7 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
     }
 
     // Отправляем текущий баланс
-    await ctx.reply(isRu ? `💵 Ваш текущий баланс: $${currentBalance.toFixed(2)}` : `💵 Your current balance: $${currentBalance.toFixed(2)}`)
+    await ctx.reply(isRu ? `Ваш текущий баланс: ${currentBalance.toFixed(2)} ⭐️` : `Your current balance: ${currentBalance.toFixed(2)} ⭐️`)
 
     const keyboard = new InlineKeyboard().text(isRu ? "❌ Отменить генерацию" : "❌ Cancel generation", "cancel")
 
@@ -149,8 +124,8 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
 
     await ctx.reply(
       isRu
-        ? `Изображение сгенерировано. Стоимость: $${price}.\n💵 Ваш новый баланс: $${newBalance.toFixed(2)}`
-        : `Image generated. Cost: $${price}.\n💵 Your new balance: $${newBalance.toFixed(2)}`,
+        ? `Изображение сгенерировано.\nСтоимость: ${starCost.toFixed(2)} ⭐️.\nВаш новый баланс: ${(starCost * newBalance).toFixed(2)} ⭐️`
+        : `Image generated.\nCost: ${starCost.toFixed(2)} ⭐️.\nYour new balance: ${(starCost * newBalance).toFixed(2)} ⭐️`,
     )
 
     const info = await getGeneratedImages(ctx.from.id.toString() || "")
