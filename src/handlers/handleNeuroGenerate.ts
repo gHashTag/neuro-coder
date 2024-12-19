@@ -1,4 +1,4 @@
-import { InputFile } from "grammy/types"
+import { InputFile } from "grammy"
 import { getPrompt } from "../core/supabase/ai"
 import { buttonNeuroHandlers } from "../helpers/buttonNeuroHandlers"
 import { generateNeuroImage } from "../helpers/generateNeuroImage"
@@ -15,7 +15,7 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
   console.log("Split parts:", parts)
 
   const count = parts[2]
-  const promptId = parts[3] // UUID будет последней ча��тью
+  const promptId = parts[3]
   console.log("Extracted count and promptId:", { count, promptId })
 
   let generatingMessage: { message_id: number } | null = null

@@ -6,7 +6,14 @@ import { getGeneratedImages } from "../../core/supabase/ai"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
 import { generateImage } from "../../helpers/generateReplicateImage"
 import { models } from "../../core/replicate"
-import { getUserBalance, updateUserBalance, starCost, sendInsufficientStarsMessage } from "../../helpers/telegramStars/telegramStars"
+import {
+  getUserBalance,
+  updateUserBalance,
+  starCost,
+  sendInsufficientStarsMessage,
+  sendBalanceMessage,
+  imageGenerationCost,
+} from "../../helpers/telegramStars/telegramStars"
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
@@ -65,8 +72,8 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
 
     const model_type = modelResponse.callbackQuery.data
     console.log(model_type, "model_type")
-    const price = Number(models[model_type].price) * starCost
-    console.log(price, "price")
+    const price = imageGenerationCost
+
     // Получаем текущий баланс пользователя
     const currentBalance = await getUserBalance(ctx.from.id)
 
@@ -76,7 +83,7 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
     }
 
     // Отправляем текущий баланс
-    await ctx.reply(isRu ? `Ваш текущий баланс: ${currentBalance.toFixed(2)} ⭐️` : `Your current balance: ${currentBalance.toFixed(2)} ⭐️`)
+    await ctx.reply(isRu ? `Ваш текущий баланс: ${currentBalance.toFixed(5)} ⭐️` : `Your current balance: ${currentBalance.toFixed(5)} ⭐️`)
 
     const keyboard = new InlineKeyboard().text(isRu ? "❌ Отменить генерацию" : "❌ Cancel generation", "cancel")
 
@@ -119,13 +126,10 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
 
     // Обновляем баланс пользователя
     const newBalance = currentBalance - price
+    console.log(newBalance, "newBalance")
     await updateUserBalance(ctx.from.id, newBalance)
 
-    await ctx.reply(
-      isRu
-        ? `Изображение сгенерировано.\nСтоимость: ${starCost.toFixed(2)} ⭐️.\nВаш новый баланс: ${newBalance.toFixed(2)} ⭐️`
-        : `Image generated.\nCost: ${starCost.toFixed(2)} ⭐️.\nYour new balance: ${newBalance.toFixed(2)} ⭐️`,
-    )
+    await sendBalanceMessage(ctx, isRu, newBalance)
 
     const info = await getGeneratedImages(ctx.from.id || 0)
     const { count, limit } = info
