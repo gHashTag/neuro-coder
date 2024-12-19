@@ -18,7 +18,7 @@ import { setModel } from "./core/supabase/ai"
 import { invite } from "./commands/invite"
 
 import { answerAi } from "./core/openai/requests"
-import textToSpeech from "./commands/textToSpeech"
+import textToSpeech from "./commands/text_to_speech"
 import { lipSyncConversation } from "./commands/lipSyncConversation"
 import { createBackgroundVideo } from "./commands/createBackgroundVideo"
 import { start } from "./commands/start"
