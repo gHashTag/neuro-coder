@@ -4,11 +4,13 @@ import { MyContext } from "../../utils/types"
 const starCost = 0.016
 
 const imageGenerationCost = 0.12
+const imageNeuroGenerationCost = 0.12
 const textToVideoCost = 0.99
 const trainingCostInDollars = 15
 const imageToVideoCost = 0.99
 const textToSpeechCost = 0.1
 const voiceCost = 0.3
+const promptGenerationCost = 0.01
 
 async function incrementBalance({ telegram_id, amount }: { telegram_id: string; amount: number }) {
   const { data, error } = await supabase.from("users").select("balance").eq("telegram_id", telegram_id).single()
@@ -93,4 +95,6 @@ export {
   imageToVideoCost,
   textToSpeechCost,
   voiceCost,
+  promptGenerationCost,
+  imageNeuroGenerationCost,
 }

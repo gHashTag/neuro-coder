@@ -3,12 +3,30 @@ import { getPrompt } from "../core/supabase/ai"
 import { buttonNeuroHandlers } from "../helpers/buttonNeuroHandlers"
 import { generateNeuroImage } from "../helpers/generateNeuroImage"
 import { MyContext } from "../utils/types"
+import {
+  getUserBalance,
+  imageNeuroGenerationCost,
+  sendBalanceMessage,
+  sendCurrentBalanceMessage,
+  sendInsufficientStarsMessage,
+  updateUserBalance,
+} from "../helpers/telegramStars"
 
 export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
     await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
     return
   }
+
+  const userId = ctx.from.id
+  const currentBalance = await getUserBalance(userId)
+  if (currentBalance < imageNeuroGenerationCost) {
+    await sendInsufficientStarsMessage(ctx, isRu)
+    return
+  }
+
+  await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
+
   console.log("Received neuro_generate_ callback with data:", data)
 
   const parts = data.split("_")
@@ -53,7 +71,9 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
           await ctx.reply(isRu ? `⏳ Сгенерировано ${i + 1} из ${numImages}...` : `⏳ Generated ${i + 1} of ${numImages}...`)
         }
       }
-
+      const newBalance = currentBalance - imageNeuroGenerationCost
+      await updateUserBalance(userId, newBalance)
+      await sendBalanceMessage(ctx, isRu, newBalance)
       console.log("All images generated, showing buttons with promptId:", promptId)
       await buttonNeuroHandlers(ctx, promptId)
     } catch (error) {

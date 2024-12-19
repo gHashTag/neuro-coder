@@ -2,6 +2,15 @@ import { Conversation, ConversationFlavor } from "@grammyjs/conversations"
 import axios from "axios"
 import { MyContext } from "../../utils/types"
 
+import {
+  promptGenerationCost,
+  getUserBalance,
+  sendCurrentBalanceMessage,
+  sendInsufficientStarsMessage,
+  updateUserBalance,
+  sendBalanceMessage,
+} from "../../helpers/telegramStars/telegramStars"
+
 if (!process.env.HUGGINGFACE_TOKEN) {
   throw new Error("HUGGINGFACE_TOKEN is not set")
 }
@@ -79,11 +88,26 @@ async function getJoyCaption(imageUrl: string): Promise<string> {
 }
 
 export const imageToPromptConversation = async (conversation: MyConversation, ctx: MyContext) => {
+  if (!ctx.from?.id) {
+    await ctx.reply("User ID not found")
+    return
+  }
+
   const isRu = ctx.from?.language_code === "ru"
 
   console.log("Starting image_to_prompt conversation")
 
   try {
+    const userId = ctx.from?.id
+    const currentBalance = await getUserBalance(userId)
+
+    // Проверяем, достаточно ли средств
+    if (currentBalance < promptGenerationCost) {
+      await sendInsufficientStarsMessage(ctx, isRu)
+      return
+    }
+    await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
+
     // Запрашиваем изображение
     await ctx.reply(isRu ? "Пожалуйста, отправьте изображение для генерации промпта" : "Please send an image to generate a prompt")
 
@@ -112,7 +136,9 @@ export const imageToPromptConversation = async (conversation: MyConversation, ct
       console.log("Getting image caption...")
       const prompt = await getJoyCaption(imageUrl)
       console.log("Received caption:", prompt)
-
+      const newBalance = currentBalance - promptGenerationCost
+      await updateUserBalance(userId, newBalance)
+      await sendBalanceMessage(ctx, isRu, newBalance)
       // Удаляем сообщение о обработке
       await ctx.api.deleteMessage(ctx.chat?.id || "", processingMsg.message_id)
 
