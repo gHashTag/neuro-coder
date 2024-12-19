@@ -4,7 +4,7 @@ import { MyContext } from "../../utils/types"
 const starCost = 0.016
 
 const imageGenerationCost = 0.12
-
+const textToVideoCost = 0.99
 const trainingCostInDollars = 15
 
 async function incrementBalance({ telegram_id, amount }: { telegram_id: string; amount: number }) {
@@ -65,8 +65,8 @@ const trainingCostInStars = Math.ceil(trainingCostInDollars / starCost)
 const sendBalanceMessage = async (ctx: MyContext, isRu: boolean, newBalance: number) => {
   await ctx.reply(
     isRu
-      ? `Изображение сгенерировано.\nСтоимость: ${imageGenerationCost.toFixed(3)} ⭐️.\nВаш новый баланс: ${newBalance.toFixed(3)} ⭐️`
-      : `Image generated.\nCost: ${imageGenerationCost.toFixed(3)} ⭐️.\nYour new balance: ${newBalance.toFixed(3)} ⭐️`,
+      ? `Изображение сгенерировано.\nСтоимость: ${imageGenerationCost.toFixed(3)} ⭐️\nВаш новый баланс: ${newBalance.toFixed(3)} ⭐️`
+      : `Image generated.\nCost: ${imageGenerationCost.toFixed(3)} ⭐️\nYour new balance: ${newBalance.toFixed(3)} ⭐️`,
   )
 }
 
@@ -80,4 +80,5 @@ export {
   sendInsufficientStarsMessage,
   imageGenerationCost,
   sendBalanceMessage,
+  textToVideoCost,
 }

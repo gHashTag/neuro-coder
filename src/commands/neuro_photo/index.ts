@@ -6,7 +6,7 @@ import { pulse } from "../../helpers"
 
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
 import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
-import { getUserBalance, sendInsufficientStarsMessage, updateUserBalance } from "src/helpers/telegramStars/telegramStars"
+import { getUserBalance, sendInsufficientStarsMessage, updateUserBalance } from "../../helpers/telegramStars/telegramStars"
 
 interface UserModel {
   model_name: string
