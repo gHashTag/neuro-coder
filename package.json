@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Grammy boilerplate to develop and host telegram bots on Vercel",
   "main": "api/index.ts",
-  "type": "module",
   "scripts": {
     "start": "node dist/api/index.js",
     "build": "tsc",
