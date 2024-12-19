@@ -2,18 +2,35 @@ import { createVoiceElevenLabs } from "../../core/supabase/ai"
 import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
 import { updateUserVoice } from "../../core/supabase"
+import {
+  sendCurrentBalanceMessage,
+  sendInsufficientStarsMessage,
+  voiceCost,
+  getUserBalance,
+  updateUserBalance,
+} from "../../helpers/telegramStars/telegramStars"
 
 export async function voiceConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
-  const lang = ctx.from?.language_code || "en"
+  if (!ctx.from) {
+    throw new Error("User not found")
+  }
+  const isRu = ctx.from?.language_code === "ru"
   const messageIds: number[] = []
+  const currentBalance = await getUserBalance(ctx.from.id)
+  const price = voiceCost
+  if (currentBalance < price) {
+    await sendInsufficientStarsMessage(ctx, isRu)
+    return
+  }
+  await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
 
   // Запрашиваем у пользователя голосовое сообщение
   const voiceRequestMessage = await ctx.reply(
-    lang === "ru" ? "🎤 Пожалуйста, отправьте голосовое сообщение для аватара." : "🎤 Please send a voice message for the avatar.",
+    isRu ? "🎤 Пожалуйста, отправьте голосовое сообщение для аватара." : "🎤 Please send a voice message for the avatar.",
   )
   const voiceMessage = (await conversation.wait()).message
   if (!voiceMessage || !voiceMessage.voice) {
-    await ctx.reply(lang === "ru" ? "❌ Ошибка: вы не отправили голосовое сообщение." : "❌ Error: you did not send a voice message.")
+    await ctx.reply(isRu ? "❌ Ошибка: вы не отправили голосовое сообщение." : "❌ Error: you did not send a voice message.")
     return
   }
   messageIds.push(voiceRequestMessage.message_id, voiceMessage.message_id)
@@ -33,19 +50,19 @@ export async function voiceConversation(conversation: Conversation<MyContext>, c
 
     if (voiceId) {
       await ctx.reply(
-        lang === "ru"
-          ? `👁 Голос аватара успешно создан! \n\n <b>Voice ID:</b> ${voiceId}`
-          : `👁 Avatar voice created successfully! \n\n <b>Voice ID:</b> ${voiceId}`,
+        isRu ? `👁 Голос аватара успешно создан! \n\n <b>Voice ID:</b> ${voiceId}` : `👁 Avatar voice created successfully! \n\n <b>Voice ID:</b> ${voiceId}`,
         {
           parse_mode: "HTML",
         },
       )
       await updateUserVoice(userId.toString(), voiceId)
+      await updateUserBalance(ctx.from.id, currentBalance - price)
+      await sendCurrentBalanceMessage(ctx, isRu, currentBalance - price)
     } else {
-      await ctx.reply(lang === "ru" ? "❌ Ошибка при создании голоса." : "❌ Error creating voice.")
+      await ctx.reply(isRu ? "❌ Ошибка при создании голоса." : "❌ Error creating voice.")
     }
   } else {
-    await ctx.reply(lang === "ru" ? "❌ Ошибка: не удалось получить информацию о пользователе." : "❌ Error: failed to retrieve user information.")
+    await ctx.reply(isRu ? "❌ Ошибка: не удалось получить информацию о пользователе." : "❌ Error: failed to retrieve user information.")
   }
 
   // Удаление всех сообщений из текущего диалога
