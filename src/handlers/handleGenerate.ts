@@ -7,9 +7,7 @@ import { MyContext } from "../utils/types"
 import {
   sendInsufficientStarsMessage,
   getUserBalance,
-  starCost,
   imageGenerationCost,
-  incrementBalance,
   sendBalanceMessage,
   updateUserBalance,
 } from "../helpers/telegramStars/telegramStars"
@@ -28,6 +26,7 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
   } else {
     console.error("Отсутствует ID callback query")
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, count, promptId] = data.split("_")
   const promptData = await getPrompt(promptId)
   if (!promptData) {

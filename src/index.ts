@@ -9,7 +9,7 @@ import { imageSizeConversation } from "./commands/imagesize"
 import { customMiddleware } from "./helpers"
 import { generateImageConversation } from "./commands/generateImageConversation"
 import createTriggerReel from "./commands/trigger_reel"
-import createCaptionForNews from "./commands/сaptionForNews"
+import captionForReels from "./commands/caption_for_reels"
 import { get100Conversation } from "./commands/get100"
 import { soulConversation } from "./commands/soul"
 import { voiceConversation } from "./commands/voice"
@@ -39,7 +39,7 @@ import { neuroPhotoConversation } from "./commands/neuro_photo"
 import { handleAspectRatioChange, handleBuy, handleChangeSize } from "./handlers"
 
 import bot from "./core/bot"
-
+import { neuroQuest } from "./commands/neuro_quest"
 import { isRussian } from "./utils/language"
 import { handleGenerateImproved } from "./handlers/handleGenerateImproved"
 import { handleGenerate } from "./handlers/handleGenerate"
@@ -51,7 +51,6 @@ import { handleNeuroImprove } from "./handlers/handleNeuroImprove"
 import { handleNeuroGenerateImproved } from "./handlers/handleNeuroGenerateImproved"
 import { handleNeuroVideo } from "./handlers/handleNeuroVideo"
 import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
-import neuroQuest from "./commands/neuro_quest"
 
 bot.api.config.use(hydrateFiles(bot.token))
 
@@ -66,102 +65,95 @@ if (process.env.NODE_ENV === "development") {
   production(bot).catch(console.error)
 }
 
-// if (process.env.NODE_ENV === "production") {
-//   // Добавляем sequentialize middleware только в development
-//   bot.use(
-//     sequentialize((ctx) => {
-//       const chat = ctx.chat?.id.toString()
-//       const user = ctx.from?.id.toString()
-//       return [chat, user].filter((con): con is string => con !== undefined)
-//     }),
-//   )
-
-//   bot.api.setMyCommands([
-//     {
-//       command: "start",
-//       description: "👋 Start bot / Запустить бота",
-//     },
-//     {
-//       command: "help",
-//       description: "❓ Help / Помощь",
-//     },
-//     {
-//       command: "buy",
-//       description: "💰 Buy a subscription / Купить подписку",
-//     },
-//     {
-//       command: "select_model",
-//       description: "🤖 Select model / Выбрать модель",
-//     },
-//     {
-//       command: "invite",
-//       description: "👥 Invite a friend / Пригласить друга",
-//     },
-//     {
-//       command: "avatar",
-//       description: "👤 Tell about yourself / Рассказать о себе",
-//     },
-//     {
-//       command: "voice",
-//       description: "🎤 Add voice to avatar / Добавить аватару голос",
-//     },
-//     {
-//       command: "text_to_speech",
-//       description: "🎤 Convert text to speech / Преобразовать текст в речь",
-//     },
-//     {
-//       command: "lipsync",
-//       description: "🎥 Lipsync / Синхронизация губ",
-//     },
-//     {
-//       command: "b_roll",
-//       description: "🎥 Create B-roll / Создать B-roll",
-//     },
-//     {
-//       command: "subtitles",
-//       description: "🎥 Create subtitles / Создать субтитры",
-//     },
-//     {
-//       command: "text_to_image",
-//       description: "🎨 Generate image from text / Сгенерировать изображение из текста",
-//     },
-//     {
-//       command: "text_to_video",
-//       description: "🎥 Generate video from text / Сгенерировать видео из текста",
-//     },
-//     {
-//       command: "image_to_video",
-//       description: "🎥 Generate video from image / Сгенерировать видео из изображения",
-//     },
-//     {
-//       command: "image_to_prompt",
-//       description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
-//     },
-//     {
-//       command: "invite",
-//       description: "👥 Invite a friend / Пригласить друга",
-//     },
-//     {
-//       command: "train_flux_model",
-//       description: "🎨 Train FLUX model / Обучить модель FLUX",
-//     },
-//     {
-//       command: "train_flux_model",
-//       description: "🎨 Train FLUX model / Обучить модель FLUX",
-//     },
-//     {
-//       command: "neuro_photo",
-//       description: "🤖 Generate your photos / Сгенерировать ваши фото",
-//     },
-//   ])
-// }
+if (process.env.NODE_ENV === "production") {
+  // Добавляем sequentialize middleware только в development
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  bot.api.setMyCommands([
+    {
+      command: "start",
+      description: "👋 Start bot / Запустить бота",
+    },
+    {
+      command: "help",
+      description: "❓ Help / Помощь",
+    },
+    {
+      command: "buy",
+      description: "💰 Buy a subscription / Купить подписку",
+    },
+    {
+      command: "select_model",
+      description: "🤖 Select model / Выбрать модель",
+    },
+    {
+      command: "invite",
+      description: "👥 Invite a friend / Пригласить друга",
+    },
+    {
+      command: "avatar",
+      description: "👤 Tell about yourself / Рассказать о себе",
+    },
+    {
+      command: "voice",
+      description: "🎤 Add voice to avatar / Добавить аватару голос",
+    },
+    {
+      command: "text_to_speech",
+      description: "🎤 Convert text to speech / Преобразовать текст в речь",
+    },
+    {
+      command: "lipsync",
+      description: "🎥 Lipsync / Синхронизация губ",
+    },
+    {
+      command: "b_roll",
+      description: "🎥 Create B-roll / Создать B-roll",
+    },
+    {
+      command: "subtitles",
+      description: "🎥 Create subtitles / Создать субтитры",
+    },
+    {
+      command: "text_to_image",
+      description: "🎨 Generate image from text / Сгенерировать изображение из текста",
+    },
+    {
+      command: "text_to_video",
+      description: "🎥 Generate video from text / Сгенерировать видео из текста",
+    },
+    {
+      command: "image_to_video",
+      description: "🎥 Generate video from image / Сгенерировать видео из изображения",
+    },
+    {
+      command: "image_to_prompt",
+      description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
+    },
+    {
+      command: "invite",
+      description: "👥 Invite a friend / Пригласить друга",
+    },
+    {
+      command: "train_flux_model",
+      description: "🎨 Train FLUX model / Обучить модель FLUX",
+    },
+    {
+      command: "train_flux_model",
+      description: "🎨 Train FLUX model / Обучить модель FLUX",
+    },
+    {
+      command: "neuro_photo",
+      description: "🤖 Generate your photos / Сгенерировать ваши фото",
+    },
+  ])
+}
 
 bot.use(conversations())
 bot.use(createConversation(imageSizeConversation))
 bot.use(createConversation(textToSpeech))
 bot.use(createConversation(generateImageConversation))
 bot.use(createConversation(createTriggerReel))
-bot.use(createConversation(createCaptionForNews))
+bot.use(createConversation(captionForReels))
 bot.use(createConversation(get100Conversation))
 bot.use(createConversation(soulConversation))
 bot.use(createConversation(voiceConversation))

@@ -16,8 +16,8 @@ composer.command("clipmaker", (ctx: MyContext) => clipmaker(ctx))
 composer.command("leela", (ctx: MyContext) => leela(ctx))
 composer.command("neuro_broker", (ctx: MyContext) => neuro_broker(ctx))
 
-composer.command("caption_for_ai_news", async (ctx) => {
-  await ctx.conversation.enter("createCaptionForNews")
+composer.command("caption_for_reels", async (ctx) => {
+  await ctx.conversation.enter("captionForReels")
 })
 
 composer.command("lipsync", async (ctx) => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import ffmpeg from "fluent-ffmpeg"
 import sharp from "sharp"
 import os from "os"
@@ -124,7 +125,6 @@ export function createSVGWithWhiteText(width: number, height: number, text: stri
   const maxWidth = width * 0.8 // 80% от ширины SVG
   const fontSize = 40
   const lineHeight = 60
-  const padding = 30 // Отступ от края
 
   // Функция для измерения ширины текста (приблизительно)
   function getTextWidth(text: string): number {
@@ -341,7 +341,6 @@ export function createYellowAndWhiteText(width: number, height: number, text: st
   const maxWidth = width * 0.85 // Увеличено до 95% от ширины SVG
   const fontSize = 52 // Увеличен размер шрифта
   const lineHeight = 50 // Увеличена высота строки
-  const padding = 30 // Отступ от края
 
   // Функция для измерения ширины текста (приблизительно)
   function getTextWidth(text: string): number {
@@ -423,7 +422,6 @@ export function createSVGWithHighlightedText(width: number, height: number, text
   const fontSize = 50
   const lineHeight = 80
   const paddingX = 10 // Горизонтальный отступ
-  const paddingY = 10 // Вертикальный отступ
 
   // Функция для измерения ширины текста (приблизи��ельно)
   function getTextWidth(text: string): number {
@@ -449,7 +447,7 @@ export function createSVGWithHighlightedText(width: number, height: number, text
     .map((line, index) => {
       const lineWidth = getTextWidth(line)
       const rectX = (width - lineWidth) / 2 - paddingX
-      const rectY = startY + index * lineHeight - paddingY / 2
+
       const wordsInLine = line.split(" ")
       const coloredWords = wordsInLine
         .map((word, wordIndex) => {
@@ -629,7 +627,7 @@ async function downloadImage(url: string, outputPath: string): Promise<string> {
   }
 }
 
-export async function generateImagesForNeuroBroker(steps: Step[], language: "en" | "zh" | "ru", isModelFlux = false) {
+export async function generateImagesForNeuroBroker(steps: Step[]) {
   const imagesWithText: { imagePath: string; text: string }[] = []
   console.log(imagesWithText, "imagesWithText")
   console.log("Начинаем генерацию изображений для медитации")
