@@ -67,95 +67,95 @@ if (process.env.NODE_ENV === "development") {
   production(bot).catch(console.error)
 }
 
-if (process.env.NODE_ENV === "production") {
-  // Добавляем sequentialize middleware только в development
-  bot.use(
-    sequentialize((ctx) => {
-      const chat = ctx.chat?.id.toString()
-      const user = ctx.from?.id.toString()
-      return [chat, user].filter((con): con is string => con !== undefined)
-    }),
-  )
+// if (process.env.NODE_ENV === "production") {
+//   // Добавляем sequentialize middleware только в development
+//   bot.use(
+//     sequentialize((ctx) => {
+//       const chat = ctx.chat?.id.toString()
+//       const user = ctx.from?.id.toString()
+//       return [chat, user].filter((con): con is string => con !== undefined)
+//     }),
+//   )
 
-  bot.api.setMyCommands([
-    {
-      command: "start",
-      description: "👋 Start bot / Запустить бота",
-    },
-    {
-      command: "help",
-      description: "❓ Help / Помощь",
-    },
-    {
-      command: "buy",
-      description: "💰 Buy a subscription / Купить подписку",
-    },
-    {
-      command: "select_model",
-      description: "🤖 Select model / Выбрать модель",
-    },
-    {
-      command: "invite",
-      description: "👥 Invite a friend / Пригласить друга",
-    },
-    {
-      command: "avatar",
-      description: "👤 Tell about yourself / Рассказать о себе",
-    },
-    {
-      command: "voice",
-      description: "🎤 Add voice to avatar / Добавить аватару голос",
-    },
-    {
-      command: "text_to_speech",
-      description: "🎤 Convert text to speech / Преобразовать текст в речь",
-    },
-    {
-      command: "lipsync",
-      description: "🎥 Lipsync / Синхронизация губ",
-    },
-    {
-      command: "b_roll",
-      description: "🎥 Create B-roll / Создать B-roll",
-    },
-    {
-      command: "subtitles",
-      description: "🎥 Create subtitles / Создать субтитры",
-    },
-    {
-      command: "text_to_image",
-      description: "🎨 Generate image from text / Сгенерировать изображение из текста",
-    },
-    {
-      command: "text_to_video",
-      description: "🎥 Generate video from text / Сгенерировать видео из текста",
-    },
-    {
-      command: "image_to_video",
-      description: "🎥 Generate video from image / Сгенерировать видео из изображения",
-    },
-    {
-      command: "image_to_prompt",
-      description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
-    },
-    {
-      command: "invite",
-      description: "👥 Invite a friend / Пригласить друга",
-    },
-    {
-      command: "train_flux_model",
-      description: "🎨 Train FLUX model / Обучить модель FLUX",
-    },
-    {
-      command: "train_flux_model",
-      description: "🎨 Train FLUX model / Обучить модель FLUX",
-    },
-    {
-      command: "neuro_photo",
-      description: "🤖 Generate your photos / Сгенерировать ваши фото",
-    },
-  ])
-}
+//   bot.api.setMyCommands([
+//     {
+//       command: "start",
+//       description: "👋 Start bot / Запустить бота",
+//     },
+//     {
+//       command: "help",
+//       description: "❓ Help / Помощь",
+//     },
+//     {
+//       command: "buy",
+//       description: "💰 Buy a subscription / Купить подписку",
+//     },
+//     {
+//       command: "select_model",
+//       description: "🤖 Select model / Выбрать модель",
+//     },
+//     {
+//       command: "invite",
+//       description: "👥 Invite a friend / Пригласить друга",
+//     },
+//     {
+//       command: "avatar",
+//       description: "👤 Tell about yourself / Рассказать о себе",
+//     },
+//     {
+//       command: "voice",
+//       description: "🎤 Add voice to avatar / Добавить аватару голос",
+//     },
+//     {
+//       command: "text_to_speech",
+//       description: "🎤 Convert text to speech / Преобразовать текст в речь",
+//     },
+//     {
+//       command: "lipsync",
+//       description: "🎥 Lipsync / Синхронизация губ",
+//     },
+//     {
+//       command: "b_roll",
+//       description: "🎥 Create B-roll / Создать B-roll",
+//     },
+//     {
+//       command: "subtitles",
+//       description: "🎥 Create subtitles / Создать субтитры",
+//     },
+//     {
+//       command: "text_to_image",
+//       description: "🎨 Generate image from text / Сгенерировать изображение из текста",
+//     },
+//     {
+//       command: "text_to_video",
+//       description: "🎥 Generate video from text / Сгенерировать видео из текста",
+//     },
+//     {
+//       command: "image_to_video",
+//       description: "🎥 Generate video from image / Сгенерировать видео из изображения",
+//     },
+//     {
+//       command: "image_to_prompt",
+//       description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
+//     },
+//     {
+//       command: "invite",
+//       description: "👥 Invite a friend / Пригласить друга",
+//     },
+//     {
+//       command: "train_flux_model",
+//       description: "🎨 Train FLUX model / Обучить модель FLUX",
+//     },
+//     {
+//       command: "train_flux_model",
+//       description: "🎨 Train FLUX model / Обучить модель FLUX",
+//     },
+//     {
+//       command: "neuro_photo",
+//       description: "🤖 Generate your photos / Сгенерировать ваши фото",
+//     },
+//   ])
+// }
 
 bot.use(conversations())
 bot.use(createConversation(imageSizeConversation))
@@ -188,8 +188,8 @@ bot.command("start", async (ctx) => {
 bot.use(customMiddleware)
 bot.use(commands)
 
-bot.on("pre_checkout_query", (ctx) => {
-  ctx.answerPreCheckoutQuery(true)
+bot.on("pre_checkout_query", async (ctx) => {
+  await ctx.answerPreCheckoutQuery(true)
   return
 })
 
