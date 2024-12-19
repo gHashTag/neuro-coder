@@ -11,8 +11,11 @@
     "noImplicitAny": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "*": ["node_modules/*"]
+    }
   },
   "baseUrl": "./src",
-  "include": ["src/**/*"],
+  "include": ["src", ".eslintrc.js"]
 }
     

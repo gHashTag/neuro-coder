@@ -4,7 +4,9 @@ module.exports = {
     project: "./tsconfig.json",
   },
   plugins: ["@typescript-eslint", "prettier"],
-  extends: ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended", "plugin:import/recommended", "plugin:import/typescript"],
+  extends: ["plugin:@typescript-eslint/recommended", "plugin:prettier/recommended", "plugin:import/recommended", "plugin:import/typescript", "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",],
   rules: {
     "@typescript-eslint/no-var-requires": "off",
     "prettier/prettier": "error",
@@ -23,8 +25,12 @@ module.exports = {
     },
   ],
   settings: {
-    node: {
-      extensions: [".ts", ".json"],
-    },
+    "import/resolver": {
+      node: {
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+        moduleDirectory: ['node_modules', 'src/'],
+      }
+    }
   },
+  ignorePatterns: [".eslintrc.js"],
 }

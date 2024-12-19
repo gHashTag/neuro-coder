@@ -1,7 +1,7 @@
 import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
 import Replicate from "replicate"
-import { writeFile } from "node:fs/promises"
+import { unlink, writeFile } from "node:fs/promises"
 import { InputFile, InlineKeyboard } from "grammy"
 import axios from "axios"
 
@@ -189,6 +189,7 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
       await ctx.reply(isRu ? "Видео успешно создано!" : "Video successfully created!")
       await updateUserBalance(ctx.from.id, currentBalance - price)
       await sendBalanceMessage(ctx, isRu, currentBalance - price)
+      await unlink(tempFilePath)
     } else {
       await ctx.reply(isRu ? "Произошла ошибка при создании видео" : "An error occurred while creating the video")
     }
