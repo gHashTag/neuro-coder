@@ -68,13 +68,13 @@ async function sendInsufficientStarsMessage(ctx: MyContext, isRu: boolean) {
 const sendBalanceMessage = async (ctx: MyContext, isRu: boolean, newBalance: number) => {
   await ctx.reply(
     isRu
-      ? `Изображение сгенерировано.\nСтоимость: ${imageGenerationCost.toFixed(3)} ⭐️\nВаш новый баланс: ${newBalance.toFixed(3)} ⭐️`
-      : `Image generated.\nCost: ${imageGenerationCost.toFixed(3)} ⭐️\nYour new balance: ${newBalance.toFixed(3)} ⭐️`,
+      ? `Изображение сгенерировано.\nСтоимость: ${imageGenerationCost.toFixed(2)} ⭐️\nВаш новый баланс: ${newBalance.toFixed(2)} ⭐️`
+      : `Image generated.\nCost: ${imageGenerationCost.toFixed(2)} ⭐️\nYour new balance: ${newBalance.toFixed(2)} ⭐️`,
   )
 }
 
 const sendCurrentBalanceMessage = async (ctx: MyContext, isRu: boolean, currentBalance: number) => {
-  await ctx.reply(isRu ? `Ваш текущий баланс: ${currentBalance.toFixed(5)} ⭐️` : `Your current balance: ${currentBalance.toFixed(5)} ⭐️`)
+  await ctx.reply(isRu ? `Ваш текущий баланс: ${currentBalance.toFixed(2)} ⭐️` : `Your current balance: ${currentBalance.toFixed(2)} ⭐️`)
   return
 }
 
