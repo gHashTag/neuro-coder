@@ -9,6 +9,7 @@ import {
   sendInsufficientStarsMessage,
   updateUserBalance,
   sendBalanceMessage,
+  sendCostMessage,
 } from "../../helpers/telegramStars/telegramStars"
 
 if (!process.env.HUGGINGFACE_TOKEN) {
@@ -100,7 +101,7 @@ export const imageToPromptConversation = async (conversation: MyConversation, ct
   try {
     const userId = ctx.from?.id
     const currentBalance = await getUserBalance(userId)
-
+    await sendCostMessage(ctx, isRu, promptGenerationCost)
     // Проверяем, достаточно ли средств
     if (currentBalance < promptGenerationCost) {
       await sendInsufficientStarsMessage(ctx, isRu)

@@ -12,6 +12,7 @@ import {
   sendCurrentBalanceMessage,
   sendInsufficientStarsMessage,
   getUserBalance,
+  sendCostMessage,
 } from "../../helpers/telegramStars/telegramStars"
 
 export const downloadFile = async (url: string): Promise<Buffer> => {
@@ -36,6 +37,7 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
   }
   const currentBalance = await getUserBalance(ctx.from.id)
   const price = imageToVideoCost
+  await sendCostMessage(ctx, isRu, price)
   if (currentBalance < price) {
     await sendInsufficientStarsMessage(ctx, isRu)
     return

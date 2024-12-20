@@ -10,6 +10,7 @@ import {
   updateUserBalance,
   getUserBalance,
   sendCurrentBalanceMessage,
+  sendCostMessage,
 } from "../../helpers/telegramStars/telegramStars"
 
 const textToSpeech = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
@@ -27,8 +28,7 @@ const textToSpeech = async (conversation: Conversation<MyContext>, ctx: MyContex
   console.log(currentBalance, "currentBalance")
 
   const price = textToSpeechCost
-  console.log(price, "price")
-  console.log(currentBalance < price, "currentBalance < price")
+  await sendCostMessage(ctx, isRu, price)
 
   if (currentBalance < price) {
     await sendInsufficientStarsMessage(ctx, isRu)

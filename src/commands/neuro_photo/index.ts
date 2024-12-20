@@ -13,6 +13,7 @@ import {
   sendCurrentBalanceMessage,
   sendInsufficientStarsMessage,
   updateUserBalance,
+  sendCostMessage,
 } from "../../helpers/telegramStars/telegramStars"
 
 interface UserModel {
@@ -56,6 +57,7 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
     return
   }
   const currentBalance = await getUserBalance(userId)
+  await sendCostMessage(ctx, isRu, imageNeuroGenerationCost)
   if (currentBalance < imageNeuroGenerationCost) {
     await sendInsufficientStarsMessage(ctx, isRu)
     return

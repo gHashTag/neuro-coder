@@ -1,7 +1,7 @@
 import { Context } from "grammy"
 import { starCost } from "../helpers/telegramStars"
 import { buy } from "../commands/buy"
-import { MyContext } from "src/utils/types"
+import { MyContext } from "../utils/types"
 
 interface BuyParams {
   ctx: Context

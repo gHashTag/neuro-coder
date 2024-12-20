@@ -78,6 +78,11 @@ const sendCurrentBalanceMessage = async (ctx: MyContext, isRu: boolean, currentB
   return
 }
 
+const sendCostMessage = async (ctx: MyContext, isRu: boolean, cost: number) => {
+  await ctx.reply(isRu ? `Стоимость: ${cost.toFixed(2)} ⭐️` : `Cost: ${cost.toFixed(2)} ⭐️`)
+  return
+}
+
 export {
   incrementBalance,
   starCost,
@@ -95,4 +100,5 @@ export {
   voiceCost,
   promptGenerationCost,
   imageNeuroGenerationCost,
+  sendCostMessage,
 }

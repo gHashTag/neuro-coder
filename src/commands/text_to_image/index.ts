@@ -13,6 +13,7 @@ import {
   sendBalanceMessage,
   imageGenerationCost,
   sendCurrentBalanceMessage,
+  sendCostMessage,
 } from "../../helpers/telegramStars/telegramStars"
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
@@ -76,6 +77,7 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
 
     // Получаем текущий баланс пользователя
     const currentBalance = await getUserBalance(ctx.from.id)
+    await sendCostMessage(ctx, isRu, price)
 
     if (currentBalance < price) {
       await sendInsufficientStarsMessage(ctx, isRu)

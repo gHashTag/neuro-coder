@@ -9,6 +9,7 @@ import {
   updateUserBalance,
   sendBalanceMessage,
   sendCurrentBalanceMessage,
+  sendCostMessage,
 } from "../../helpers/telegramStars/telegramStars"
 
 export const textToVideoConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
@@ -19,6 +20,7 @@ export const textToVideoConversation = async (conversation: Conversation<MyConte
     const isRu = ctx.from?.language_code === "ru"
     const currentBalance = await getUserBalance(ctx.from.id)
     const price = textToVideoCost
+    await sendCostMessage(ctx, isRu, price)
     if (currentBalance < price) {
       await sendInsufficientStarsMessage(ctx, isRu)
       return

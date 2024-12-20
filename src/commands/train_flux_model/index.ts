@@ -7,7 +7,14 @@ import { createWriteStream } from "fs"
 
 import { replicate } from "../../core/replicate"
 import { createModelTraining, updateModelTraining, ModelTrainingUpdate, supabase } from "../../core/supabase"
-import { getUserBalance, sendInsufficientStarsMessage, starCost, trainingCostInStars, updateUserBalance } from "../../helpers/telegramStars/telegramStars"
+import {
+  getUserBalance,
+  sendCostMessage,
+  sendInsufficientStarsMessage,
+  starCost,
+  trainingCostInStars,
+  updateUserBalance,
+} from "../../helpers/telegramStars/telegramStars"
 
 // Добавляем интерфейс для ошибки API
 interface ApiError extends Error {
@@ -314,7 +321,7 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
   let modelName = ""
   // Получаем текущий баланс пользователя
   const currentBalance = await getUserBalance(ctx.from.id)
-
+  await sendCostMessage(ctx, isRu, trainingCostInStars)
   if (currentBalance < trainingCostInStars) {
     await sendInsufficientStarsMessage(ctx, isRu)
     return

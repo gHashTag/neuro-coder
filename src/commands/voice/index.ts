@@ -8,6 +8,7 @@ import {
   voiceCost,
   getUserBalance,
   updateUserBalance,
+  sendCostMessage,
 } from "../../helpers/telegramStars/telegramStars"
 
 export async function voiceConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
@@ -18,6 +19,7 @@ export async function voiceConversation(conversation: Conversation<MyContext>, c
   const messageIds: number[] = []
   const currentBalance = await getUserBalance(ctx.from.id)
   const price = voiceCost
+  await sendCostMessage(ctx, isRu, price)
   if (currentBalance < price) {
     await sendInsufficientStarsMessage(ctx, isRu)
     return
