@@ -97,8 +97,7 @@ export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
 💡 Each level will give you skills for creating professional content.
 
 Ready to become a content creation pro?`,
-    reply_markup: new InlineKeyboard().text(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "quest_start").row(),
-    // .text(isRu ? "💎 Купить подписку" : "💎 Buy subscription", "buy"),
+    reply_markup: new InlineKeyboard().text(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "quest_start").row().text(isRu ? "💎 Пополнить баланс" : "💎 Top up balance", "top_up_balance"),
   })
 
   // Обработка ответов пользователя

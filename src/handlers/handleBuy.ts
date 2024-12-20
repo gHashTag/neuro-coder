@@ -1,5 +1,7 @@
 import { Context } from "grammy"
 import { starCost } from "../helpers/telegramStars"
+import { buy } from "../commands/buy"
+import { MyContext } from "src/utils/types"
 
 interface BuyParams {
   ctx: Context
@@ -9,6 +11,11 @@ interface BuyParams {
 
 // Start of Selection
 export async function handleBuy({ ctx, data, isRu }: BuyParams) {
+  if (data.endsWith("top_up_balance")) {
+    await buy(ctx as MyContext)
+    return
+  }
+
   if (data.endsWith("up_100")) {
     const dollarAmount = (100 * starCost).toFixed(2)
     await ctx.replyWithInvoice(
