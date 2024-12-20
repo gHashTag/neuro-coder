@@ -17,7 +17,7 @@ import {
   handleQuestComplete,
   handleQuestRules,
 } from "./handlers"
-import { handleModelCallback } from "src/handlers/handleModelCallback"
+import { handleModelCallback } from "../../handlers/handleModelCallback"
 
 export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
@@ -115,6 +115,10 @@ Ready to become a content creation pro?`,
       switch (action) {
         case "quest_rules":
           await handleQuestRules(ctx)
+          break
+
+        case "quest_start":
+          await handleLevel1(ctx)
           break
         case "quest_start":
           await handleLevel1(ctx)
