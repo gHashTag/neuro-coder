@@ -1,6 +1,7 @@
 import { InlineKeyboard } from "grammy"
 import { MyContext, MyConversation } from "../../utils/types"
 import {
+  handleLevel0,
   handleLevel1,
   handleLevel10,
   handleLevel11,
@@ -116,11 +117,10 @@ Ready to become a content creation pro?`,
         case "quest_rules":
           await handleQuestRules(ctx)
           break
-
         case "quest_start":
-          await handleLevel1(ctx)
+          await handleLevel0(ctx)
           break
-        case "quest_start":
+        case "level_1":
           await handleLevel1(ctx)
           break
         case "level_2":
