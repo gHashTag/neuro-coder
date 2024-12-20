@@ -1,4 +1,4 @@
-import { getUserBalance } from "src/helpers/telegramStars"
+import { getUserBalance } from "../../helpers/telegramStars"
 import { MyContext } from "../../utils/types"
 
 export async function balance(ctx: MyContext) {
