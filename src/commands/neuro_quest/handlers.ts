@@ -679,8 +679,8 @@ You have successfully completed all tasks and reached the maximum level! 🌟✨
         inline_keyboard: [
           [
             {
-              text: isRu ? "💎 Купить подписку" : "💎 Buy subscription",
-              callback_data: "buy",
+              text: isRu ? "💎 Пополнить баланс" : "💎 Top up balance",
+              callback_data: "top_up_balance",
             },
           ],
         ],

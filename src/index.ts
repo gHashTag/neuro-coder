@@ -80,7 +80,7 @@ if (process.env.NODE_ENV === "production") {
     },
     {
       command: "buy",
-      description: "💰 Buy a subscription / Купить подписку",
+      description: "💰 Top up balance / Пополнить баланс",
     },
     {
       command: "select_model",
