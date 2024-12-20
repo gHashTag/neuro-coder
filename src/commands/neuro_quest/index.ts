@@ -19,6 +19,7 @@ import {
   handleQuestRules,
 } from "./handlers"
 import { handleModelCallback } from "../../handlers/handleModelCallback"
+import { buy } from "../buy"
 
 export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
@@ -161,8 +162,8 @@ Ready to become a content creation pro?`,
         case "quest_complete":
           await handleQuestComplete(ctx)
           break
-        case "buy_subscription":
-          await ctx.conversation.enter("buySubscription")
+        case "top_up_balance":
+          await buy(ctx)
           break
         default:
           console.log("🎮 Unknown action:", action)

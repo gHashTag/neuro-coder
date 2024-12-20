@@ -199,6 +199,7 @@ bot.on("message:successful_payment", async (ctx) => {
   const user_id = await getUid(ctx.from.id.toString())
   if (!user_id) throw new Error("No user_id")
 
+  await ctx.api.sendMessage("-1001978334539", `💫 Пользователь @${ctx.from.username} (ID: ${ctx.from.id}) пополнил баланс на ${stars} звезд! (Стоимость звезды: $${starCost})`)
   // Увеличиваем баланс пользователя на количество звезд
   await incrementBalance({ telegram_id: ctx.from.id.toString(), amount: stars })
 
