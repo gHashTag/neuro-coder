@@ -203,7 +203,6 @@ bot.on("message:successful_payment", async (ctx) => {
   const user_id = await getUid(ctx.from.id.toString())
   if (!user_id) throw new Error("No user_id")
 
-  await ctx.api.sendMessage("-1001978334539", `💫 Пользователь @${ctx.from.username} (ID: ${ctx.from.id}) пополнил баланс на ${stars} звезд! (Стоимость звезды: $${starCost})`)
   // Увеличиваем баланс пользователя на количество звезд
   await incrementBalance({ telegram_id: ctx.from.id.toString(), amount: stars })
 
@@ -212,6 +211,7 @@ bot.on("message:successful_payment", async (ctx) => {
       ? `💫 Ваш баланс пополнен на ${stars} звезд! (Стоимость звезды: $${starCost})`
       : `💫 Your balance has been replenished by ${stars} stars! (Cost per star: $${starCost})`,
   )
+  await ctx.api.sendMessage("-1001978334539", `💫 Пользователь @${ctx.from.username} (ID: ${ctx.from.id}) пополнил баланс на ${stars} звезд! (Стоимость звезды: $${starCost})`)
 })
 
 bot.on("message:text", async (ctx) => {
