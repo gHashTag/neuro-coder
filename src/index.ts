@@ -13,7 +13,7 @@ import captionForReels from "./commands/caption_for_reels"
 import { get100Conversation } from "./commands/get100"
 import { avatarConversation } from "./commands/avatar"
 import { voiceConversation } from "./commands/voice"
-import { setModel } from "./core/supabase/ai"
+import { getUserData, setModel } from "./core/supabase/ai"
 
 import { invite } from "./commands/invite"
 
@@ -219,8 +219,14 @@ bot.on("message:text", async (ctx) => {
   try {
     // Получаем модель пользователя
     const userModel = await getUserModel(ctx.from?.id.toString() || "")
+    const userData = await getUserData(ctx.from?.id.toString() || "")
 
-    const response = await answerAi(userModel, ctx.message.text, ctx.from?.language_code || "en")
+    if (!userData) {
+      await ctx.reply(ctx.from?.language_code === "ru" ? "Не удалось получить данные пользователя" : "Failed to get user data")
+      return
+    }
+
+    const response = await answerAi(userModel, userData, ctx.message.text, ctx.from?.language_code || "en")
 
     // Проверяем, что ответ не null
     if (!response) {
