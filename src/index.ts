@@ -193,11 +193,8 @@ bot.on("message:successful_payment", async (ctx) => {
   const isRu = isRussian(ctx)
   console.log("ctx 646(succesful_payment)", ctx)
 
-  // Получите сумму платежа в долларах
-  const paymentAmount = ctx.message.successful_payment.total_amount / 100 // Предполагается, что сумма в центах
-
   // Рассчитайте количество звезд, которые пользователь получит
-  const stars = Math.floor(paymentAmount / starCost)
+  const stars = ctx.message.successful_payment.total_amount
 
   if (!ctx.from?.id) throw new Error("No telegram id")
   const user_id = await getUid(ctx.from.id.toString())
