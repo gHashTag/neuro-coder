@@ -8,6 +8,7 @@ import { invite } from "./invite"
 import { buy } from "./buy"
 import selectModelComposer from "./select_model"
 import { MyContext } from "../utils/types"
+import { balance } from "./balance"
 
 const composer = new Composer<MyContext>()
 
@@ -41,6 +42,8 @@ composer.command("playom", async (ctx) => {
 })
 
 composer.command("buy", buy)
+
+composer.command("balance", balance)
 
 composer.command("trigger_reel", async (ctx) => {
   await ctx.conversation.enter("createTriggerReel")
