@@ -26,8 +26,6 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
     await sendInsufficientStarsMessage(ctx, isRu)
     return
   }
-  // await sendCostMessage(ctx, isRu, imageNeuroGenerationCost)
-  // await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
 
   console.log("Received neuro_generate_ callback with data:", data)
 
@@ -75,7 +73,7 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
       }
       const newBalance = currentBalance - imageNeuroGenerationCost
       await updateUserBalance(userId, newBalance)
-      // await sendBalanceMessage(ctx, isRu, newBalance)
+      await sendBalanceMessage(ctx, isRu, newBalance)
       console.log("All images generated, showing buttons with promptId:", promptId)
       await buttonNeuroHandlers(ctx, promptId)
     } catch (error) {
