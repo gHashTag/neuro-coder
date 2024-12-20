@@ -1,4 +1,5 @@
 import { Context } from "grammy"
+import { starCost } from "src/helpers/telegramStars"
 
 interface BuyParams {
   ctx: Context
@@ -8,15 +9,13 @@ interface BuyParams {
 
 // Start of Selection
 export async function handleBuy({ ctx, data, isRu }: BuyParams) {
-  const starCost = 0.016
-
   if (data.endsWith("up_100")) {
     const dollarAmount = (100 * starCost).toFixed(2)
     await ctx.replyWithInvoice(
       isRu ? "100 ⭐️" : "100 ⭐️",
       isRu
-        ? `💬 Получите 100 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\nn\Используйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
-        : `💬 Receive 100 stars 🌟 This is equivalent to $${dollarAmount} 💵\n💫 Use the stars for various features of our bot and enjoy new possibilities!`,
+        ? `💬 Получите 100 звезд 🌟 Это эквивалентно $${dollarAmount} 💵\nИспользуйте звезды для различных функций нашего бота и наслаждайтесь новыми возможностями!`
+        : `💬 Receive 100 stars 🌟 This is equivalent to $${dollarAmount} 💵\nUse the stars for various features of our bot and enjoy new possibilities!`,
       "100",
       "XTR",
       [{ label: "Цена", amount: 100 }],
