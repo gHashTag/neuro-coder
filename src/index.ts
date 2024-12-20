@@ -51,6 +51,7 @@ import { handleNeuroImprove } from "./handlers/handleNeuroImprove"
 import { handleNeuroGenerateImproved } from "./handlers/handleNeuroGenerateImproved"
 import { handleNeuroVideo } from "./handlers/handleNeuroVideo"
 import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
+import { handleModelCallback } from "./handlers/handleModelCallback"
 
 bot.api.config.use(hydrateFiles(bot.token))
 
@@ -262,7 +263,9 @@ bot.on("callback_query:data", async (ctx) => {
 
     // Добавляем новый обработчик для выбора модели
     if (data.startsWith("select_model_")) {
+      console.log("CHECK")
       const model = data.replace("select_model_", "")
+      console.log("model", model)
       await setModel(ctx.from.id.toString(), model)
       return
     }
