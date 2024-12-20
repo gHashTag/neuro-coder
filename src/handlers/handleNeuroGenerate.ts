@@ -7,6 +7,7 @@ import {
   getUserBalance,
   imageNeuroGenerationCost,
   sendBalanceMessage,
+  sendCostMessage,
   sendCurrentBalanceMessage,
   sendInsufficientStarsMessage,
   updateUserBalance,
@@ -19,13 +20,14 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
   }
 
   const userId = ctx.from.id
+
   const currentBalance = await getUserBalance(userId)
   if (currentBalance < imageNeuroGenerationCost) {
     await sendInsufficientStarsMessage(ctx, isRu)
     return
   }
-
-  await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
+  // await sendCostMessage(ctx, isRu, imageNeuroGenerationCost)
+  // await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
 
   console.log("Received neuro_generate_ callback with data:", data)
 
@@ -73,7 +75,7 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
       }
       const newBalance = currentBalance - imageNeuroGenerationCost
       await updateUserBalance(userId, newBalance)
-      await sendBalanceMessage(ctx, isRu, newBalance)
+      // await sendBalanceMessage(ctx, isRu, newBalance)
       console.log("All images generated, showing buttons with promptId:", promptId)
       await buttonNeuroHandlers(ctx, promptId)
     } catch (error) {

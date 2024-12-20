@@ -24,7 +24,7 @@ export async function buttonNeuroHandlers(ctx: MyContext, prompt_id: string) {
       .row()
       .text(isRu ? "⬆️ Улучшить" : "⬆️ Improve", `neuro_improve_${prompt_id}`)
       .row()
-      .text(isRu ? "🎥 Создать видео" : "🎥 Create video", `neuro_video_${prompt_id}`)
+    // .text(isRu ? "🎥 Создать видео" : "🎥 Create video", `neuro_video_${prompt_id}`)
 
     console.log("Sending reply with keyboard...")
     await ctx.reply(isRu ? "Выберите количество изображений или действие:" : "Select number of images or action:", {

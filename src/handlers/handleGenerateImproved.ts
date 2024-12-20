@@ -1,5 +1,4 @@
-import { InputFile } from "grammy/types"
-import { Context } from "grammy"
+import { Context, InputFile } from "grammy"
 
 import { generateNeuroImage } from "../helpers/generateNeuroImage"
 import { buttonNeuroHandlers } from "../helpers/buttonNeuroHandlers"

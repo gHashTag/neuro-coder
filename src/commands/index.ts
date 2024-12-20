@@ -9,7 +9,6 @@ import { buy } from "./buy"
 import selectModelComposer from "./select_model"
 import { MyContext } from "../utils/types"
 import { balance } from "./balance"
-import { handleQuestComplete } from "./neuro_quest/handlers"
 
 const composer = new Composer<MyContext>()
 
