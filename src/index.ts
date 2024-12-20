@@ -75,48 +75,20 @@ if (process.env.NODE_ENV === "production") {
       description: "👋 Start bot / Запустить бота",
     },
     {
-      command: "help",
-      description: "❓ Help / Помощь",
-    },
-    {
-      command: "buy",
-      description: "💰 Top up balance / Пополнить баланс",
-    },
-    {
-      command: "balance",
-      description: "💰 Balance / Баланс",
-    },
-    {
-      command: "select_model",
-      description: "🤖 Select model / Выбрать модель",
-    },
-    {
-      command: "invite",
-      description: "👥 Invite a friend / Пригласить друга",
-    },
-    {
       command: "avatar",
       description: "👤 Tell about yourself / Рассказать о себе",
     },
     {
-      command: "voice",
-      description: "🎤 Add voice to avatar / Добавить аватару голос",
+      command: "train_flux_model",
+      description: "🎨 Train FLUX model / Обучить модель FLUX",
     },
     {
-      command: "text_to_speech",
-      description: "🎤 Convert text to speech / Преобразовать текст в речь",
+      command: "neuro_photo",
+      description: "🤖 Generate your photos / Сгенерировать ваши фото",
     },
     {
-      command: "lipsync",
-      description: "🎥 Lipsync / Синхронизация губ",
-    },
-    {
-      command: "b_roll",
-      description: "🎥 Create B-roll / Создать B-roll",
-    },
-    {
-      command: "subtitles",
-      description: "🎥 Create subtitles / Создать субтитры",
+      command: "image_to_prompt",
+      description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
     },
     {
       command: "text_to_image",
@@ -131,24 +103,52 @@ if (process.env.NODE_ENV === "production") {
       description: "🎥 Generate video from image / Сгенерировать видео из изображения",
     },
     {
-      command: "image_to_prompt",
-      description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
+      command: "voice",
+      description: "🎤 Add voice to avatar / Добавить аватару голос",
+    },
+    {
+      command: "text_to_speech",
+      description: "🎤 Convert text to speech / Преобразовать текст в речь",
+    },
+    {
+      command: "select_model",
+      description: "🤖 Select model / Выбрать модель",
+    },
+    {
+      command: "b_roll",
+      description: "🎥 Create B-roll / Создать B-roll",
+    },
+    {
+      command: "lipsync",
+      description: "🎥 Lipsync / Синхронизация губ",
+    },
+    {
+      command: "subtitles",
+      description: "🎥 Create subtitles / Создать субтитры",
     },
     {
       command: "invite",
       description: "👥 Invite a friend / Пригласить друга",
     },
     {
-      command: "train_flux_model",
-      description: "🎨 Train FLUX model / Обучить модель FLUX",
+      command: "buy",
+      description: "💰 Top up balance / Пополнить баланс",
     },
     {
-      command: "train_flux_model",
-      description: "🎨 Train FLUX model / Обучить модель FLUX",
+      command: "balance",
+      description: "💰 Balance / Баланс",
     },
     {
-      command: "neuro_photo",
-      description: "🤖 Generate your photos / Сгенерировать ваши фото",
+      command: "select_model",
+      description: "🤖 Select model / Выбрать модель",
+    },
+    {
+      command: "b_roll",
+      description: "🎥 Create B-roll / Создать B-roll",
+    },
+    {
+      command: "help",
+      description: "🤖 Help / Помощь",
     },
   ])
 }
@@ -208,7 +208,10 @@ bot.on("message:successful_payment", async (ctx) => {
       ? `💫 Ваш баланс пополнен на ${stars} звезд! (Стоимость звезды: $${starCost})`
       : `💫 Your balance has been replenished by ${stars} stars! (Cost per star: $${starCost})`,
   )
-  await ctx.api.sendMessage("-1001978334539", `💫 Пользователь @${ctx.from.username} (ID: ${ctx.from.id}) пополнил баланс на ${stars} звезд! (Стоимость звезды: $${starCost})`)
+  await ctx.api.sendMessage(
+    "-1001978334539",
+    `💫 Пользователь @${ctx.from.username} (ID: ${ctx.from.id}) пополнил баланс на ${stars} звезд! (Стоимость звезды: $${starCost})`,
+  )
 })
 
 bot.on("message:text", async (ctx) => {
