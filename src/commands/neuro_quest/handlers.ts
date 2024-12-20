@@ -619,7 +619,7 @@ export async function handleQuestComplete(ctx: MyContext) {
 
 🍀 Удачи в прохождении! 🍀
 
-💵 На вашем балансе 1 доллар. Используйте его, чтобы открыть новые возможности!`
+💵 На вашем балансе 1 ⭐️. Используйте его, чтобы открыть новые возможности!`
       : `🎉 NeuroQuest completed! 🎉
 
 You have successfully completed all tasks and reached the maximum level! 🌟✨
@@ -630,7 +630,7 @@ You have successfully completed all tasks and reached the maximum level! 🌟✨
 
 🍀 Good luck in the quest! 🍀
 
-💵 You have $1 on your balance. Use it to unlock new features!`,
+💵 You have 1 ⭐️ on your balance. Use it to unlock new features!`,
     {
       reply_markup: {
         inline_keyboard: [

@@ -5,11 +5,10 @@ import { InlineKeyboard, InputFile } from "grammy"
 import { getGeneratedImages } from "../../core/supabase/ai"
 import { buttonHandlers } from "../../helpers/buttonHandlers"
 import { generateImage } from "../../helpers/generateReplicateImage"
-import { models } from "../../core/replicate"
+
 import {
   getUserBalance,
   updateUserBalance,
-  starCost,
   sendInsufficientStarsMessage,
   sendBalanceMessage,
   imageGenerationCost,
