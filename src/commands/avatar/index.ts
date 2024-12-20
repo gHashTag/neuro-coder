@@ -2,7 +2,7 @@ import { updateUserSoul } from "../../core/supabase"
 import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
 
-export async function soulConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
+export async function avatarConversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const lang = ctx.from?.language_code || "en"
   const messageIds: number[] = []
 

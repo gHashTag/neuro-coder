@@ -184,6 +184,22 @@ composer.command("help", async (ctx) => {
   await ctx.conversation.enter("helpConversation")
 })
 
+composer.command("avatar", async (ctx) => {
+  await ctx.conversation.enter("avatarConversation")
+})
+
+composer.command("text_to_image", async (ctx) => {
+  await ctx.conversation.enter("textToImageConversation")
+})
+
+composer.command("image_to_prompt", async (ctx) => {
+  await ctx.conversation.enter("imageToPromptConversation")
+})
+
+composer.command("train_flux_model", async (ctx) => {
+  await ctx.conversation.enter("trainFluxModelConversation")
+})
+
 composer.use(selectModelComposer)
 
 export default composer

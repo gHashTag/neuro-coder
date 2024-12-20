@@ -11,7 +11,7 @@ import { generateImageConversation } from "./commands/generateImageConversation"
 import createTriggerReel from "./commands/trigger_reel"
 import captionForReels from "./commands/caption_for_reels"
 import { get100Conversation } from "./commands/get100"
-import { soulConversation } from "./commands/soul"
+import { avatarConversation } from "./commands/avatar"
 import { voiceConversation } from "./commands/voice"
 import { setModel } from "./core/supabase/ai"
 
@@ -156,7 +156,7 @@ bot.use(createConversation(generateImageConversation))
 bot.use(createConversation(createTriggerReel))
 bot.use(createConversation(captionForReels))
 bot.use(createConversation(get100Conversation))
-bot.use(createConversation(soulConversation))
+bot.use(createConversation(avatarConversation))
 bot.use(createConversation(voiceConversation))
 bot.command("invite", invite)
 bot.use(createConversation(lipSyncConversation))
@@ -318,19 +318,6 @@ bot.on("callback_query:data", async (ctx) => {
     }
     await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")
   }
-})
-
-// Регистрирем команду
-bot.command("text_to_image", async (ctx) => {
-  await ctx.conversation.enter("textToImageConversation")
-})
-
-bot.command("image_to_prompt", async (ctx) => {
-  await ctx.conversation.enter("imageToPromptConversation")
-})
-
-bot.command("train_flux_model", async (ctx) => {
-  await ctx.conversation.enter("trainFluxModelConversation")
 })
 
 bot.catch((err) => {
