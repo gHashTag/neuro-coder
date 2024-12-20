@@ -680,7 +680,7 @@ You have successfully completed all tasks and reached the maximum level! 🌟✨
           [
             {
               text: isRu ? "💎 Купить подписку" : "💎 Buy subscription",
-              callback_data: "buy_subscription",
+              callback_data: "buy",
             },
           ],
         ],
