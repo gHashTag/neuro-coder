@@ -19,6 +19,7 @@ import {
   handleQuestRules,
 } from "./handlers"
 import { handleModelCallback } from "../../handlers/handleModelCallback"
+import { buy } from "../buy"
 
 export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
@@ -97,7 +98,10 @@ export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
 💡 Each level will give you skills for creating professional content.
 
 Ready to become a content creation pro?`,
-    reply_markup: new InlineKeyboard().text(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "quest_start").row().text(isRu ? "💎 Пополнить баланс" : "💎 Top up balance", "top_up_balance"),
+    reply_markup: new InlineKeyboard()
+      .text(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "quest_start")
+      .row()
+      .text(isRu ? "💎 Пополнить баланс" : "💎 Top up balance", "top_up_balance"),
   })
 
   // Обработка ответов пользователя
@@ -161,8 +165,8 @@ Ready to become a content creation pro?`,
         case "quest_complete":
           await handleQuestComplete(ctx)
           break
-        case "buy_subscription":
-          await ctx.conversation.enter("buySubscription")
+        case "top_up_balance":
+          await buy(ctx)
           break
         default:
           console.log("🎮 Unknown action:", action)
