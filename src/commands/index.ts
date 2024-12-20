@@ -169,7 +169,7 @@ composer.command("train_flux_model", async (ctx) => {
 })
 
 composer.command("image_to_video", async (ctx) => {
-  await ctx.conversation.enter("imageToVideo")
+  await ctx.conversation.enter("imageToVideoConversation")
 })
 
 composer.command("neuro_photo", async (ctx) => {
