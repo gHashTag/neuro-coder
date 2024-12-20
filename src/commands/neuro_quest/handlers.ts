@@ -48,42 +48,42 @@ export async function handleLevel1(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   await ctx.reply(
     isRu
-      ? `📷 Создайте фотореалистичные изображения с вашим лицом! 📷
+      ? `🎨 Обучите модель FLUX для создания уникальных изображений с вашим лицом! 🎨
 
-После того как вы обучили модель с помощью команды /train_flux_model, вы можете перейти к созданию уникальных изображений с вашим лицом! Используйте команду /neuro_photo, чтобы воплотить свои идеи в жизнь! 🌟✨
+С помощью команды /train_flux_model вы можете обучить модель, чтобы она могла создавать фотографии с вашим лицом, отражающие вашу индивидуальность и стиль. Это первый шаг к созданию удивительных нейрофотографий! 🌟✨
 
 🖌️ Как это работает?
-1. Убедитесь, что вы обучили модель с помощью /train_flux_model.
-2. Введите команду /neuro_photo в нашем боте.
-3. Опишите, что вы хотите увидеть, и получите изображение с вашим лицом!
+1. Введите команду /train_flux_model в нашем боте.
+2. Загрузите фотографии с вашим лицом(Минимальное количество фотографий - 10).
+3. Дождитесь завершения обучения модели.
 
-🎨 Почему это круто?
-Создавайте персонализированные изображения, которые отражают вашу индивидуальность.
-Делитесь уникальными изображениями с друзьями и семьей.
-Используйте изображения для творчества и вдохновения.
+🎨 Почему это важно?
+Обученная модель позволяет создавать более точные и персонализированные изображения.
+Вы сможете использовать модель для различных творческих проектов.
+Это открывает новые возможности для визуализации ваших идей.
 
 💡 Примеры использования:
-Создайте аватар для социальных сетей.
-Визуализируйте свои мечты и цели с вашим участием.
-Поделитесь своими креативными идеями в социальных сетях.`
-      : `📷 Create photorealistic images with your face! 📷
+Создайте уникальные аватары для социальных сетей.
+Визуализируйте свои мечты и цели.
+Используйте изображения для вдохновения и творчества.`
+      : `🎨 Train the FLUX model to create unique images with your face! 🎨
 
-Once you have trained the model with the /train_flux_model command, you can move on to creating unique images with your face! Use the /neuro_photo command to bring your ideas to life! 🌟✨
+With the /train_flux_model command, you can train the model to create photos with your face that reflect your personality and style. This is the first step to creating amazing neurophotographs! 🌟✨
 
 🖌️ How does it work?
-1. Make sure you have trained the model with /train_flux_model.
-2. Enter the /neuro_photo command in our bot.
-3. Describe what you want to see and get an image with your face!
+1. Enter the /train_flux_model command in our bot.
+2. Upload photos with your face (Minimum number of photos is 10).
+3. Wait for the model to complete training.
 
-🎨 Why is it cool?
-Create personalized images that reflect your personality.
-Share unique images with friends and family.
-Use images for creativity and inspiration.
+🎨 Why is this important?
+A trained model allows you to create more accurate and personalized images.
+You will be able to use the model for various creative projects.
+This opens up new possibilities for visualizing your ideas.
 
 💡 Use cases:
-Create an avatar for social networks.
-Visualize your dreams and goals with your participation.
-Share your creative ideas on social media.`,
+Create unique avatars for social networks.
+Visualize your dreams and goals.
+Use images for inspiration and creativity`,
     {
       reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_2"),
     },
@@ -97,7 +97,7 @@ export async function handleLevel2(ctx: MyContext) {
   await ctx.reply(
     isRu
       ? `📸 Создайте уникальные нейрофотографии! 📸
-После обучения модели с помощью команды /train_flux_model, вы можете создавать удивительные изображения с помощью команды /neuro_photo. Воплотите свои идеи в жизнь с помощью нейросетей! 🌟✨
+После обучения модели, вы можете создавать удивительные изображения с помощью команды /neuro_photo. Воплотите свои идеи в жизнь с помощью нейросетей! 🌟✨
 
 🖌️ Как это работает?
 1. Убедитесь, что вы обучили модель с помощью /train_flux_model.
@@ -114,7 +114,7 @@ export async function handleLevel2(ctx: MyContext) {
 Визуализируйте свои мечты и цели.
 Поделитесь своими креативными идеями в социальных сетях.`
       : `📸 Create unique neurophotographs! 📸
-After training the model with the /train_flux_model command, you can create amazing images with the /neuro_photo command. Bring your ideas to life with neural networks! 🌟✨
+After training the model, you can create amazing images with the /neuro_photo command. Bring your ideas to life with neural networks! 🌟✨
 
 🖌️ How does it work?
 1. Make sure you have trained the model with /train_flux_model.
@@ -663,7 +663,7 @@ export async function handleQuestComplete(ctx: MyContext) {
 
 🍀 Удачи в прохождении! 🍀
 
-💵 На вашем балансе 1 ⭐️. Используйте его, чтобы открыть новые возможности!`
+💵 На вашем балансе 100 ⭐️. Используйте его, чтобы открыть новые возможности!`
       : `🎉 NeuroQuest completed! 🎉
 
 You have successfully completed all tasks and reached the maximum level! 🌟✨
@@ -674,7 +674,7 @@ You have successfully completed all tasks and reached the maximum level! 🌟✨
 
 🍀 Good luck in the quest! 🍀
 
-💵 You have 1 ⭐️ on your balance. Use it to unlock new features!`,
+💵 You have 100 ⭐️ on your balance. Use it to unlock new features!`,
     {
       reply_markup: {
         inline_keyboard: [
