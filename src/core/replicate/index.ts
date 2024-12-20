@@ -45,6 +45,15 @@ interface ModelConfig {
   price: number
 }
 
+const getInput = (prompt: string) => ({
+  prompt,
+  aspect_ratio: "9:16",
+  width: 768,
+  height: 1344,
+  negative_prompt:
+    "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
+})
+
 export const models: Record<string, ModelConfig> = {
   flux: {
     key: "black-forest-labs/flux-1.1-pro-ultra",
@@ -122,5 +131,25 @@ export const models: Record<string, ModelConfig> = {
       prompt,
     }),
     price: 0.03,
+  },
+  lee_solar: {
+    key: "ghashtag/lee_solar:7b7e9744c88e23c0eeccb9874c36336f73fce9d3d17992c8acabb04e67ee03b4",
+    word: "",
+    description: {
+      ru: "🎨 Lee Solar - астрологические изображения",
+      en: "🎨 Lee Solar - astrological images",
+    },
+    getInput,
+    price: 0.022,
+  },
+  dpbelarusx: {
+    key: "dpbelarusx/dpbelarusx:7b7e9744c88e23c0eeccb9874c36336f73fce9d3d17992c8acabb04e67ee03b4",
+    word: "",
+    description: {
+      ru: "🎨 DPBelarusX - астрологические изображения",
+      en: "🎨 DPBelarusX - astrological images",
+    },
+    getInput,
+    price: 0.022,
   },
 }

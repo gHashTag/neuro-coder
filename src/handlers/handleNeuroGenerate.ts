@@ -1,21 +1,39 @@
-import { InputFile } from "grammy/types"
+import { InputFile } from "grammy"
 import { getPrompt } from "../core/supabase/ai"
 import { buttonNeuroHandlers } from "../helpers/buttonNeuroHandlers"
 import { generateNeuroImage } from "../helpers/generateNeuroImage"
 import { MyContext } from "../utils/types"
+import {
+  getUserBalance,
+  imageNeuroGenerationCost,
+  sendBalanceMessage,
+  sendCurrentBalanceMessage,
+  sendInsufficientStarsMessage,
+  updateUserBalance,
+} from "../helpers/telegramStars"
 
 export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
     await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
     return
   }
+
+  const userId = ctx.from.id
+  const currentBalance = await getUserBalance(userId)
+  if (currentBalance < imageNeuroGenerationCost) {
+    await sendInsufficientStarsMessage(ctx, isRu)
+    return
+  }
+
+  await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
+
   console.log("Received neuro_generate_ callback with data:", data)
 
   const parts = data.split("_")
   console.log("Split parts:", parts)
 
   const count = parts[2]
-  const promptId = parts[3] // UUID будет последней ча��тью
+  const promptId = parts[3]
   console.log("Extracted count and promptId:", { count, promptId })
 
   let generatingMessage: { message_id: number } | null = null
@@ -38,7 +56,7 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
 
       for (let i = 0; i < numImages; i++) {
         console.log(`Starting generation of image ${i + 1}/${numImages}`)
-        const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString(), ctx)
+        const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx)
 
         if (!result) {
           console.error("Generation returned null result")
@@ -53,7 +71,9 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
           await ctx.reply(isRu ? `⏳ Сгенерировано ${i + 1} из ${numImages}...` : `⏳ Generated ${i + 1} of ${numImages}...`)
         }
       }
-
+      const newBalance = currentBalance - imageNeuroGenerationCost
+      await updateUserBalance(userId, newBalance)
+      await sendBalanceMessage(ctx, isRu, newBalance)
       console.log("All images generated, showing buttons with promptId:", promptId)
       await buttonNeuroHandlers(ctx, promptId)
     } catch (error) {

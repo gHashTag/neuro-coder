@@ -29,7 +29,7 @@ export async function handleGenerateImproved(ctx: Context, data: string, isRu: b
 
   try {
     console.log("Generating neuro image...")
-    const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id.toString(), ctx)
+    const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx)
     console.log("Generation result with prompt_id:", result?.prompt_id)
 
     if (!result) {

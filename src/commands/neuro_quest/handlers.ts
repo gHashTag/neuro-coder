@@ -1,6 +1,49 @@
 import { MyContext } from "../../utils/types"
 import { InlineKeyboard } from "grammy"
 
+export async function handleLevel0(ctx: MyContext) {
+  const isRu = ctx.from?.language_code === "ru"
+
+  await ctx.reply(
+    isRu
+      ? `🌟 Создайте свой уникальный аватар! 🌟
+\nХотите, чтобы ваш бот знал о вас больше? \n🤖 С помощью команды /avatar вы можете предоставить информацию о себе, чтобы улучшить взаимодействие с ботом! 🧠✨
+
+🔍 Что это значит?
+Создание аватара позволяет боту лучше понимать ваши потребности и предоставлять более персонализированные ответы. Это как создание цифрового профиля, который помогает боту лучше взаимодействовать с вами.
+
+💡 Как это работает?
+Введите команду для начала создания аватара.
+Ответьте на несколько простых вопросов о вашей компании, должности и навыках.
+Наслаждайтесь более персонализированным взаимодействием с ботом!
+
+📈 Преимущества:
+Более точные и персонализированные ответы.
+Возможность улучшить взаимодействие с ботом.
+Создание уникального профиля, который помогает боту лучше понимать ваши запросы.
+`
+      : `🌟 Create your unique avatar! 🌟
+\nWant your bot to know more about you? \n🤖 With the /avatar command, you can provide information about yourself to improve your interactions with the bot! 🧠✨
+
+🔍 What does it mean?
+Creating an avatar allows the bot to better understand your needs and provide more personalized answers. It's like creating a digital profile that helps the bot better interact with you.
+
+💡 How does it work?
+Enter the command to start creating an avatar.
+Answer a few simple questions about your company, job title, and skills.
+Enjoy a more personalized interaction with the bot!
+
+📈 Benefits:
+More accurate and personalized answers.
+The ability to improve interactions with the bot.
+Create a unique profile that helps the bot better understand your requests.
+`,
+    {
+      reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_1"),
+    },
+  )
+}
+
 export async function handleLevel1(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
 
@@ -619,7 +662,7 @@ export async function handleQuestComplete(ctx: MyContext) {
 
 🍀 Удачи в прохождении! 🍀
 
-💵 На вашем балансе 1 доллар. Используйте его, чтобы открыть новые возможности!`
+💵 На вашем балансе 1 ⭐️. Используйте его, чтобы открыть новые возможности!`
       : `🎉 NeuroQuest completed! 🎉
 
 You have successfully completed all tasks and reached the maximum level! 🌟✨
@@ -630,7 +673,7 @@ You have successfully completed all tasks and reached the maximum level! 🌟✨
 
 🍀 Good luck in the quest! 🍀
 
-💵 You have $1 on your balance. Use it to unlock new features!`,
+💵 You have 1 ⭐️ on your balance. Use it to unlock new features!`,
     {
       reply_markup: {
         inline_keyboard: [

@@ -113,7 +113,7 @@ const createReels = async (ctx: Context): Promise<void> => {
     )
     console.log(JSON.stringify(stepsData, null, 2), "stepsData")
 
-    const englishImages = await generateImagesForNeuroBroker(stepsData, "en", false)
+    const englishImages = await generateImagesForNeuroBroker(stepsData)
     console.log(englishImages, "englishImages")
 
     // const ownerImage = await generateImageNeuroBroker(

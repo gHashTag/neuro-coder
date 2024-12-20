@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import ffmpeg from "fluent-ffmpeg"
 import sharp from "sharp"
 import os from "os"
@@ -124,7 +125,6 @@ export function createSVGWithWhiteText(width: number, height: number, text: stri
   const maxWidth = width * 0.8 // 80% от ширины SVG
   const fontSize = 40
   const lineHeight = 60
-  const padding = 30 // Отступ от края
 
   // Функция для измерения ширины текста (приблизительно)
   function getTextWidth(text: string): number {
@@ -341,7 +341,6 @@ export function createYellowAndWhiteText(width: number, height: number, text: st
   const maxWidth = width * 0.85 // Увеличено до 95% от ширины SVG
   const fontSize = 52 // Увеличен размер шрифта
   const lineHeight = 50 // Увеличена высота строки
-  const padding = 30 // Отступ от края
 
   // Функция для измерения ширины текста (приблизительно)
   function getTextWidth(text: string): number {
@@ -423,7 +422,6 @@ export function createSVGWithHighlightedText(width: number, height: number, text
   const fontSize = 50
   const lineHeight = 80
   const paddingX = 10 // Горизонтальный отступ
-  const paddingY = 10 // Вертикальный отступ
 
   // Функция для измерения ширины текста (приблизи��ельно)
   function getTextWidth(text: string): number {
@@ -449,7 +447,7 @@ export function createSVGWithHighlightedText(width: number, height: number, text
     .map((line, index) => {
       const lineWidth = getTextWidth(line)
       const rectX = (width - lineWidth) / 2 - paddingX
-      const rectY = startY + index * lineHeight - paddingY / 2
+
       const wordsInLine = line.split(" ")
       const coloredWords = wordsInLine
         .map((word, wordIndex) => {
@@ -629,7 +627,7 @@ async function downloadImage(url: string, outputPath: string): Promise<string> {
   }
 }
 
-export async function generateImagesForNeuroBroker(steps: Step[], language: "en" | "zh" | "ru", isModelFlux = false) {
+export async function generateImagesForNeuroBroker(steps: Step[]) {
   const imagesWithText: { imagePath: string; text: string }[] = []
   console.log(imagesWithText, "imagesWithText")
   console.log("Начинаем генерацию изображений для медитации")
@@ -1348,22 +1346,22 @@ export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, 
 
   const username = ctx.from?.username || ""
   const telegram_id = ctx.from?.id
-  const chatMember = await bot.api.getChatMember("@neuro_coder_ai", telegram_id || 0)
-  console.log(chatMember, "chatMember")
-  const isSubscribed = chatMember.status === "member" || chatMember.status === "administrator" || chatMember.status === "creator"
+  // const chatMember = await bot.api.getChatMember("@neuro_coder_ai", telegram_id || 0)
+  // console.log(chatMember, "chatMember")
+  // const isSubscribed = chatMember.status === "member" || chatMember.status === "administrator" || chatMember.status === "creator"
 
-  if (!isSubscribed) {
-    const isRu = ctx.from?.language_code === "ru"
-    await ctx.reply(
-      isRu ? "Пожалуйста, подпишитесь на наш канал, чтобы продолжить использование бота. 😊" : "Please subscribe to our channel to continue using the bot. 😊",
-      {
-        reply_markup: {
-          inline_keyboard: [[{ text: "Подписаться", url: `t.me/neuro_coder_ai` }]],
-        },
-      },
-    )
-    return
-  }
+  // if (!isSubscribed) {
+  //   const isRu = ctx.from?.language_code === "ru"
+  //   await ctx.reply(
+  //     isRu ? "Пожалуйста, подпишитесь на наш канал, чтобы продолжить использование бота. 😊" : "Please subscribe to our channel to continue using the bot. 😊",
+  //     {
+  //       reply_markup: {
+  //         inline_keyboard: [[{ text: "Подписаться", url: `t.me/neuro_coder_ai` }]],
+  //       },
+  //     },
+  //   )
+  //   return
+  // }
 
   if (telegram_id) {
     // Ваша логика здесь
@@ -1371,7 +1369,7 @@ export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, 
     await createUser({ username, telegram_id: telegram_id.toString() })
 
     // Проверка наличия инвайтера
-    const { data: user, error } = await supabase.from("users").select("inviter").eq("telegram_id", telegram_id).maybeSingle()
+    const { data: user, error } = await supabase.from("users").select("inviter").eq("telegram_id", telegram_id.toString()).maybeSingle()
 
     if (error) {
       console.error(`Ошибка при проверке инвайтера: ${error.message}`)

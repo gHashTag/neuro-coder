@@ -1,7 +1,7 @@
 import { Composer, InlineKeyboard } from "grammy"
 import { MyContext } from "../../utils/types"
-import { setModel } from "../../core/supabase/ai"
 import OpenAI from "openai"
+import { handleModelCallback } from "../../handlers/handleModelCallback"
 
 const composer = new Composer<MyContext>()
 
@@ -56,20 +56,9 @@ composer.command("select_model", async (ctx) => {
   }
 })
 
-// Обработчик для callback_query остается без изменений
 composer.callbackQuery(/^model_/, async (ctx) => {
   const model = ctx.callbackQuery.data.replace("model_", "")
-  const isRu = ctx.from?.language_code === "ru"
-
-  try {
-    await setModel(ctx.from.id.toString(), model)
-    await ctx.answerCallbackQuery()
-    await ctx.reply(isRu ? `✅ Модель успешно изменена на ${model}` : `✅ Model successfully changed to ${model}`)
-  } catch (error) {
-    console.error("Error setting model:", error)
-    await ctx.answerCallbackQuery()
-    await ctx.reply(isRu ? "❌ Ошибка при изменении модели" : "❌ Error changing model")
-  }
+  await handleModelCallback(model, ctx)
 })
 
 export default composer

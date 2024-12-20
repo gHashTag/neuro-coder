@@ -1,13 +1,29 @@
 import { Conversation } from "@grammyjs/conversations"
 import { generateVideo } from "../../helpers/generateVideo"
-import { InputFile } from "grammy"
+import { InputFile, InlineKeyboard } from "grammy"
 import type { MyContext } from "../../utils/types"
-import { InlineKeyboard } from "grammy"
+import {
+  textToVideoCost,
+  sendInsufficientStarsMessage,
+  getUserBalance,
+  updateUserBalance,
+  sendBalanceMessage,
+  sendCurrentBalanceMessage,
+} from "../../helpers/telegramStars/telegramStars"
 
 export const textToVideoConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   try {
+    if (!ctx.from) {
+      throw new Error("User not found")
+    }
     const isRu = ctx.from?.language_code === "ru"
-
+    const currentBalance = await getUserBalance(ctx.from.id)
+    const price = textToVideoCost
+    if (currentBalance < price) {
+      await sendInsufficientStarsMessage(ctx, isRu)
+      return
+    }
+    await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
     // Создаем клавиатуру для выбора модели
     const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper")
 
@@ -48,6 +64,9 @@ export const textToVideoConversation = async (conversation: Conversation<MyConte
       caption: prompt,
       supports_streaming: true,
     })
+
+    await updateUserBalance(ctx.from.id, currentBalance - price)
+    await sendBalanceMessage(ctx, isRu, currentBalance - price)
   } catch (error: unknown) {
     console.error("Error in textToVideoConversation:", error)
     const isRu = ctx.from?.language_code === "ru"

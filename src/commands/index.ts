@@ -16,8 +16,8 @@ composer.command("clipmaker", (ctx: MyContext) => clipmaker(ctx))
 composer.command("leela", (ctx: MyContext) => leela(ctx))
 composer.command("neuro_broker", (ctx: MyContext) => neuro_broker(ctx))
 
-composer.command("caption_for_ai_news", async (ctx) => {
-  await ctx.conversation.enter("createCaptionForNews")
+composer.command("caption_for_reels", async (ctx) => {
+  await ctx.conversation.enter("captionForReels")
 })
 
 composer.command("lipsync", async (ctx) => {
@@ -149,7 +149,7 @@ composer.command("subtitles", async (ctx) => {
 })
 
 composer.command("get100", async (ctx) => {
-  await ctx.conversation.enter("get100AnfiVesnaConversation")
+  await ctx.conversation.enter("get100Conversation")
 })
 
 composer.command("text_to_image", async (ctx) => {
@@ -169,7 +169,7 @@ composer.command("train_flux_model", async (ctx) => {
 })
 
 composer.command("image_to_video", async (ctx) => {
-  await ctx.conversation.enter("imageToVideo")
+  await ctx.conversation.enter("imageToVideoConversation")
 })
 
 composer.command("neuro_photo", async (ctx) => {
@@ -182,6 +182,22 @@ composer.command("image_to_prompt", async (ctx) => {
 
 composer.command("help", async (ctx) => {
   await ctx.conversation.enter("helpConversation")
+})
+
+composer.command("avatar", async (ctx) => {
+  await ctx.conversation.enter("avatarConversation")
+})
+
+composer.command("text_to_image", async (ctx) => {
+  await ctx.conversation.enter("textToImageConversation")
+})
+
+composer.command("image_to_prompt", async (ctx) => {
+  await ctx.conversation.enter("imageToPromptConversation")
+})
+
+composer.command("train_flux_model", async (ctx) => {
+  await ctx.conversation.enter("trainFluxModelConversation")
 })
 
 composer.use(selectModelComposer)

@@ -25,7 +25,7 @@ export async function fetchImage(url: string): Promise<Buffer> {
   return Buffer.from(response.data)
 }
 
-export const generateImage = async (prompt: string, model_type: string, telegram_id: string): Promise<GenerationResult> => {
+export const generateImage = async (prompt: string, model_type: string, telegram_id: number): Promise<GenerationResult> => {
   try {
     await incrementGeneratedImages(telegram_id)
     const aspect_ratio = await getAspectRatio(telegram_id)

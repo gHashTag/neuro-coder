@@ -15,7 +15,7 @@ export async function handleRetry(ctx: MyContext, isRu: boolean) {
   const { data: lastPrompt } = await supabase
     .from("prompts_history")
     .select("*")
-    .eq("telegram_id", ctx.from)
+    .eq("telegram_id", ctx.from.id.toString())
     .order("created_at", { ascending: false })
     .limit(1)
     .single()
@@ -26,7 +26,7 @@ export async function handleRetry(ctx: MyContext, isRu: boolean) {
   }
 
   console.log("Generating image 3")
-  const result = await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id.toString())
+  const result = await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id)
   console.log("result4", result)
   if (!result) {
     throw new Error("Не удалось сенерирвать изображение")

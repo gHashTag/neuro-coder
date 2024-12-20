@@ -14,13 +14,13 @@ export const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPAB
 export const createUser = async ({ username, telegram_id, inviter = "" }: { username: string; telegram_id: string; inviter?: string }) => {
   let inviterUser
   if (inviter) {
-    const { data: checkInviter, error: fetchError } = await supabase.from("users").select("telegram_id").eq("telegram_id", inviter).maybeSingle()
+    const { data: checkInviter, error: fetchError } = await supabase.from("users").select("telegram_id").eq("telegram_id", inviter.toString()).maybeSingle()
     if (fetchError) throw new Error(`Ошибка при проверке инвайтера: ${fetchError.message}`)
     inviterUser = checkInviter
   }
   const isInviter = inviter && inviterUser
   // Проверяем, существует ли пользователь с данным telegram_id
-  const { data: existingUser, error } = await supabase.from("users").select("*").eq("telegram_id", telegram_id).maybeSingle()
+  const { data: existingUser, error } = await supabase.from("users").select("*").eq("telegram_id", telegram_id.toString()).maybeSingle()
 
   if (error) {
     throw new Error(`Ошибка при проверке существующего пользователя: ${error.message}`)
@@ -28,14 +28,14 @@ export const createUser = async ({ username, telegram_id, inviter = "" }: { user
 
   if (existingUser) {
     if (existingUser.username !== username) {
-      const { error: updateError } = await supabase.from("users").update({ username }).eq("telegram_id", telegram_id)
+      const { error: updateError } = await supabase.from("users").update({ username }).eq("telegram_id", telegram_id.toString())
       if (updateError) {
         throw new Error(`Ошибка при обновлении пользователя: ${updateError.message}`)
       }
     }
 
     if (!existingUser.inviter && isInviter) {
-      const { error: updateInviterError } = await supabase.from("users").update({ inviter }).eq("telegram_id", telegram_id)
+      const { error: updateInviterError } = await supabase.from("users").update({ inviter }).eq("telegram_id", telegram_id.toString())
       if (updateInviterError) {
         throw new Error(`Ошибка при обновлении инвайтера: ${updateInviterError.message}`)
       }
@@ -50,27 +50,27 @@ export const createUser = async ({ username, telegram_id, inviter = "" }: { user
 }
 
 export const getUid = async (telegram_id: string) => {
-  const { data, error } = await supabase.from("users").select("user_id").eq("telegram_id", telegram_id).maybeSingle()
+  const { data, error } = await supabase.from("users").select("user_id").eq("telegram_id", telegram_id.toString()).maybeSingle()
   if (error) throw new Error(`Ошибка при получении user_id: ${error.message}`)
   return data?.user_id
 }
 
 export const updateUserSoul = async (telegram_id: string, company: string, position: string, designation: string) => {
-  const { error } = await supabase.from("users").update({ company, position, designation }).eq("telegram_id", telegram_id)
+  const { error } = await supabase.from("users").update({ company, position, designation }).eq("telegram_id", telegram_id.toString())
   if (error) {
     throw new Error(`Ошибка при обновлении пользователя: ${error.message}`)
   }
 }
 
 export const updateUserVoice = async (telegram_id: string, voice_id_elevenlabs: string) => {
-  const { error } = await supabase.from("users").update({ voice_id_elevenlabs }).eq("telegram_id", telegram_id)
+  const { error } = await supabase.from("users").update({ voice_id_elevenlabs }).eq("telegram_id", telegram_id.toString())
   if (error) {
     throw new Error(`Ошибка при обновлении пользователя: ${error.message}`)
   }
 }
 
 export const getVoiceId = async (telegram_id: string) => {
-  const { data, error } = await supabase.from("users").select("voice_id_elevenlabs").eq("telegram_id", telegram_id).maybeSingle()
+  const { data, error } = await supabase.from("users").select("voice_id_elevenlabs").eq("telegram_id", telegram_id.toString()).maybeSingle()
   if (error) {
     throw new Error(`Ошибка при получении voice_id_elevenlabs: ${error.message}`)
   }
@@ -113,7 +113,7 @@ export const updateModelTraining = async (user_id: string, model_name: string, u
 }
 
 export const getUserModel = async (telegram_id: string): Promise<string> => {
-  const { data, error } = await supabase.from("users").select("model").eq("telegram_id", telegram_id).single()
+  const { data, error } = await supabase.from("users").select("model").eq("telegram_id", telegram_id.toString()).single()
 
   if (error) {
     console.error("Error getting user model:", error)

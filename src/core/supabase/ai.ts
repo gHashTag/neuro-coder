@@ -88,11 +88,11 @@ export const setHistory = async ({ brand, response, video_url, command, type, vo
   return true
 }
 
-export const incrementGeneratedImages = async (telegram_id: string) => {
-  const { data, error } = await supabase.from("users").select("count").eq("telegram_id", telegram_id).single()
+export const incrementGeneratedImages = async (telegram_id: number) => {
+  const { data, error } = await supabase.from("users").select("count").eq("telegram_id", telegram_id.toString()).single()
 
   if (error && error.code === "PGRST116") {
-    const { error: insertError } = await supabase.from("users").insert({ telegram_id: telegram_id, count: 1 })
+    const { error: insertError } = await supabase.from("users").insert({ telegram_id: telegram_id.toString(), count: 1 })
 
     if (insertError) {
       console.error("Ошибка при добавлении нового telegram_id:", insertError)
@@ -100,7 +100,7 @@ export const incrementGeneratedImages = async (telegram_id: string) => {
     }
   } else if (data) {
     const newCount = data.count + 1
-    const { error: updateError } = await supabase.from("users").update({ count: newCount }).eq("telegram_id", telegram_id)
+    const { error: updateError } = await supabase.from("users").update({ count: newCount }).eq("telegram_id", telegram_id.toString())
 
     if (updateError) {
       console.error("Ошибка при обновлении count для telegram_id:", updateError)
@@ -114,11 +114,11 @@ export const incrementGeneratedImages = async (telegram_id: string) => {
   return true
 }
 
-export const incrementLimit = async ({ telegram_id, amount }: { telegram_id: string; amount: number }) => {
-  const { data, error } = await supabase.from("users").select("limit").eq("telegram_id", telegram_id).single()
+export const incrementLimit = async ({ telegram_id, amount }: { telegram_id: number; amount: number }) => {
+  const { data, error } = await supabase.from("users").select("limit").eq("telegram_id", telegram_id.toString()).single()
 
   if (error && error.code === "PGRST116") {
-    const { error: insertError } = await supabase.from("users").insert({ telegram_id: telegram_id, limit: amount })
+    const { error: insertError } = await supabase.from("users").insert({ telegram_id: telegram_id.toString(), limit: amount })
 
     if (insertError) {
       console.error("Ошибка при добавлении нового telegram_id:", insertError)
@@ -126,7 +126,7 @@ export const incrementLimit = async ({ telegram_id, amount }: { telegram_id: str
     }
   } else if (data) {
     const newLimit = data.limit + amount
-    const { error: updateError } = await supabase.from("users").update({ limit: newLimit }).eq("telegram_id", telegram_id)
+    const { error: updateError } = await supabase.from("users").update({ limit: newLimit }).eq("telegram_id", telegram_id.toString())
 
     if (updateError) {
       console.error("Ошибка при обновлении limit для telegram_id:", updateError)
@@ -140,8 +140,8 @@ export const incrementLimit = async ({ telegram_id, amount }: { telegram_id: str
   return true
 }
 
-export const getGeneratedImages = async (telegram_id: string) => {
-  const { data, error } = await supabase.from("users").select("count, limit").eq("telegram_id", telegram_id).single()
+export const getGeneratedImages = async (telegram_id: number) => {
+  const { data, error } = await supabase.from("users").select("count, limit").eq("telegram_id", telegram_id.toString()).single()
 
   if (error || !data) {
     console.log("Ошибка при получении count для telegram_id:", error)
@@ -151,8 +151,8 @@ export const getGeneratedImages = async (telegram_id: string) => {
   return { count: Number(data.count), limit: Number(data.limit) }
 }
 
-export const getAspectRatio = async (telegram_id: string) => {
-  const { data, error } = await supabase.from("users").select("aspect_ratio").eq("telegram_id", telegram_id).single()
+export const getAspectRatio = async (telegram_id: number) => {
+  const { data, error } = await supabase.from("users").select("aspect_ratio").eq("telegram_id", telegram_id.toString()).single()
 
   if (error || !data) {
     console.error("Ошибка при получении aspect_ratio для telegram_id:", error)
@@ -162,8 +162,8 @@ export const getAspectRatio = async (telegram_id: string) => {
   return data.aspect_ratio
 }
 
-export const setAspectRatio = async (telegram_id: string, aspect_ratio: string) => {
-  const { error } = await supabase.from("users").update({ aspect_ratio: aspect_ratio }).eq("telegram_id", telegram_id)
+export const setAspectRatio = async (telegram_id: number, aspect_ratio: string) => {
+  const { error } = await supabase.from("users").update({ aspect_ratio: aspect_ratio }).eq("telegram_id", telegram_id.toString())
 
   if (error) {
     console.error("Ошибка при установке aspect_ratio для telegram_id:", error)
@@ -261,7 +261,7 @@ export async function createVoiceSyncLabs({ fileUrl, username }: { fileUrl: stri
   }
 }
 
-export const savePrompt = async (prompt: string, model_type: string, media_url?: string, telegram_id?: string): Promise<number | null> => {
+export const savePrompt = async (prompt: string, model_type: string, media_url?: string, telegram_id?: number): Promise<number | null> => {
   // Проверяем, существует ли уже такой промпт в таблице
   const { data: existingPrompt, error: selectError } = await supabase
     .from("prompts_history")
@@ -329,4 +329,18 @@ export async function setModel(telegram_id: string, model: string) {
   } catch (error) {
     throw new Error("Error setModel: " + error)
   }
+}
+
+export const getUserData = async (telegram_id: string) => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("username, first_name, last_name, company, position, designation")
+    .eq("telegram_id", telegram_id.toString())
+    .single()
+
+  if (error) {
+    throw new Error(`Ошибка при получении данных пользователя: ${error.message}`)
+  }
+
+  return data
 }

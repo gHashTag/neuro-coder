@@ -15,7 +15,7 @@ const leeSolarNumerolog = async (conversation: Conversation<MyContext>, ctx: MyC
     }
 
     const model_type = "lee_solar_numerolog"
-    const result = await generateImage(text, model_type, ctx.from?.id.toString() || "")
+    const result = await generateImage(text, model_type, ctx.from?.id || 0)
 
     if (!result) {
       throw new Error("Не удалось сгенерировать изображение")

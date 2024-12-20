@@ -1,6 +1,7 @@
 import { InlineKeyboard } from "grammy"
 import { MyContext, MyConversation } from "../../utils/types"
 import {
+  handleLevel0,
   handleLevel1,
   handleLevel10,
   handleLevel11,
@@ -17,6 +18,7 @@ import {
   handleQuestComplete,
   handleQuestRules,
 } from "./handlers"
+import { handleModelCallback } from "../../handlers/handleModelCallback"
 
 export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
@@ -95,10 +97,8 @@ export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
 💡 Each level will give you skills for creating professional content.
 
 Ready to become a content creation pro?`,
-    reply_markup: new InlineKeyboard()
-      .text(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "quest_start")
-      .row()
-      .text(isRu ? "💎 Купить подписку" : "💎 Buy subscription", "buy_subscription"),
+    reply_markup: new InlineKeyboard().text(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "quest_start").row(),
+    // .text(isRu ? "💎 Купить подписку" : "💎 Buy subscription", "buy"),
   })
 
   // Обработка ответов пользователя
@@ -107,57 +107,68 @@ Ready to become a content creation pro?`,
     await ctx.api.answerCallbackQuery(response.callbackQuery.id)
 
     const action = response.callbackQuery.data
-
-    switch (action) {
-      case "quest_rules":
-        await handleQuestRules(ctx)
-        break
-      case "level_2":
-        await handleLevel2(ctx)
-        break
-      case "level_3":
-        await handleLevel3(ctx)
-        break
-      case "level_4":
-        await handleLevel4(ctx)
-        break
-      case "level_5":
-        await handleLevel5(ctx)
-        break
-      case "level_6":
-        await handleLevel6(ctx)
-        break
-      case "level_7":
-        await handleLevel7(ctx)
-        break
-      case "level_8":
-        await handleLevel8(ctx)
-        break
-      case "level_9":
-        await handleLevel9(ctx)
-        break
-      case "level_10":
-        await handleLevel10(ctx)
-        break
-      case "level_11":
-        await handleLevel11(ctx)
-        break
-      case "level_12":
-        await handleLevel12(ctx)
-        break
-      case "level_13":
-        await handleLevel13(ctx)
-        break
-      case "quest_complete":
-        await handleQuestComplete(ctx)
-        return
-      case "buy_subscription":
-        await ctx.conversation.enter("buySubscription")
-        return
-      case "quest_start":
-      default:
-        await handleLevel1(ctx)
-        break
+    console.log("🎮 Action:", action)
+    if (/^model_/.test(action)) {
+      console.log("🎮 Action:", action)
+      const model = action.replace("model_", "")
+      await handleModelCallback(model, ctx)
+    } else {
+      switch (action) {
+        case "quest_rules":
+          await handleQuestRules(ctx)
+          break
+        case "quest_start":
+          await handleLevel0(ctx)
+          break
+        case "level_1":
+          await handleLevel1(ctx)
+          break
+        case "level_2":
+          await handleLevel2(ctx)
+          break
+        case "level_3":
+          await handleLevel3(ctx)
+          break
+        case "level_4":
+          await handleLevel4(ctx)
+          break
+        case "level_5":
+          await handleLevel5(ctx)
+          break
+        case "level_6":
+          await handleLevel6(ctx)
+          break
+        case "level_7":
+          await handleLevel7(ctx)
+          break
+        case "level_8":
+          await handleLevel8(ctx)
+          break
+        case "level_9":
+          await handleLevel9(ctx)
+          break
+        case "level_10":
+          await handleLevel10(ctx)
+          break
+        case "level_11":
+          await handleLevel11(ctx)
+          break
+        case "level_12":
+          await handleLevel12(ctx)
+          break
+        case "level_13":
+          await handleLevel13(ctx)
+          break
+        case "quest_complete":
+          await handleQuestComplete(ctx)
+          break
+        case "buy_subscription":
+          await ctx.conversation.enter("buySubscription")
+          break
+        default:
+          console.log("🎮 Unknown action:", action)
+          break
+      }
     }
   }
 }

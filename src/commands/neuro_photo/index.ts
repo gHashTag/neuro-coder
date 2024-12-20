@@ -3,9 +3,17 @@ import { supabase } from "../../core/supabase"
 
 import { InputFile } from "grammy"
 import { pulse } from "../../helpers"
-import { savePrompt } from "../../core/supabase/ai"
+
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
 import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
+import {
+  getUserBalance,
+  imageNeuroGenerationCost,
+  sendBalanceMessage,
+  sendCurrentBalanceMessage,
+  sendInsufficientStarsMessage,
+  updateUserBalance,
+} from "../../helpers/telegramStars/telegramStars"
 
 interface UserModel {
   model_name: string
@@ -14,7 +22,7 @@ interface UserModel {
   model_key?: `${string}/${string}:${string}`
 }
 
-async function getLatestUserModel(userId: string): Promise<UserModel | null> {
+async function getLatestUserModel(userId: number): Promise<UserModel | null> {
   const { data, error } = await supabase
     .from("model_trainings")
     .select("model_name, trigger_word, model_url")
@@ -41,12 +49,18 @@ async function getLatestUserModel(userId: string): Promise<UserModel | null> {
 
 export async function neuroPhotoConversation(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
-  const userId = ctx.from?.id.toString()
+  const userId = ctx.from?.id
 
   if (!userId) {
     await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
     return
   }
+  const currentBalance = await getUserBalance(userId)
+  if (currentBalance < imageNeuroGenerationCost) {
+    await sendInsufficientStarsMessage(ctx, isRu)
+    return
+  }
+  await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
 
   try {
     // Получаем последнюю обученную модель пользователя
@@ -91,6 +105,11 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
       console.log("Photo to send:", typeof photoToSend, photoToSend instanceof InputFile ? "InputFile" : "not InputFile")
 
       await ctx.replyWithPhoto(photoToSend)
+
+      // Снимаем звезды с баланса
+      const newBalance = currentBalance - imageNeuroGenerationCost
+      await updateUserBalance(userId, newBalance)
+      await sendBalanceMessage(ctx, isRu, newBalance)
 
       // Отправляем в pulse с правильным model_type
       const pulseImage = Buffer.isBuffer(result.image) ? `data:image/jpeg;base64,${result.image.toString("base64")}` : result.image

@@ -9,16 +9,16 @@ import { imageSizeConversation } from "./commands/imagesize"
 import { customMiddleware } from "./helpers"
 import { generateImageConversation } from "./commands/generateImageConversation"
 import createTriggerReel from "./commands/trigger_reel"
-import createCaptionForNews from "./commands/сaptionForNews"
+import captionForReels from "./commands/caption_for_reels"
 import { get100Conversation } from "./commands/get100"
-import { soulConversation } from "./commands/soul"
+import { avatarConversation } from "./commands/avatar"
 import { voiceConversation } from "./commands/voice"
-import { setModel } from "./core/supabase/ai"
+import { getUserData, setModel } from "./core/supabase/ai"
 
 import { invite } from "./commands/invite"
 
 import { answerAi } from "./core/openai/requests"
-import textToSpeech from "./commands/textToSpeech"
+import textToSpeech from "./commands/text_to_speech"
 import { lipSyncConversation } from "./commands/lipSyncConversation"
 import { createBackgroundVideo } from "./commands/createBackgroundVideo"
 import { start } from "./commands/start"
@@ -31,17 +31,15 @@ import createAinews from "./commands/ainews"
 import { textToImageConversation } from "./commands/text_to_image"
 
 import { textToVideoConversation } from "./commands/text_to_video"
-import imageToVideo from "./commands/image_to_video"
+import { imageToVideoConversation } from "./commands/image_to_video"
 import { imageToPromptConversation } from "./commands/image_to_prompt"
 import { trainFluxModelConversation } from "./commands/train_flux_model"
 import { neuroPhotoConversation } from "./commands/neuro_photo"
-import { run, sequentialize } from "@grammyjs/runner"
-import neuroQuest from "./commands/neuro_quest"
 
 import { handleAspectRatioChange, handleBuy, handleChangeSize } from "./handlers"
 
 import bot from "./core/bot"
-
+import { neuroQuest } from "./commands/neuro_quest"
 import { isRussian } from "./utils/language"
 import { handleGenerateImproved } from "./handlers/handleGenerateImproved"
 import { handleGenerate } from "./handlers/handleGenerate"
@@ -52,7 +50,8 @@ import { handleNeuroGenerate } from "./handlers/handleNeuroGenerate"
 import { handleNeuroImprove } from "./handlers/handleNeuroImprove"
 import { handleNeuroGenerateImproved } from "./handlers/handleNeuroGenerateImproved"
 import { handleNeuroVideo } from "./handlers/handleNeuroVideo"
-import { incrementBalance } from "./helpers/incrementBalance"
+import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
+import { handleModelCallback } from "./handlers/handleModelCallback"
 
 bot.api.config.use(hydrateFiles(bot.token))
 
@@ -69,14 +68,7 @@ if (process.env.NODE_ENV === "development") {
 
 if (process.env.NODE_ENV === "production") {
   // Добавляем sequentialize middleware только в development
-  bot.use(
-    sequentialize((ctx) => {
-      const chat = ctx.chat?.id.toString()
-      const user = ctx.from?.id.toString()
-      return [chat, user].filter((con): con is string => con !== undefined)
-    }),
-  )
-
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   bot.api.setMyCommands([
     {
       command: "start",
@@ -162,9 +154,9 @@ bot.use(createConversation(imageSizeConversation))
 bot.use(createConversation(textToSpeech))
 bot.use(createConversation(generateImageConversation))
 bot.use(createConversation(createTriggerReel))
-bot.use(createConversation(createCaptionForNews))
+bot.use(createConversation(captionForReels))
 bot.use(createConversation(get100Conversation))
-bot.use(createConversation(soulConversation))
+bot.use(createConversation(avatarConversation))
 bot.use(createConversation(voiceConversation))
 bot.command("invite", invite)
 bot.use(createConversation(lipSyncConversation))
@@ -175,7 +167,7 @@ bot.use(createConversation(subtitles))
 bot.use(createConversation(createAinews))
 bot.use(createConversation(textToImageConversation))
 bot.use(createConversation(textToVideoConversation))
-bot.use(createConversation(imageToVideo))
+bot.use(createConversation(imageToVideoConversation))
 bot.use(createConversation(imageToPromptConversation))
 bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))
@@ -188,17 +180,14 @@ bot.command("start", async (ctx) => {
 bot.use(customMiddleware)
 bot.use(commands)
 
-bot.on("pre_checkout_query", (ctx) => {
-  ctx.answerPreCheckoutQuery(true)
+bot.on("pre_checkout_query", async (ctx) => {
+  await ctx.answerPreCheckoutQuery(true)
   return
 })
 
 bot.on("message:successful_payment", async (ctx) => {
   const isRu = isRussian(ctx)
   console.log("ctx 646(succesful_payment)", ctx)
-
-  // Укажите стоимость одной звезды
-  const starCost = 0.016
 
   // Получите сумму платежа в долларах
   const paymentAmount = ctx.message.successful_payment.total_amount / 100 // Предполагается, что сумма в центах
@@ -230,8 +219,14 @@ bot.on("message:text", async (ctx) => {
   try {
     // Получаем модель пользователя
     const userModel = await getUserModel(ctx.from?.id.toString() || "")
+    const userData = await getUserData(ctx.from?.id.toString() || "")
 
-    const response = await answerAi(userModel, ctx.message.text, ctx.from?.language_code || "en")
+    if (!userData) {
+      await ctx.reply(ctx.from?.language_code === "ru" ? "Не удалось получить данные пользователя" : "Failed to get user data")
+      return
+    }
+
+    const response = await answerAi(userModel, userData, ctx.message.text, ctx.from?.language_code || "en")
 
     // Проверяем, что ответ не null
     if (!response) {
@@ -274,21 +269,23 @@ bot.on("callback_query:data", async (ctx) => {
 
     // Добавляем новый обработчик для выбора модели
     if (data.startsWith("select_model_")) {
+      console.log("CHECK")
       const model = data.replace("select_model_", "")
+      console.log("model", model)
       await setModel(ctx.from.id.toString(), model)
       return
     }
 
     if (data.startsWith("generate_improved_")) {
-      console.log("generate_improved_", data)
+      console.log("generate_improved_")
       await handleGenerateImproved(ctx, data, isRu)
       return
     } else if (data.startsWith("generate_")) {
-      console.log("generate_", data)
+      console.log("generate_")
       await handleGenerate(ctx, data, isRu)
       return
     } else if (data.startsWith("improve_")) {
-      console.log("improve_", data)
+      console.log("improve_")
       await handleImprove(ctx, data, isRu)
       return
     } else if (data.startsWith("generate_image_")) {
@@ -327,19 +324,6 @@ bot.on("callback_query:data", async (ctx) => {
     }
     await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")
   }
-})
-
-// Регистрирем команду
-bot.command("text_to_image", async (ctx) => {
-  await ctx.conversation.enter("textToImageConversation")
-})
-
-bot.command("image_to_prompt", async (ctx) => {
-  await ctx.conversation.enter("imageToPromptConversation")
-})
-
-bot.command("train_flux_model", async (ctx) => {
-  await ctx.conversation.enter("trainFluxModelConversation")
 })
 
 bot.catch((err) => {

@@ -1,7 +1,8 @@
-import { InputFile } from "grammy/types"
+import { InputFile } from "grammy"
 import { pulse } from "../helpers"
 import { generateImage } from "../helpers/generateReplicateImage"
 import { MyContext } from "../utils/types"
+import { sendInsufficientStarsMessage, getUserBalance, imageGenerationCost, incrementBalance, sendBalanceMessage } from "../helpers/telegramStars/telegramStars"
 
 export async function handleGenerateImage(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
@@ -10,12 +11,21 @@ export async function handleGenerateImage(ctx: MyContext, data: string, isRu: bo
   }
   const prompt = data.replace("generate_image_", "")
 
+  // Получаем текущий баланс пользователя
+  const currentBalance = await getUserBalance(ctx.from.id)
+
+  // Проверяем, достаточно ли средств
+  if (currentBalance < imageGenerationCost) {
+    await sendInsufficientStarsMessage(ctx, isRu)
+    return
+  }
+
   // Отправляем сообщение о начале генерации
   const generatingMsg = await ctx.reply(isRu ? "⏳ Генерирую изображение..." : "⏳ Generating image...")
 
   try {
     console.log("Generating image 2")
-    const result = await generateImage(prompt, "sdxl", ctx.from.id.toString())
+    const result = await generateImage(prompt, "sdxl", ctx.from.id)
 
     if (!result) {
       throw new Error("Failed to generate image")
@@ -29,6 +39,9 @@ export async function handleGenerateImage(ctx: MyContext, data: string, isRu: bo
     // Отправляем в pulse
     const pulseImage = Buffer.isBuffer(result.image) ? `data:image/jpeg;base64,${result.image.toString("base64")}` : result.image
 
+    await incrementBalance({ telegram_id: ctx.from.id.toString(), amount: imageGenerationCost })
+    const newBalance = await getUserBalance(ctx.from.id)
+    await sendBalanceMessage(ctx, isRu, newBalance)
     await pulse(ctx, pulseImage, prompt, "/sdxl")
 
     // Показываем кнопки для дальнейших действий

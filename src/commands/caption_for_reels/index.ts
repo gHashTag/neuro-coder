@@ -2,7 +2,7 @@ import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
 import { getCaptionForNews } from "../../helpers"
 
-const createCaptionForNews = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
+const captionForReels = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   try {
     const isRu = ctx.from?.language_code === "ru"
     await ctx.replyWithChatAction("typing")
@@ -105,7 +105,7 @@ const createCaptionForNews = async (conversation: Conversation<MyContext>, ctx: 
   }
 }
 
-export default createCaptionForNews
+export default captionForReels
 
 // async function testSlideshow() {
 //     const imageDir = path.join(process.cwd(), "src", "images");

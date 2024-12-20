@@ -1,11 +1,10 @@
 import { Context, InputFile } from "grammy"
-
+import type { InputMediaPhoto } from "grammy/types"
 import ffmpeg from "fluent-ffmpeg"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import { promises as fs } from "fs"
 import path from "path"
 import { createSlideshow, generateImagesForMeditation, getMeditationSteps } from "../../helpers"
-import { InputMediaPhoto } from "grammy/types"
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 
