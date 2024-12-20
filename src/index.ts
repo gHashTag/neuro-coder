@@ -83,6 +83,10 @@ if (process.env.NODE_ENV === "production") {
       description: "💰 Top up balance / Пополнить баланс",
     },
     {
+      command: "balance",
+      description: "💰 Balance / Баланс",
+    },
+    {
       command: "select_model",
       description: "🤖 Select model / Выбрать модель",
     },
