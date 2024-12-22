@@ -190,6 +190,10 @@ bot.on("pre_checkout_query", async (ctx) => {
 })
 
 bot.on("message:successful_payment", async (ctx) => {
+  if (!ctx.chat) {
+    console.error("Update does not belong to a chat")
+    return
+  }
   const isRu = isRussian(ctx)
   console.log("ctx 646(succesful_payment)", ctx)
 

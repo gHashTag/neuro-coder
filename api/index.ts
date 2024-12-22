@@ -1,10 +1,11 @@
 require("../src/index")
 
 import express from "express"
-import { webhookCallback } from "grammy"
+import { session, Context, webhookCallback } from "grammy"
 
 import bot from "../src/core/bot"
 import { supabase } from "../src/core/supabase"
+import { sequentialize } from "@grammyjs/runner"
 
 const app = express()
 
@@ -20,14 +21,27 @@ app.use(express.json())
 app.use(`/api/index`, webhookCallback(bot, "express"))
 
 // Build a unique identifier for the `Context` object.
-// function getSessionKey(ctx: Context) {
-//   return ctx.chat?.id.toString()
-// }
+function getSessionKey(ctx: Context) {
+  return ctx.chat?.id.toString()
+}
 
-// Sequentialize before accessing session data!
-// bot.use(sequentialize(getSessionKey))
-// bot.use(session({ getSessionKey }))
-// run(bot)
+//Sequentialize before accessing session data!
+bot.use(sequentialize(getSessionKey))
+bot.use(session({ getSessionKey }))
+
+bot.on("message", async (ctx) => {
+  if (!ctx.chat) {
+    console.error("Update does not belong to a chat")
+    return
+  }
+
+  try {
+    // Your logic here
+    await ctx.reply("Your message")
+  } catch (error) {
+    console.error("Error handling message:", error)
+  }
+})
 
 app.post("/api/synclabs-webhook", async (req, res) => {
   try {
