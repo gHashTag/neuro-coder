@@ -12,11 +12,10 @@ const production = async (bot: Bot<MyContextWithSession>): Promise<void> => {
 
     const success = await bot.api.setWebhook(webhookUrl)
 
-    await bot.start()
-
     if (success) {
       console.log(`Webhook successfully set to ${webhookUrl}`)
       console.log("Bot is running in webhook mode")
+      await bot.start()
     } else {
       throw new Error("Failed to set webhook")
     }
