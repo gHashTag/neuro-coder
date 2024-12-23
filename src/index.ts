@@ -26,7 +26,7 @@ import leeSolarNumerolog from "./commands/lee_solar_numerolog"
 import leeSolarBroker from "./commands/lee_solar_broker"
 import { subtitles } from "./commands/subtitles"
 
-import { getUid, getUserModel, supabase } from "./core/supabase"
+import { getUid, getUserModel } from "./core/supabase"
 import createAinews from "./commands/ainews"
 import { textToImageConversation } from "./commands/text_to_image"
 
