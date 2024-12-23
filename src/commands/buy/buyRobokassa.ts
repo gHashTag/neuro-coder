@@ -1,4 +1,3 @@
-import { sendPaymentNotification } from "../../helpers"
 import { MyContext } from "../../utils/types"
 
 export async function buyRobokassa(ctx: MyContext) {
@@ -15,11 +14,11 @@ export async function buyRobokassa(ctx: MyContext) {
           [
             {
               text: isRu ? "Купить 3040 ⭐️ за 5000 р" : "Buy 3040 ⭐️ for 5000 RUB",
-              web_app: { url: `https://auth.robokassa.ru/merchant/Invoice/EKUlwqKUdkuSb_FaC3UU9Q` },
+              web_app: { url: `https://auth.robokassa.ru/merchant/Invoice/lm8bmBTG0Eet_kh7ITXp-w` },
             },
             {
               text: isRu ? "Купить 6080 ⭐️ за 10000 р" : "Buy 6080 ⭐️ for 10000 RUB",
-              web_app: { url: `https://auth.robokassa.ru/merchant/Invoice/EOht5ErOOEuhctIeAqJgoA` },
+              web_app: { url: `https://auth.robokassa.ru/merchant/Invoice/I3IwAR8z-E67RwCPE-ag6Q` },
             },
           ],
           [{ text: isRu ? "Что такое звезды❓" : "What are stars❓", web_app: { url: `https://telegram.org/blog/telegram-stars/${isRu ? "ru" : "en"}?ln=a` } }],
