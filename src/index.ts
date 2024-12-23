@@ -70,7 +70,6 @@ function initial(): SessionData {
   return { melimi00: { videos: [], texts: [] }, text: "" }
 }
 
-// Инициализация сессии
 bot.use(session({ initial }))
 
 bot.use(conversations<MyContextWithSession>())
