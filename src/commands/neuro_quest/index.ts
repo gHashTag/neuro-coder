@@ -21,6 +21,7 @@ import {
 import { handleModelCallback } from "../../handlers/handleModelCallback"
 import { buy } from "../buy"
 import { buyRobokassa } from "../buy/buyRobokassa"
+import { handleGenerate, handleGenerateImproved } from "src/handlers"
 
 export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
@@ -104,77 +105,6 @@ Ready to become a content creation pro?`,
       .row()
       .text(isRu ? "💎 Пополнить баланс" : "💎 Top up balance", "top_up_balance"),
   })
-
-  // Обработка ответов пользователя
-  while (true) {
-    const response = await conversation.waitFor("callback_query:data")
-    await ctx.api.answerCallbackQuery(response.callbackQuery.id)
-
-    const action = response.callbackQuery.data
-    console.log("🎮 Action:", action)
-    if (/^model_/.test(action)) {
-      console.log("🎮 Action:", action)
-      const model = action.replace("model_", "")
-      await handleModelCallback(model, ctx)
-    } else {
-      switch (action) {
-        case "quest_rules":
-          await handleQuestRules(ctx)
-          break
-        case "quest_start":
-          await handleLevel0(ctx)
-          break
-        case "level_1":
-          await handleLevel1(ctx)
-          break
-        case "level_2":
-          await handleLevel2(ctx)
-          break
-        case "level_3":
-          await handleLevel3(ctx)
-          break
-        case "level_4":
-          await handleLevel4(ctx)
-          break
-        case "level_5":
-          await handleLevel5(ctx)
-          break
-        case "level_6":
-          await handleLevel6(ctx)
-          break
-        case "level_7":
-          await handleLevel7(ctx)
-          break
-        case "level_8":
-          await handleLevel8(ctx)
-          break
-        case "level_9":
-          await handleLevel9(ctx)
-          break
-        case "level_10":
-          await handleLevel10(ctx)
-          break
-        case "level_11":
-          await handleLevel11(ctx)
-          break
-        case "level_12":
-          await handleLevel12(ctx)
-          break
-        case "level_13":
-          await handleLevel13(ctx)
-          break
-        case "quest_complete":
-          await handleQuestComplete(ctx)
-          break
-        case "top_up_balance":
-          await buyRobokassa(ctx)
-          break
-        default:
-          console.log("🎮 Unknown action:", action)
-          break
-      }
-    }
-  }
 }
 
 export default neuroQuest

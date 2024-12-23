@@ -11,7 +11,9 @@ export async function handleImprove(ctx: MyContext, data: string, isRu: boolean)
   await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
 
   const promptId = data.split("_")[1]
+  console.log(promptId, "promptId")
   const promptData = await getPrompt(promptId)
+  console.log(promptData, "promptData")
 
   if (!promptData) {
     await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")

@@ -4,7 +4,7 @@ import commands from "./commands"
 import { development, production } from "./utils/launch"
 import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
-import { Context, session } from "grammy"
+import { session } from "grammy"
 import { imageSizeConversation } from "./commands/imagesize"
 import { customMiddleware } from "./helpers"
 import { generateImageConversation } from "./commands/generateImageConversation"
@@ -14,7 +14,7 @@ import { get100Conversation } from "./commands/get100"
 import { avatarConversation } from "./commands/avatar"
 import { voiceConversation } from "./commands/voice"
 import { getUserData, setModel } from "./core/supabase/ai"
-
+import { freeStorage } from "@grammyjs/storage-free"
 import { invite } from "./commands/invite"
 
 import { answerAi } from "./core/openai/requests"
@@ -54,6 +54,25 @@ import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStar
 import { MyContextWithSession, SessionData } from "./utils/types"
 import { emailConversation } from "./commands/emailConversation"
 import { buyRobokassa } from "./commands/buy/buyRobokassa"
+import {
+  handleLevel0,
+  handleLevel1,
+  handleLevel10,
+  handleLevel11,
+  handleLevel2,
+  handleLevel3,
+  handleLevel4,
+  handleLevel5,
+  handleLevel6,
+  handleLevel7,
+  handleLevel8,
+  handleLevel9,
+  handleQuestRules,
+} from "./commands/neuro_quest/handlers"
+import { handleLevel12 } from "./commands/neuro_quest/handlers"
+import { handleLevel13 } from "./commands/neuro_quest/handlers"
+import { handleQuestComplete } from "./commands/neuro_quest/handlers"
+import { handleModelCallback } from "./handlers/handleModelCallback"
 
 bot.api.config.use(hydrateFiles(bot.token))
 
@@ -70,7 +89,7 @@ function initial(): SessionData {
   return { melimi00: { videos: [], texts: [] }, text: "" }
 }
 
-bot.use(session({ initial }))
+bot.use(session({ initial, storage: freeStorage<SessionData>(bot.token) }))
 
 bot.use(conversations<MyContextWithSession>())
 bot.use(createConversation(imageSizeConversation))
@@ -181,72 +200,130 @@ bot.on("callback_query:data", async (ctx) => {
     const data = ctx.callbackQuery.data
     await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
 
-    if (data === "change_size") {
-      await handleChangeSize({ ctx })
-      return
-    }
+    switch (true) {
+      case data === "change_size":
+        await handleChangeSize({ ctx })
+        break
 
-    if (data === "request_email") {
-      await ctx.conversation.enter("emailConversation")
-      return
-    }
+      case data === "request_email":
+        await ctx.conversation.enter("emailConversation")
+        break
 
-    if (data.startsWith("size_")) {
-      await handleAspectRatioChange({ ctx })
-      return
-    }
+      case data.startsWith("size_"):
+        await handleAspectRatioChange({ ctx })
+        break
 
-    if (data.startsWith("top_up")) {
-      await buyRobokassa(ctx)
-      return
-    }
+      case data.startsWith("top_up"):
+        await buyRobokassa(ctx)
+        break
 
-    // Добавляем новый обработчик для выбора модели
-    if (data.startsWith("select_model_")) {
-      console.log("CHECK")
-      const model = data.replace("select_model_", "")
-      console.log("model", model)
-      await setModel(ctx.from.id.toString(), model)
-      return
-    }
+      case data.startsWith("select_model_"):
+        console.log("CHECK")
+        const model = data.replace("select_model_", "")
+        console.log("model", model)
+        await setModel(ctx.from.id.toString(), model)
+        break
 
-    if (data.startsWith("generate_improved_")) {
-      await handleGenerateImproved(ctx, data, isRu)
-      return
-    } else if (data.startsWith("generate_")) {
-      console.log("generate_")
-      await handleGenerate(ctx, data, isRu)
-      return
-    } else if (data.startsWith("improve_")) {
-      console.log("improve_")
-      await handleImprove(ctx, data, isRu)
-      return
-    } else if (data.startsWith("generate_image_")) {
-      console.log("generate_image_", data)
-      await handleGenerateImage(ctx, data, isRu)
-      return
-    }
+      case data.startsWith("generate_improved_"):
+        await handleGenerateImproved(ctx, data, isRu)
+        break
 
-    if (data === "retry") {
-      await handleRetry(ctx, isRu)
-      return
-    }
+      case data.startsWith("generate_"):
+        console.log("generate_")
+        await handleGenerate(ctx, data, isRu)
+        break
 
-    // Добавляем обрботчики для нейро-кнопок
-    if (data.startsWith("neuro_generate_")) {
-      await handleNeuroGenerate(ctx, data, isRu)
-      return
-    } else if (data.startsWith("neuro_improve_")) {
-      await handleNeuroImprove(ctx, data, isRu)
-      return
-    } else if (data.startsWith("neuro_generate_improved_")) {
-      await handleNeuroGenerateImproved(ctx, data, isRu)
-      return
-    } else if (data === "neuro_cancel") {
-      await ctx.reply(isRu ? "❌ Генерация отменена" : "❌ Generation cancelled")
-    } else if (data.startsWith("neuro_video_")) {
-      await handleNeuroVideo(ctx, data, isRu)
-      return
+      case data.startsWith("improve_"):
+        console.log("improve_")
+        await handleImprove(ctx, data, isRu)
+        break
+
+      case data.startsWith("generate_image_"):
+        console.log("generate_image_", data)
+        await handleGenerateImage(ctx, data, isRu)
+        break
+
+      case data === "retry":
+        await handleRetry(ctx, isRu)
+        break
+
+      case data.startsWith("neuro_generate_"):
+        await handleNeuroGenerate(ctx, data, isRu)
+        break
+
+      case data.startsWith("neuro_improve_"):
+        await handleNeuroImprove(ctx, data, isRu)
+        break
+
+      case data.startsWith("neuro_generate_improved_"):
+        await handleNeuroGenerateImproved(ctx, data, isRu)
+        break
+
+      case data === "neuro_cancel":
+        await ctx.reply(isRu ? "❌ Генерация отменена" : "❌ Generation cancelled")
+        break
+
+      case data === "quest_rules":
+        await handleQuestRules(ctx)
+        break
+      case data === "quest_start":
+        await handleLevel0(ctx)
+        break
+      case data === "level_1":
+        await handleLevel1(ctx)
+        break
+      case data === "level_2":
+        await handleLevel2(ctx)
+        break
+      case data === "level_3":
+        await handleLevel3(ctx)
+        break
+      case data === "level_4":
+        await handleLevel4(ctx)
+        break
+      case data === "level_5":
+        await handleLevel5(ctx)
+        break
+      case data === "level_6":
+        await handleLevel6(ctx)
+        break
+      case data === "level_7":
+        await handleLevel7(ctx)
+        break
+      case data === "level_8":
+        await handleLevel8(ctx)
+        break
+      case data === "level_9":
+        await handleLevel9(ctx)
+        break
+      case data === "level_10":
+        await handleLevel10(ctx)
+        break
+      case data === "level_11":
+        await handleLevel11(ctx)
+        break
+      case data === "level_12":
+        await handleLevel12(ctx)
+        break
+      case data === "level_13":
+        await handleLevel13(ctx)
+        break
+      case data === "quest_complete":
+        await handleQuestComplete(ctx)
+        break
+      case data === "top_up_balance":
+        await buyRobokassa(ctx)
+        break
+      case data.startsWith("generate_"):
+        console.log("generate_")
+        await handleGenerate(ctx, data, isRu)
+        break
+      case data.startsWith("neuro_video_"):
+        await handleNeuroVideo(ctx, data, isRu)
+        break
+
+      default:
+        console.error("Неизвестная команда:", data)
     }
   } catch (error) {
     console.error("Ошибка при обработке callback query:", error)

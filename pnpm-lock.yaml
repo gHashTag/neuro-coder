@@ -32,6 +32,9 @@ importers:
       '@grammyjs/runner':
         specifier: ^2.0.3
         version: 2.0.3(grammy@1.33.0)
+      '@grammyjs/storage-free':
+        specifier: ^2.4.2
+        version: 2.4.2
       '@grammyjs/types':
         specifier: ^3.17.0
         version: 3.17.0
@@ -308,6 +311,9 @@ packages:
     engines: {node: '>=12.20.0 || >=14.13.1'}
     peerDependencies:
       grammy: ^1.13.1
+
+  '@grammyjs/storage-free@2.4.2':
+    resolution: {integrity: sha512-apyZiHXxVOZQSITt5N279WFAus8kXkYFjASmsDHeHtD9M3sGfj2RYTNmYzPCMzhymD2NGuElunhh8w4geGfwaA==}
 
   '@grammyjs/types@3.17.0':
     resolution: {integrity: sha512-e8AR3xQwRAFX248E7Qw/7mIu1OzvoXloJzOBJVtuPKzzL7tGkn5trZAdZUBgGViVQg5ZwVS/x9N2nRrcyH/DfA==}
@@ -2848,6 +2854,12 @@ snapshots:
     dependencies:
       abort-controller: 3.0.0
       grammy: 1.33.0
+
+  '@grammyjs/storage-free@2.4.2':
+    dependencies:
+      node-fetch: 2.7.0
+    transitivePeerDependencies:
+      - encoding
 
   '@grammyjs/types@3.17.0': {}
 

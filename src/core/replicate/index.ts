@@ -45,15 +45,38 @@ interface ModelConfig {
   price: number
 }
 
-const getInput = (prompt: string) => ({
-  prompt,
-  aspect_ratio: "9:16",
-  width: 768,
-  height: 1344,
-  negative_prompt:
-    "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
-})
+const getInput = (prompt: string, aspect_ratio: string) => {
+  console.log(aspect_ratio, "getInput aspect_ratio")
+  let width: number, height: number
 
+  switch (aspect_ratio) {
+    case "1:1":
+      width = 1024
+      height = 1024
+      break
+    case "16:9":
+      width = 1368
+      height = 768
+      break
+    case "9:16":
+      width = 768
+      height = 1368
+      break
+    default:
+      width = 1368
+      height = 1024
+      break
+  }
+
+  return {
+    prompt,
+    aspect_ratio,
+    width,
+    height,
+    negative_prompt:
+      "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
+  }
+}
 export const models: Record<string, ModelConfig> = {
   flux: {
     key: "black-forest-labs/flux-1.1-pro-ultra",
@@ -62,12 +85,7 @@ export const models: Record<string, ModelConfig> = {
       ru: "🎨 Flux - фотореалистичные изображения высокого качества",
       en: "🎨 Flux - photorealistic high quality images",
     },
-    getInput: (prompt, aspect_ratio) => ({
-      prompt,
-      size: aspect_ratio === "1:1" ? "1024x1024" : aspect_ratio === "16:9" ? "1365x768" : "1365x1024",
-      aspect_ratio: aspect_ratio,
-      negative_prompt: "nsfw, erotic, violence, bad anatomy",
-    }),
+    getInput: (prompt, aspect_ratio) => getInput(prompt, aspect_ratio || "16:9"),
     price: 0.06,
   },
   sdxl: {
@@ -77,16 +95,7 @@ export const models: Record<string, ModelConfig> = {
       ru: "🎨 SDXL - фотореалистичные изображения высокого качества",
       en: "🎨 SDXL - photorealistic high quality images",
     },
-    getInput: (prompt, aspect_ratio) => ({
-      width: aspect_ratio === "1:1" ? 1024 : 1024,
-      height: aspect_ratio === "1:1" ? 1024 : 768,
-      prompt,
-      refine: "expert_ensemble_refiner",
-      apply_watermark: false,
-      num_inference_steps: 25,
-      negative_prompt:
-        "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
-    }),
+    getInput: (prompt, aspect_ratio) => getInput(prompt, aspect_ratio || "16:9"),
     price: 0.04,
   },
   sd3: {
@@ -96,12 +105,7 @@ export const models: Record<string, ModelConfig> = {
       ru: "🎨 SD3 - фотореалистичные изображения высокого качества",
       en: "🎨 SD3 - photorealistic high quality images",
     },
-    getInput: (prompt, aspect_ratio) => ({
-      prompt,
-      aspect_ratio: aspect_ratio === "1:1" ? "1:1" : aspect_ratio === "16:9" ? "16:9" : "3:2",
-      negative_prompt:
-        "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
-    }),
+    getInput: (prompt, aspect_ratio) => getInput(prompt, aspect_ratio || "16:9"),
     price: 0.04,
   },
   recraft: {
@@ -111,13 +115,7 @@ export const models: Record<string, ModelConfig> = {
       ru: "🎨 Recraft - фотореалистичные изображения высокого качества",
       en: "🎨 Recraft - photorealistic high quality images",
     },
-    getInput: (prompt, aspect_ratio) => ({
-      prompt,
-      width: aspect_ratio === "1:1" ? 1024 : 1024,
-      height: aspect_ratio === "1:1" ? 1024 : 768,
-      negative_prompt:
-        "nsfw, erotic, violence, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
-    }),
+    getInput: (prompt, aspect_ratio) => getInput(prompt, aspect_ratio || "16:9"),
     price: 0.022,
   },
   photon: {
@@ -127,9 +125,7 @@ export const models: Record<string, ModelConfig> = {
       ru: "🎨 Photon - фотореалистичные изображения высокого качества",
       en: "🎨 Photon - photorealistic high quality images",
     },
-    getInput: (prompt) => ({
-      prompt,
-    }),
+    getInput: (prompt, aspect_ratio) => getInput(prompt, aspect_ratio || "16:9"),
     price: 0.03,
   },
   lee_solar: {
@@ -139,7 +135,7 @@ export const models: Record<string, ModelConfig> = {
       ru: "🎨 Lee Solar - астрологические изображения",
       en: "🎨 Lee Solar - astrological images",
     },
-    getInput,
+    getInput: (prompt, aspect_ratio) => getInput(prompt, aspect_ratio || "16:9"),
     price: 0.022,
   },
   dpbelarusx: {
@@ -149,7 +145,7 @@ export const models: Record<string, ModelConfig> = {
       ru: "🎨 DPBelarusX - астрологические изображения",
       en: "🎨 DPBelarusX - astrological images",
     },
-    getInput,
+    getInput: (prompt, aspect_ratio) => getInput(prompt, aspect_ratio || "16:9"),
     price: 0.022,
   },
 }

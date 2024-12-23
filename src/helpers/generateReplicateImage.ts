@@ -29,13 +29,15 @@ export const generateImage = async (prompt: string, model_type: string, telegram
   try {
     await incrementGeneratedImages(telegram_id)
     const aspect_ratio = await getAspectRatio(telegram_id)
-    console.log(aspect_ratio, "aspect_ratio")
+    console.log(aspect_ratio, "aspect_ratio generateImage")
 
     const modelConfig = models[model_type]
     console.log(modelConfig, "modelConfig")
     if (!modelConfig) {
       throw new Error(`Неподдерживаемый тип модели: ${model_type}`)
     }
+
+    console.log(JSON.stringify(modelConfig), "modelConfig")
 
     const input = modelConfig.getInput(`${modelConfig.word} ${prompt}`, aspect_ratio)
     console.log(input, "input")

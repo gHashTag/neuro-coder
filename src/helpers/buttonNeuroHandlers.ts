@@ -22,7 +22,8 @@ export async function buttonNeuroHandlers(ctx: MyContext, prompt_id: string) {
       .text("3️⃣", callbacks[2])
       .text("4️⃣", callbacks[3])
       .row()
-      .text(isRu ? "⬆️ Улучшить" : "⬆️ Improve", `neuro_improve_${prompt_id}`)
+      .text(isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", `neuro_improve_${prompt_id}`)
+      .text(isRu ? "📐 Изменить размер" : "📐 Change size", `change_size`)
       .row()
     // .text(isRu ? "🎥 Создать видео" : "🎥 Create video", `neuro_video_${prompt_id}`)
 
