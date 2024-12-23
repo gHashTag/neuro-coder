@@ -1338,7 +1338,21 @@ export const upgradePrompt = async (prompt: string) => {
   return completion.choices[0].message.content
 }
 
-export const customMiddleware: MiddlewareFn<MyContextWithSession> = async (ctx, next) => {
+export const sendPaymentNotification = async (amount: number, stars: number, telegramId: string, language: string, username: string) => {
+  try {
+    const caption =
+      language === "ru"
+        ? `💸 Пользователь @${username || "Пользователь без username"} (Telegram ID: ${telegramId}) оплатил ${amount} рублей и получил ${stars} звезд.`
+        : `💸 User @${username || "User without username"} (Telegram ID: ${telegramId}) paid ${amount} RUB and received ${stars} stars.`
+
+    await bot.api.sendMessage("-4166575919", caption)
+  } catch (error) {
+    console.error("Ошибка при отправке уведомления об оплате:", error)
+    throw new Error("Ошибка при отправке уведомления об оплате")
+  }
+}
+
+export const customMiddleware: MiddlewareFn<MyContext> = async (ctx, next) => {
   if (process.env.NODE_ENV === "development") {
     // Пропускаем проверку для режима разработки
     return await next()

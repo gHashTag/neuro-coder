@@ -9,6 +9,8 @@ import { buy } from "./buy"
 import selectModelComposer from "./select_model"
 import { MyContext } from "../utils/types"
 import { balance } from "./balance"
+import { buyRobokassa } from "./buy/buyRobokassa"
+import { emailConversation } from "./emailConversation"
 
 const composer = new Composer<MyContext>()
 
@@ -41,7 +43,9 @@ composer.command("playom", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
 })
 
-composer.command("buy", buy)
+composer.command("buy", async (ctx) => {
+  await ctx.conversation.enter("emailConversation")
+})
 
 composer.command("balance", balance)
 

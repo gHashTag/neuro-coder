@@ -4,7 +4,7 @@ import commands from "./commands"
 import { development, production } from "./utils/launch"
 import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
-import { session } from "grammy"
+import { Context, session } from "grammy"
 import { imageSizeConversation } from "./commands/imagesize"
 import { customMiddleware } from "./helpers"
 import { generateImageConversation } from "./commands/generateImageConversation"
@@ -26,7 +26,7 @@ import leeSolarNumerolog from "./commands/lee_solar_numerolog"
 import leeSolarBroker from "./commands/lee_solar_broker"
 import { subtitles } from "./commands/subtitles"
 
-import { getUid, getUserModel } from "./core/supabase"
+import { getUid, getUserModel, supabase } from "./core/supabase"
 import createAinews from "./commands/ainews"
 import { textToImageConversation } from "./commands/text_to_image"
 
@@ -36,7 +36,7 @@ import { imageToPromptConversation } from "./commands/image_to_prompt"
 import { trainFluxModelConversation } from "./commands/train_flux_model"
 import { neuroPhotoConversation } from "./commands/neuro_photo"
 
-import { handleAspectRatioChange, handleBuy, handleChangeSize } from "./handlers"
+import { handleAspectRatioChange, handleChangeSize } from "./handlers"
 
 import bot from "./core/bot"
 import { neuroQuest } from "./commands/neuro_quest"
@@ -51,11 +51,11 @@ import { handleNeuroImprove } from "./handlers/handleNeuroImprove"
 import { handleNeuroGenerateImproved } from "./handlers/handleNeuroGenerateImproved"
 import { handleNeuroVideo } from "./handlers/handleNeuroVideo"
 import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
-import { handleModelCallback } from "./handlers/handleModelCallback"
+import { MyContextWithSession, SessionData } from "./utils/types"
+import { emailConversation } from "./commands/emailConversation"
+import { buyRobokassa } from "./commands/buy/buyRobokassa"
 
 bot.api.config.use(hydrateFiles(bot.token))
-
-bot.use(session({ initial: () => ({}) }))
 
 console.log(`Starting bot in ${process.env.NODE_ENV} mode`)
 
@@ -66,94 +66,14 @@ if (process.env.NODE_ENV === "development") {
   production(bot).catch(console.error)
 }
 
-if (process.env.NODE_ENV === "production") {
-  // Добавляем sequentialize middleware только в development
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  bot.api.setMyCommands([
-    {
-      command: "start",
-      description: "👋 Start bot / Запустить бота",
-    },
-    {
-      command: "avatar",
-      description: "👤 Tell about yourself / Рассказать о себе",
-    },
-    {
-      command: "train_flux_model",
-      description: "🎨 Train FLUX model / Обучить модель FLUX",
-    },
-    {
-      command: "neuro_photo",
-      description: "🤖 Generate your photos / Сгенерировать ваши фото",
-    },
-    {
-      command: "image_to_prompt",
-      description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
-    },
-    {
-      command: "text_to_image",
-      description: "🎨 Generate image from text / Сгенерировать изображение из текста",
-    },
-    {
-      command: "text_to_video",
-      description: "🎥 Generate video from text / Сгенерировать видео из текста",
-    },
-    {
-      command: "image_to_video",
-      description: "🎥 Generate video from image / Сгенерировать видео из изображения",
-    },
-    {
-      command: "voice",
-      description: "🎤 Add voice to avatar / Добавить аватару голос",
-    },
-    {
-      command: "text_to_speech",
-      description: "🎤 Convert text to speech / Преобразовать текст в речь",
-    },
-    {
-      command: "select_model",
-      description: "🤖 Select model / Выбрать модель",
-    },
-    {
-      command: "b_roll",
-      description: "🎥 Create B-roll / Создать B-roll",
-    },
-    {
-      command: "lipsync",
-      description: "🎥 Lipsync / Синхронизация губ",
-    },
-    {
-      command: "subtitles",
-      description: "🎥 Create subtitles / Создать субтитры",
-    },
-    {
-      command: "invite",
-      description: "👥 Invite a friend / Пригласить друга",
-    },
-    {
-      command: "buy",
-      description: "💰 Top up balance / Пополнить баланс",
-    },
-    {
-      command: "balance",
-      description: "💰 Balance / Баланс",
-    },
-    {
-      command: "select_model",
-      description: "🤖 Select model / Выбрать модель",
-    },
-    {
-      command: "b_roll",
-      description: "🎥 Create B-roll / Создать B-roll",
-    },
-    {
-      command: "help",
-      description: "🤖 Help / Помощь",
-    },
-  ])
+function initial(): SessionData {
+  return { melimi00: { videos: [], texts: [] }, text: "" }
 }
 
-bot.use(conversations())
+// Инициализация сессии
+bot.use(session({ initial }))
+
+bot.use(conversations<MyContextWithSession>())
 bot.use(createConversation(imageSizeConversation))
 bot.use(createConversation(textToSpeech))
 bot.use(createConversation(generateImageConversation))
@@ -176,6 +96,7 @@ bot.use(createConversation(imageToPromptConversation))
 bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))
 bot.use(createConversation(neuroQuest))
+bot.use(createConversation(emailConversation))
 
 bot.command("start", async (ctx) => {
   await start(ctx)
@@ -266,13 +187,18 @@ bot.on("callback_query:data", async (ctx) => {
       return
     }
 
+    if (data === "request_email") {
+      await ctx.conversation.enter("emailConversation")
+      return
+    }
+
     if (data.startsWith("size_")) {
       await handleAspectRatioChange({ ctx })
       return
     }
 
     if (data.startsWith("top_up")) {
-      await handleBuy({ ctx, data, isRu })
+      await buyRobokassa(ctx)
       return
     }
 
@@ -333,6 +259,93 @@ bot.on("callback_query:data", async (ctx) => {
     await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")
   }
 })
+
+if (process.env.NODE_ENV === "production") {
+  // Добавляем sequentialize middleware только в development
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  bot.api.setMyCommands([
+    {
+      command: "start",
+      description: "👋 Start bot / Запустить бота",
+    },
+    {
+      command: "avatar",
+      description: "👤 Tell about yourself / Рассказать о себе",
+    },
+    {
+      command: "train_flux_model",
+      description: "🎨 Train FLUX model / Обучить модель FLUX",
+    },
+    {
+      command: "neuro_photo",
+      description: "🤖 Generate your photos / Сгенерировать ваши фото",
+    },
+    {
+      command: "image_to_prompt",
+      description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
+    },
+    {
+      command: "text_to_image",
+      description: "🎨 Generate image from text / Сгенерировать изображение из текста",
+    },
+    {
+      command: "text_to_video",
+      description: "🎥 Generate video from text / Сгенерировать видео из текста",
+    },
+    {
+      command: "image_to_video",
+      description: "🎥 Generate video from image / Сгенерировать видео из изображения",
+    },
+    {
+      command: "voice",
+      description: "🎤 Add voice to avatar / Добавить аватару голос",
+    },
+    {
+      command: "text_to_speech",
+      description: "🎤 Convert text to speech / Преобразовать текст в речь",
+    },
+    {
+      command: "select_model",
+      description: "🤖 Select model / Выбрать модель",
+    },
+    {
+      command: "b_roll",
+      description: "🎥 Create B-roll / Создать B-roll",
+    },
+    {
+      command: "lipsync",
+      description: "🎥 Lipsync / Синхронизация губ",
+    },
+    {
+      command: "subtitles",
+      description: "🎥 Create subtitles / Создать субтитры",
+    },
+    {
+      command: "invite",
+      description: "👥 Invite a friend / Пригласить друга",
+    },
+    {
+      command: "buy",
+      description: "💰 Top up balance / Пополнить баланс",
+    },
+    {
+      command: "balance",
+      description: "💰 Balance / Баланс",
+    },
+    {
+      command: "select_model",
+      description: "🤖 Select model / Выбрать модель",
+    },
+    {
+      command: "b_roll",
+      description: "🎥 Create B-roll / Создать B-roll",
+    },
+    {
+      command: "help",
+      description: "🤖 Help / Помощь",
+    },
+  ])
+}
 
 bot.catch((err) => {
   const ctx = err.ctx

@@ -16,8 +16,6 @@ if (!process.env.HUGGINGFACE_TOKEN) {
   throw new Error("HUGGINGFACE_TOKEN is not set")
 }
 
-type MyConversation = Conversation<MyContext & ConversationFlavor>
-
 function escapeMarkdown(text: string): string {
   // Экранируем специальные символы Markdown
   return text.replace(/[_*[\]()~`>#+=|{}.!-]/g, "\\$&")
@@ -88,7 +86,7 @@ async function getJoyCaption(imageUrl: string): Promise<string> {
   }
 }
 
-export const imageToPromptConversation = async (conversation: MyConversation, ctx: MyContext) => {
+export const imageToPromptConversation = async (conversation: Conversation<MyContext>, ctx: MyContext) => {
   if (!ctx.from?.id) {
     await ctx.reply("User ID not found")
     return
