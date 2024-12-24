@@ -148,4 +148,14 @@ export const models: Record<string, ModelConfig> = {
     getInput: (prompt, aspect_ratio) => getInput(prompt, aspect_ratio || "16:9"),
     price: 0.022,
   },
+  neuro_coder: {
+    key: "ghashtag/neuro_coder_flux-dev-lora:5ff9ea5918427540563f09940bf95d6efc16b8ce9600e82bb17c2b188384e355",
+    word: "",
+    description: {
+      ru: "🎨 NeuroCoder - астрологические изображения",
+      en: "🎨 NeuroCoder - astrological images",
+    },
+    getInput: (prompt, aspect_ratio) => getInput(prompt, aspect_ratio || "16:9"),
+    price: 0.022,
+  },
 }

@@ -5,7 +5,7 @@ import { generateImage } from "../../helpers/generateReplicateImage"
 
 async function get100Conversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const keyboard = new InlineKeyboard().text("Отменить генерацию", "cancel")
-  const model_type = "dpbelarusx"
+  const model_type = "neuro_coder"
   console.log(model_type)
   await ctx.reply("Привет! Напишите промпт на английском для генерации изображения.", {
     reply_markup: keyboard,
