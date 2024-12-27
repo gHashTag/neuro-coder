@@ -49,4 +49,4 @@ const textToSpeech = async (conversation: Conversation<MyContext>, ctx: MyContex
   fs.unlinkSync(audioStream)
 }
 
-export default textToSpeech
+export { textToSpeech }

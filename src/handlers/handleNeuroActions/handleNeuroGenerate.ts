@@ -1,17 +1,10 @@
 import { InputFile } from "grammy"
-import { getPrompt } from "../core/supabase/ai"
-import { buttonNeuroHandlers } from "../helpers/buttonNeuroHandlers"
-import { generateNeuroImage } from "../helpers/generateNeuroImage"
-import { MyContext } from "../utils/types"
-import {
-  getUserBalance,
-  imageNeuroGenerationCost,
-  sendBalanceMessage,
-  sendCostMessage,
-  sendCurrentBalanceMessage,
-  sendInsufficientStarsMessage,
-  updateUserBalance,
-} from "../helpers/telegramStars"
+import { getPrompt } from "../../core/supabase/ai"
+import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
+import { generateNeuroImage } from "../../helpers/generateNeuroImage"
+import { MyContext } from "../../utils/types"
+import { getUserBalance, imageNeuroGenerationCost, sendBalanceMessage, sendInsufficientStarsMessage, updateUserBalance } from "../../helpers/telegramStars"
+import { pulse } from "../../helpers"
 
 export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
@@ -66,6 +59,9 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
         console.log("Generation successful, sending photo...")
         const photoToSend = Buffer.isBuffer(result.image) ? new InputFile(result.image) : result.image
         await ctx.replyWithPhoto(photoToSend)
+        const prompt = promptData.prompt
+        const model_type = promptData.model_type
+        await pulse(ctx, prompt, model_type, "neuro_generate")
 
         if (numImages > 1) {
           await ctx.reply(isRu ? `⏳ Сгенерировано ${i + 1} из ${numImages}...` : `⏳ Generated ${i + 1} of ${numImages}...`)

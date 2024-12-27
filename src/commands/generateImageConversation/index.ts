@@ -6,44 +6,6 @@ import { buttonHandlers } from "../../helpers/buttonHandlers"
 
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
 
-export const generateMoreImagesButtons = async (ctx: MyContext, prompt_id: string | number | null) => {
-  try {
-    // Если prompt_id равен null, не показываем кнопки
-    if (prompt_id === null) {
-      return
-    }
-
-    const isRu = ctx.from?.language_code === "ru"
-
-    await ctx.reply(isRu ? "Что дальше?" : "What's next?", {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: isRu ? "🔄 Сгенерировать ещё" : "🔄 Generate more",
-              callback_data: `generate_more_${prompt_id}`,
-            },
-          ],
-          [
-            {
-              text: isRu ? "🎨 Другая модель" : "🎨 Different model",
-              callback_data: "select_model",
-            },
-          ],
-          [
-            {
-              text: isRu ? "❌ Отмена" : "❌ Cancel",
-              callback_data: "cancel",
-            },
-          ],
-        ],
-      },
-    })
-  } catch (error) {
-    console.error("Error in buttonHandlers:", error)
-  }
-}
-
 const generateImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
   try {

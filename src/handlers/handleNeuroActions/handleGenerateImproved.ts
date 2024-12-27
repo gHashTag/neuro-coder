@@ -1,11 +1,11 @@
 import { Context, InputFile } from "grammy"
 
-import { generateNeuroImage } from "../helpers/generateNeuroImage"
-import { buttonNeuroHandlers } from "../helpers/buttonNeuroHandlers"
-import { getPrompt } from "../core/supabase/ai"
-import { MyContext } from "../utils/types"
+import { generateNeuroImage } from "../../helpers/generateNeuroImage"
+import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
+import { getPrompt } from "../../core/supabase/ai"
+import { MyContext } from "../../utils/types"
 
-export async function handleGenerateImproved(ctx: Context, data: string, isRu: boolean) {
+export async function handleGenerateNeuroImproved(ctx: Context, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
     throw new Error("Context or user not found")
   }

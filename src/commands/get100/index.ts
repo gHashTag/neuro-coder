@@ -1,21 +1,17 @@
 import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard, InputFile } from "grammy"
-import { generateImage } from "../../helpers/generateReplicateImage"
+import { generateNeuroImage } from "../../helpers/generateNeuroImage"
+import { models } from "../../core/replicate"
 
 async function get100Conversation(conversation: Conversation<MyContext>, ctx: MyContext) {
   const keyboard = new InlineKeyboard().text("Отменить генерацию", "cancel")
-  const model_type = "dpbelarusx"
+  const model_type = models["neuro_coder"].key
   console.log(model_type)
   await ctx.reply("Привет! Напишите промпт на английском для генерации изображения.", {
     reply_markup: keyboard,
   })
-  const { message, callbackQuery } = await conversation.wait()
-
-  if (callbackQuery?.data === "cancel") {
-    await ctx.reply("Вы отменили генерацию изображения.")
-    return
-  }
+  const { message } = await conversation.wait()
 
   if (!message || !ctx.from?.id) return
 
@@ -28,7 +24,7 @@ async function get100Conversation(conversation: Conversation<MyContext>, ctx: My
   const generatingMessage = await ctx.reply("Генерация изображения началась...")
 
   for (let i = 0; i < 100; i++) {
-    const result = await generateImage(text, model_type, ctx.from.id)
+    const result = await generateNeuroImage(text, model_type, ctx.from.id, ctx.chat?.id)
     if (!result) {
       await ctx.reply("Ошибка при генерации изображения")
       continue

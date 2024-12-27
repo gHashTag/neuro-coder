@@ -7,7 +7,7 @@ import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import path from "path"
 import RunwayML from "@runwayml/sdk"
 import { openai } from "../core/openai"
-import { MyContext, MyContextWithSession, Step } from "../utils/types"
+import { MyContext, Step } from "../utils/types"
 
 import { createWriteStream, promises as fs } from "fs"
 

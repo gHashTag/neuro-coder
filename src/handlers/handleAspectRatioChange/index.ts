@@ -1,7 +1,7 @@
-import { setAspectRatio } from "../core/supabase/ai"
-import { isRussian } from "../utils/language"
-import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../constants/messages"
-import { MyContextWithSession } from "../utils/types"
+import { setAspectRatio } from "../../core/supabase/ai"
+import { isRussian } from "../../utils/language"
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../../constants/messages"
+import { MyContextWithSession } from "../../utils/types"
 
 interface AspectRatioHandlerParams {
   ctx: MyContextWithSession
@@ -24,6 +24,7 @@ export async function handleAspectRatioChange({ ctx }: AspectRatioHandlerParams)
 
     await setAspectRatio(userId, aspect_ratio)
     await ctx.reply(isRu ? SUCCESS_MESSAGES.SIZE_CHANGED_RU(aspect_ratio) : SUCCESS_MESSAGES.SIZE_CHANGED_EN(aspect_ratio))
+    return
   } catch (error) {
     console.error("Error in aspect ratio handler:", error)
     throw error

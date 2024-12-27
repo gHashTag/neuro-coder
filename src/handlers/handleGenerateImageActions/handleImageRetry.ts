@@ -1,10 +1,10 @@
-import { InputFile } from "grammy/types"
-import { supabase } from "../core/supabase"
-import { pulse } from "../helpers"
-import { generateImage } from "../helpers/generateReplicateImage"
-import { MyContext } from "../utils/types"
+import { InputFile } from "grammy"
+import { supabase } from "../../core/supabase"
+import { pulse } from "../../helpers"
+import { generateImage } from "../../helpers/generateReplicateImage"
+import { MyContext } from "../../utils/types"
 
-export async function handleRetry(ctx: MyContext, isRu: boolean) {
+export async function handleImageRetry(ctx: MyContext, isRu: boolean) {
   if (!ctx || !ctx.from) {
     await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
     return
@@ -54,4 +54,5 @@ export async function handleRetry(ctx: MyContext, isRu: boolean) {
       ],
     },
   })
+  return
 }

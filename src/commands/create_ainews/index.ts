@@ -103,7 +103,7 @@ const createAinews = async (conversation: Conversation<MyContext>, ctx: MyContex
   }
 }
 
-export default createAinews
+export { createAinews }
 
 // async function testSlideshow() {
 //     const imageDir = path.join(process.cwd(), "src", "images");

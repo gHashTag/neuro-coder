@@ -1,19 +1,20 @@
-import { upgradePrompt } from "../helpers"
-import { getPrompt } from "../core/supabase/ai"
-import { MyContext } from "../utils/types"
-import { supabase } from "../core/supabase"
+import { getPrompt } from "../../core/supabase/ai"
+import { upgradePrompt } from "../../helpers"
+import { supabase } from "../../core/supabase"
+import { MyContext } from "../../utils/types"
+import { InlineKeyboard } from "grammy"
 
-export async function handleImprove(ctx: MyContext, data: string, isRu: boolean) {
+export async function handleNeuroImprove(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
     await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
     return
   }
-  await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
+  console.log("Starting neuro_improve handler")
+  const promptId = data.replace("neuro_improve_", "")
+  console.log("Prompt ID:", promptId)
 
-  const promptId = data.split("_")[1]
-  console.log(promptId, "promptId")
   const promptData = await getPrompt(promptId)
-  console.log(promptData, "promptData")
+  console.log("Original prompt data:", promptData)
 
   if (!promptData) {
     await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
@@ -24,12 +25,14 @@ export async function handleImprove(ctx: MyContext, data: string, isRu: boolean)
 
   try {
     const improvedPrompt = await upgradePrompt(promptData.prompt)
+    console.log("Improved prompt:", improvedPrompt)
+
     if (!improvedPrompt) {
       await ctx.reply(isRu ? "Не удалось улучшить промпт" : "Failed to improve prompt")
       return
     }
 
-    // Сохраняем улучшенный промпт
+    // Сохраняем улучшенный промпт в базу данных
     const { data: savedPrompt, error } = await supabase
       .from("prompts_history")
       .insert({
@@ -42,22 +45,20 @@ export async function handleImprove(ctx: MyContext, data: string, isRu: boolean)
       .single()
 
     if (error || !savedPrompt) {
-      console.error("Ошибка при сохранении улучшенного промпта:", error)
-      await ctx.reply(isRu ? "Ошибка при сохранении улучшенного промпта" : "Error saving improved prompt")
-      return
+      throw new Error("Failed to save improved prompt")
     }
 
     // Показываем улучшенный промпт и спрашиваем подтверждение
     await ctx.reply(isRu ? `Улучшенный промпт:\n${improvedPrompt}\n\nСгенерировать изображение?` : `Improved prompt:\n${improvedPrompt}\n\nGenerate image?`, {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: isRu ? "✅ Да" : "✅ Yes", callback_data: `generate_1_${savedPrompt.prompt_id}` }],
-          [{ text: isRu ? "❌ Нет" : "❌ No", callback_data: "cancel" }],
-        ],
-      },
+      reply_markup: new InlineKeyboard()
+        .text(isRu ? "✅ Да" : "✅ Yes", `neuro_generate_improved_${savedPrompt.prompt_id}`)
+        .row()
+        .text(isRu ? "❌ Нет" : "❌ No", "neuro_cancel"),
     })
   } catch (error) {
-    console.error("Ошибка при улучшении прмпта:", error)
-    await ctx.reply(isRu ? "Произошла ошибка при улучшении промпта" : "An error occurred while improving the prompt")
+    console.error("Error improving neuro prompt:", error)
+    await ctx.reply(
+      isRu ? "Произошла ошибка при улучшении промпта. Пожалуйста, попробуйте позже." : "An error occurred while improving the prompt. Please try again later.",
+    )
   }
 }

@@ -1,8 +1,14 @@
 import { InputFile } from "grammy"
-import { pulse } from "../helpers"
-import { generateImage } from "../helpers/generateReplicateImage"
-import { MyContext } from "../utils/types"
-import { sendInsufficientStarsMessage, getUserBalance, imageGenerationCost, incrementBalance, sendBalanceMessage } from "../helpers/telegramStars/telegramStars"
+import { pulse } from "../../helpers"
+import { generateImage } from "../../helpers/generateReplicateImage"
+import { MyContext } from "../../utils/types"
+import {
+  sendInsufficientStarsMessage,
+  getUserBalance,
+  imageGenerationCost,
+  incrementBalance,
+  sendBalanceMessage,
+} from "../../helpers/telegramStars/telegramStars"
 
 export async function handleGenerateImage(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
@@ -48,12 +54,13 @@ export async function handleGenerateImage(ctx: MyContext, data: string, isRu: bo
     await ctx.reply(isRu ? "Что дальше?" : "What's next?", {
       reply_markup: {
         inline_keyboard: [
-          [{ text: isRu ? "🔄 Повторить генерацию" : "🔄 Regenerate", callback_data: "retry" }],
+          [{ text: isRu ? "🔄 Повторить генерацию" : "🔄 Regenerate", callback_data: "retry_image" }],
           [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: "improve" }],
           [{ text: isRu ? "🎥 Сгенерировать видео" : "🎥 Generate video", callback_data: "video" }],
         ],
       },
     })
+    return
   } catch (error) {
     console.error("Error generating image:", error)
     await ctx.reply(

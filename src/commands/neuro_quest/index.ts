@@ -1,29 +1,8 @@
 import { InlineKeyboard } from "grammy"
 import { MyContext, MyConversation } from "../../utils/types"
-import {
-  handleLevel0,
-  handleLevel1,
-  handleLevel10,
-  handleLevel11,
-  handleLevel12,
-  handleLevel13,
-  handleLevel2,
-  handleLevel3,
-  handleLevel4,
-  handleLevel5,
-  handleLevel6,
-  handleLevel7,
-  handleLevel8,
-  handleLevel9,
-  handleQuestComplete,
-  handleQuestRules,
-} from "./handlers"
-import { handleModelCallback } from "../../handlers/handleModelCallback"
-import { buy } from "../buy"
-import { buyRobokassa } from "../buy/buyRobokassa"
-import { handleGenerate, handleGenerateImproved } from "src/handlers"
 
 export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
+  console.log("CASE: neuroQuest")
   const isRu = ctx.from?.language_code === "ru"
   console.log("🎮 Starting Neuro Quest for user:", ctx.from?.id)
 
@@ -101,10 +80,9 @@ export async function neuroQuest(conversation: MyConversation, ctx: MyContext) {
 
 Ready to become a content creation pro?`,
     reply_markup: new InlineKeyboard()
-      .text(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "quest_start")
+      .text(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "level_0")
       .row()
       .text(isRu ? "💎 Пополнить баланс" : "💎 Top up balance", "top_up_balance"),
   })
+  return
 }
-
-export default neuroQuest

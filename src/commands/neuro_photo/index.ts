@@ -1,11 +1,10 @@
-import { MyContext, MyConversation } from "../../utils/types"
-import { supabase } from "../../core/supabase"
-
 import { InputFile } from "grammy"
 import { pulse } from "../../helpers"
 
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
 import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
+import { MyContext, MyConversation } from "../../utils/types"
+import { supabase } from "../../core/supabase"
 import {
   getUserBalance,
   imageNeuroGenerationCost,
@@ -32,7 +31,7 @@ async function getLatestUserModel(userId: number): Promise<UserModel | null> {
     .order("created_at", { ascending: false })
     .limit(1)
     .single()
-  console.log(data, "getLatestUserModel: data")
+  console.log(data, "getLatestUserModel")
   if (error) {
     console.error("Error getting user model:", error)
     return null
@@ -49,6 +48,7 @@ async function getLatestUserModel(userId: number): Promise<UserModel | null> {
 }
 
 export async function neuroPhotoConversation(conversation: MyConversation, ctx: MyContext) {
+  console.log("CASE: neuroPhotoConversation")
   const isRu = ctx.from?.language_code === "ru"
   const userId = ctx.from?.id
 
@@ -78,9 +78,14 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
     }
 
     // Запрашиваем промпт
-    await ctx.reply(isRu ? `📸 Опишите, какую фотографию вы хотите сгенерировать` : `📸Describe what kind of photo you want to generate.`)
+    await ctx.reply(isRu ? `📸 Опишите, какую фотографию вы хотите сгенерировать` : `📸Describe what kind of photo you want to generate.`, {
+      reply_markup: {
+        force_reply: true,
+      },
+    })
 
     const promptMsg = await conversation.wait()
+    console.log(promptMsg, "promptMsg")
     const promptText = promptMsg.message?.text
 
     if (!promptText) {
@@ -119,12 +124,15 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
 
       // Показываем кнопки для дальнейших действий
       await buttonNeuroHandlers(ctx, result.prompt_id.toString())
+      return
     } finally {
       // Удаляем сообщение о загрузке
       await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMsg.message_id).catch(console.error)
+      return
     }
   } catch (error) {
     console.error("Error in neuro_photo conversation:", error)
     await ctx.reply(isRu ? "❌ Произошла ошибка. Пожалуйста, попробуйте еще раз." : "❌ An error occurred. Please try again.")
+    return
   }
 }

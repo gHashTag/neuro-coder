@@ -44,6 +44,7 @@ Create a unique profile that helps the bot better understand your requests.
       reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_1"),
     },
   )
+  return
 }
 
 export async function handleLevel1(ctx: MyContext) {
@@ -186,6 +187,7 @@ Use descriptions to improve the SEO of your content.
       reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_4"),
     },
   )
+  return
 }
 
 export async function handleLevel4(ctx: MyContext) {
@@ -235,6 +237,7 @@ Share your creative ideas on social media.`,
       reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_5"),
     },
   )
+  return
 }
 
 export async function handleLevel5(ctx: MyContext) {
@@ -467,6 +470,7 @@ Improved interaction with the bot.`,
       reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_10"),
     },
   )
+  return
 }
 
 export async function handleLevel10(ctx: MyContext) {
@@ -652,9 +656,10 @@ Share a useful tool with your friends.
 Get rewards for activity.
 Expand the user community and open new horizons together!`,
     {
-      reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "quest_complete"),
+      reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_complete"),
     },
   )
+  return
 }
 
 export async function handleQuestComplete(ctx: MyContext) {
@@ -697,6 +702,7 @@ You have successfully completed all tasks and reached the maximum level! 🌟✨
       },
     },
   )
+  return
 }
 
 export async function handleQuestRules(ctx: MyContext) {
@@ -723,4 +729,5 @@ export async function handleQuestRules(ctx: MyContext) {
 
 Good luck! 🍀`,
   )
+  return
 }

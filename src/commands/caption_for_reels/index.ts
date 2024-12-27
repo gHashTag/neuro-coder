@@ -105,7 +105,7 @@ const captionForReels = async (conversation: Conversation<MyContext>, ctx: MyCon
   }
 }
 
-export default captionForReels
+export { captionForReels }
 
 // async function testSlideshow() {
 //     const imageDir = path.join(process.cwd(), "src", "images");

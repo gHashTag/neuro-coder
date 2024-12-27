@@ -33,4 +33,4 @@ const leeSolarBroker = async (conversation: Conversation<MyContext>, ctx: MyCont
   }
 }
 
-export default leeSolarBroker
+export { leeSolarBroker }

@@ -1,78 +1,53 @@
 require("dotenv").config()
-
-import commands from "./commands"
+import { Composer, session } from "grammy"
 import { development, production } from "./utils/launch"
 import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
-import { session } from "grammy"
-import { imageSizeConversation } from "./commands/imagesize"
 import { customMiddleware } from "./helpers"
-import { generateImageConversation } from "./commands/generateImageConversation"
-import createTriggerReel from "./commands/trigger_reel"
-import captionForReels from "./commands/caption_for_reels"
-import { get100Conversation } from "./commands/get100"
-import { avatarConversation } from "./commands/avatar"
-import { voiceConversation } from "./commands/voice"
 import { getUserData, setModel } from "./core/supabase/ai"
 import { freeStorage } from "@grammyjs/storage-free"
-import { invite } from "./commands/invite"
-
 import { answerAi } from "./core/openai/requests"
-import textToSpeech from "./commands/text_to_speech"
-import { lipSyncConversation } from "./commands/lipSyncConversation"
-import { createBackgroundVideo } from "./commands/createBackgroundVideo"
-import { start } from "./commands/start"
-import leeSolarNumerolog from "./commands/lee_solar_numerolog"
-import leeSolarBroker from "./commands/lee_solar_broker"
-import { subtitles } from "./commands/subtitles"
-
 import { getUid, getUserModel } from "./core/supabase"
-import createAinews from "./commands/ainews"
-import { textToImageConversation } from "./commands/text_to_image"
-
-import { textToVideoConversation } from "./commands/text_to_video"
-import { imageToVideoConversation } from "./commands/image_to_video"
-import { imageToPromptConversation } from "./commands/image_to_prompt"
-import { trainFluxModelConversation } from "./commands/train_flux_model"
-import { neuroPhotoConversation } from "./commands/neuro_photo"
-
-import { handleAspectRatioChange, handleChangeSize } from "./handlers"
-
+import { handleAspectRatioChange, handleChangeSize, handleNeuroActions } from "./handlers"
 import bot from "./core/bot"
-import { neuroQuest } from "./commands/neuro_quest"
 import { isRussian } from "./utils/language"
-import { handleGenerateImproved } from "./handlers/handleGenerateImproved"
-import { handleGenerate } from "./handlers/handleGenerate"
-import { handleImprove } from "./handlers/handleImprove"
-import { handleGenerateImage } from "./handlers/handleGenerateImage"
-import { handleRetry } from "./handlers/handleRetry"
-import { handleNeuroGenerate } from "./handlers/handleNeuroGenerate"
-import { handleNeuroImprove } from "./handlers/handleNeuroImprove"
-import { handleNeuroGenerateImproved } from "./handlers/handleNeuroGenerateImproved"
-import { handleNeuroVideo } from "./handlers/handleNeuroVideo"
 import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
-import { MyContextWithSession, SessionData } from "./utils/types"
-import { emailConversation } from "./commands/emailConversation"
-import { buyRobokassa } from "./commands/buy/buyRobokassa"
+import { MyContext, MyContextWithSession, SessionData } from "./utils/types"
+
+import { handleLevelQuest } from "./handlers/handleLevelQuest"
+
 import {
-  handleLevel0,
-  handleLevel1,
-  handleLevel10,
-  handleLevel11,
-  handleLevel2,
-  handleLevel3,
-  handleLevel4,
-  handleLevel5,
-  handleLevel6,
-  handleLevel7,
-  handleLevel8,
-  handleLevel9,
-  handleQuestRules,
-} from "./commands/neuro_quest/handlers"
-import { handleLevel12 } from "./commands/neuro_quest/handlers"
-import { handleLevel13 } from "./commands/neuro_quest/handlers"
-import { handleQuestComplete } from "./commands/neuro_quest/handlers"
-import { handleModelCallback } from "./handlers/handleModelCallback"
+  neuro_broker,
+  leela,
+  clipmaker,
+  invite,
+  balance,
+  neuroQuest,
+  buyRobokassa,
+  start,
+  imageSizeConversation,
+  textToSpeech,
+  generateImageConversation,
+  createTriggerReel,
+  captionForReels,
+  get100Conversation,
+  avatarConversation,
+  voiceConversation,
+  lipSyncConversation,
+  createBackgroundVideo,
+  leeSolarNumerolog,
+  leeSolarBroker,
+  subtitles,
+  createAinews,
+  textToImageConversation,
+  textToVideoConversation,
+  imageToVideoConversation,
+  imageToPromptConversation,
+  trainFluxModelConversation,
+  neuroPhotoConversation,
+  emailConversation,
+  priceConversation,
+} from "./commands"
 
 bot.api.config.use(hydrateFiles(bot.token))
 
@@ -85,22 +60,26 @@ if (process.env.NODE_ENV === "development") {
   production(bot).catch(console.error)
 }
 
+const composer = new Composer<MyContext>()
+
 function initial(): SessionData {
   return { melimi00: { videos: [], texts: [] }, text: "" }
 }
 
 bot.use(session({ initial, storage: freeStorage<SessionData>(bot.token) }))
-
 bot.use(conversations<MyContextWithSession>())
+
+bot.use(createConversation(start))
+bot.use(createConversation(neuroQuest))
 bot.use(createConversation(imageSizeConversation))
 bot.use(createConversation(textToSpeech))
 bot.use(createConversation(generateImageConversation))
 bot.use(createConversation(createTriggerReel))
 bot.use(createConversation(captionForReels))
+bot.use(createConversation(priceConversation))
 bot.use(createConversation(get100Conversation))
 bot.use(createConversation(avatarConversation))
 bot.use(createConversation(voiceConversation))
-bot.command("invite", invite)
 bot.use(createConversation(lipSyncConversation))
 bot.use(createConversation(createBackgroundVideo))
 bot.use(createConversation(leeSolarNumerolog))
@@ -113,15 +92,223 @@ bot.use(createConversation(imageToVideoConversation))
 bot.use(createConversation(imageToPromptConversation))
 bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))
-bot.use(createConversation(neuroQuest))
 bot.use(createConversation(emailConversation))
+bot.use(customMiddleware)
 
-bot.command("start", async (ctx) => {
-  await start(ctx)
+composer.command("invite", invite)
+
+composer.command("start", async (ctx) => {
+  console.log("CASE: start")
+  await ctx.conversation.enter("start")
 })
 
-bot.use(customMiddleware)
-bot.use(commands)
+composer.command("clipmaker", (ctx: MyContext) => clipmaker(ctx))
+
+composer.command("leela", (ctx: MyContext) => leela(ctx))
+
+composer.command("neuro_broker", (ctx: MyContext) => neuro_broker(ctx))
+
+composer.command("caption_for_reels", async (ctx) => {
+  await ctx.conversation.enter("captionForReels")
+})
+
+composer.command("neuro_quest", async (ctx) => {
+  await ctx.conversation.enter("neuroQuest")
+})
+
+composer.command("price", async (ctx) => {
+  await ctx.conversation.enter("priceConversation")
+})
+
+composer.command("lipsync", async (ctx) => {
+  await ctx.conversation.enter("lipSyncConversation")
+})
+
+composer.command("b_roll", async (ctx) => {
+  await ctx.conversation.enter("createBackgroundVideo")
+})
+
+composer.command("text_to_speech", async (ctx) => {
+  await ctx.conversation.enter("textToSpeech")
+})
+
+composer.command("imagesize", async (ctx) => {
+  await ctx.conversation.enter("imageSizeConversation")
+})
+
+composer.command("playom", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("buy", async (ctx) => {
+  await ctx.conversation.enter("emailConversation")
+})
+
+composer.command("balance", balance)
+
+composer.command("trigger_reel", async (ctx) => {
+  await ctx.conversation.enter("createTriggerReel")
+})
+
+composer.command("anatol777", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("anfi_vesna", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("vega_condominium", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("dpbelarusx", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("neuro_coder", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("lee_solar_numerolog", async (ctx) => {
+  await ctx.conversation.enter("leeSolarNumerolog")
+})
+
+composer.command("lee_solar_broker", async (ctx) => {
+  await ctx.conversation.enter("leeSolarBroker")
+})
+
+composer.command("yellowshoess", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("gimba", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("karin", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("svedovaya", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("evi", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("evii", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("kata", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("neuro_broker_00", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("neuro_broker_01", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("kirill_korolev", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("zavarikin", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("lekomtsev", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("chuklinov", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("lee_solar", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("muse_nataly", async (ctx) => {
+  await ctx.conversation.enter("generateImageConversation")
+})
+
+composer.command("soul", async (ctx) => {
+  await ctx.conversation.enter("soulConversation")
+})
+
+composer.command("voice", async (ctx) => {
+  await ctx.conversation.enter("voiceConversation")
+})
+
+composer.command("invite", invite)
+
+composer.command("subtitles", async (ctx) => {
+  await ctx.conversation.enter("subtitles")
+})
+
+composer.command("get100", async (ctx) => {
+  await ctx.conversation.enter("get100Conversation")
+})
+
+composer.command("text_to_image", async (ctx) => {
+  await ctx.conversation.enter("textToImageConversation")
+})
+
+composer.command("text_to_video", async (ctx) => {
+  await ctx.conversation.enter("textToVideoConversation")
+})
+
+composer.command("caption_for_ai_news", async (ctx) => {
+  await ctx.conversation.enter("createCaptionForNews")
+})
+
+composer.command("train_flux_model", async (ctx) => {
+  await ctx.conversation.enter("trainFluxModelConversation")
+})
+
+composer.command("image_to_video", async (ctx) => {
+  await ctx.conversation.enter("imageToVideoConversation")
+})
+
+composer.command("neuro_photo", async (ctx) => {
+  await ctx.conversation.enter("neuroPhotoConversation")
+})
+
+composer.command("image_to_prompt", async (ctx) => {
+  await ctx.conversation.enter("imageToPromptConversation")
+})
+
+composer.command("help", async (ctx) => {
+  await ctx.conversation.enter("helpConversation")
+})
+
+composer.command("avatar", async (ctx) => {
+  await ctx.conversation.enter("avatarConversation")
+})
+
+composer.command("text_to_image", async (ctx) => {
+  await ctx.conversation.enter("textToImageConversation")
+})
+
+composer.command("image_to_prompt", async (ctx) => {
+  await ctx.conversation.enter("imageToPromptConversation")
+})
+
+composer.command("train_flux_model", async (ctx) => {
+  await ctx.conversation.enter("trainFluxModelConversation")
+})
+
+composer.command("select_model", async (ctx) => {
+  await ctx.conversation.enter("selectModelComposer")
+})
+
+bot.use(composer)
 
 bot.on("pre_checkout_query", async (ctx) => {
   await ctx.answerPreCheckoutQuery(true)
@@ -158,8 +345,8 @@ bot.on("message:successful_payment", async (ctx) => {
 })
 
 bot.on("message:text", async (ctx) => {
-  // Если это команда, пропускаем
   if (ctx.message.text.startsWith("/")) {
+    console.log("SKIP")
     return
   }
 
@@ -176,7 +363,6 @@ bot.on("message:text", async (ctx) => {
 
     const response = await answerAi(userModel, userData, ctx.message.text, ctx.from?.language_code || "en")
 
-    // Проверяем, что ответ не null
     if (!response) {
       await ctx.reply(
         ctx.from?.language_code === "ru"
@@ -187,6 +373,7 @@ bot.on("message:text", async (ctx) => {
     }
 
     await ctx.reply(response)
+    return
   } catch (error) {
     console.error("Error in GPT response:", error)
     await ctx.reply(ctx.from?.language_code === "ru" ? "Произошла ошибка при обработке запроса" : "An error occurred while processing your request")
@@ -194,6 +381,7 @@ bot.on("message:text", async (ctx) => {
 })
 
 bot.on("callback_query:data", async (ctx) => {
+  console.log("CASE: callback_query:data")
   const isRu = isRussian(ctx)
 
   try {
@@ -202,137 +390,56 @@ bot.on("callback_query:data", async (ctx) => {
 
     switch (true) {
       case data === "change_size":
+        console.log("CASE: change_size")
         await handleChangeSize({ ctx })
         break
 
       case data === "request_email":
+        console.log("CASE: request_email")
         await ctx.conversation.enter("emailConversation")
         break
 
       case data.startsWith("size_"):
+        console.log("CASE: size_")
         await handleAspectRatioChange({ ctx })
         break
 
-      case data.startsWith("top_up"):
+      case data === "top_up_balance":
+        console.log("CASE: top_up_balance")
         await buyRobokassa(ctx)
         break
 
       case data.startsWith("select_model_"):
-        console.log("CHECK")
+        console.log("CASE: select_model_")
         const model = data.replace("select_model_", "")
         console.log("model", model)
         await setModel(ctx.from.id.toString(), model)
         break
 
-      case data.startsWith("generate_improved_"):
-        await handleGenerateImproved(ctx, data, isRu)
+      case data.startsWith("neuro_"):
+        console.log("CASE: neuro_")
+        await handleNeuroActions(ctx, data, isRu)
         break
 
-      case data.startsWith("generate_"):
-        console.log("generate_")
-        await handleGenerate(ctx, data, isRu)
-        break
-
-      case data.startsWith("improve_"):
-        console.log("improve_")
-        await handleImprove(ctx, data, isRu)
-        break
-
-      case data.startsWith("generate_image_"):
-        console.log("generate_image_", data)
-        await handleGenerateImage(ctx, data, isRu)
-        break
-
-      case data === "retry":
-        await handleRetry(ctx, isRu)
-        break
-
-      case data.startsWith("neuro_generate_"):
-        await handleNeuroGenerate(ctx, data, isRu)
-        break
-
-      case data.startsWith("neuro_improve_"):
-        await handleNeuroImprove(ctx, data, isRu)
-        break
-
-      case data.startsWith("neuro_generate_improved_"):
-        await handleNeuroGenerateImproved(ctx, data, isRu)
-        break
-
-      case data === "neuro_cancel":
-        await ctx.reply(isRu ? "❌ Генерация отменена" : "❌ Generation cancelled")
-        break
-
-      case data === "quest_rules":
-        await handleQuestRules(ctx)
-        break
-      case data === "quest_start":
-        await handleLevel0(ctx)
-        break
-      case data === "level_1":
-        await handleLevel1(ctx)
-        break
-      case data === "level_2":
-        await handleLevel2(ctx)
-        break
-      case data === "level_3":
-        await handleLevel3(ctx)
-        break
-      case data === "level_4":
-        await handleLevel4(ctx)
-        break
-      case data === "level_5":
-        await handleLevel5(ctx)
-        break
-      case data === "level_6":
-        await handleLevel6(ctx)
-        break
-      case data === "level_7":
-        await handleLevel7(ctx)
-        break
-      case data === "level_8":
-        await handleLevel8(ctx)
-        break
-      case data === "level_9":
-        await handleLevel9(ctx)
-        break
-      case data === "level_10":
-        await handleLevel10(ctx)
-        break
-      case data === "level_11":
-        await handleLevel11(ctx)
-        break
-      case data === "level_12":
-        await handleLevel12(ctx)
-        break
-      case data === "level_13":
-        await handleLevel13(ctx)
-        break
-      case data === "quest_complete":
-        await handleQuestComplete(ctx)
-        break
-      case data === "top_up_balance":
-        await buyRobokassa(ctx)
-        break
-      case data.startsWith("generate_"):
-        console.log("generate_")
-        await handleGenerate(ctx, data, isRu)
-        break
-      case data.startsWith("neuro_video_"):
-        await handleNeuroVideo(ctx, data, isRu)
+      case data.startsWith("level_"):
+        console.log("CASE: level_")
+        await handleLevelQuest(ctx, data)
         break
 
       default:
         console.error("Неизвестная команда:", data)
     }
+    return
   } catch (error) {
     console.error("Ошибка при обработке callback query:", error)
     try {
       await ctx.answerCallbackQuery()
+      return
     } catch (e) {
       console.error("Не удалось ответить на callback query:", e)
+      await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")
+      return
     }
-    await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")
   }
 })
 

@@ -1,212 +1,33 @@
-import { Composer } from "grammy"
-
-import { clipmaker } from "./clipmaker"
-import leela from "./leela"
-import neuro_broker from "./neuro_broker"
-
-import { invite } from "./invite"
-import { buy } from "./buy"
-import selectModelComposer from "./select_model"
-import { MyContext } from "../utils/types"
-import { balance } from "./balance"
-import { buyRobokassa } from "./buy/buyRobokassa"
-import { emailConversation } from "./emailConversation"
-
-const composer = new Composer<MyContext>()
-
-composer.command("clipmaker", (ctx: MyContext) => clipmaker(ctx))
-
-composer.command("leela", (ctx: MyContext) => leela(ctx))
-composer.command("neuro_broker", (ctx: MyContext) => neuro_broker(ctx))
-
-composer.command("caption_for_reels", async (ctx) => {
-  await ctx.conversation.enter("captionForReels")
-})
-
-composer.command("lipsync", async (ctx) => {
-  await ctx.conversation.enter("lipSyncConversation")
-})
-
-composer.command("b_roll", async (ctx) => {
-  await ctx.conversation.enter("createBackgroundVideo")
-})
-
-composer.command("text_to_speech", async (ctx) => {
-  await ctx.conversation.enter("textToSpeech")
-})
-
-composer.command("imagesize", async (ctx) => {
-  await ctx.conversation.enter("imageSizeConversation")
-})
-
-composer.command("playom", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("buy", async (ctx) => {
-  await ctx.conversation.enter("emailConversation")
-})
-
-composer.command("balance", balance)
-
-composer.command("trigger_reel", async (ctx) => {
-  await ctx.conversation.enter("createTriggerReel")
-})
-
-composer.command("anatol777", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("anfi_vesna", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("vega_condominium", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("dpbelarusx", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("neuro_coder", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("lee_solar_numerolog", async (ctx) => {
-  await ctx.conversation.enter("leeSolarNumerolog")
-})
-
-composer.command("lee_solar_broker", async (ctx) => {
-  await ctx.conversation.enter("leeSolarBroker")
-})
-
-composer.command("yellowshoess", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("gimba", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("karin", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("svedovaya", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("evi", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("evii", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("kata", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("neuro_broker_00", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("neuro_broker_01", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("kirill_korolev", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("zavarikin", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("lekomtsev", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("chuklinov", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("lee_solar", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("muse_nataly", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-})
-
-composer.command("soul", async (ctx) => {
-  await ctx.conversation.enter("soulConversation")
-})
-
-composer.command("voice", async (ctx) => {
-  await ctx.conversation.enter("voiceConversation")
-})
-
-composer.command("invite", invite)
-
-composer.command("subtitles", async (ctx) => {
-  await ctx.conversation.enter("subtitles")
-})
-
-composer.command("get100", async (ctx) => {
-  await ctx.conversation.enter("get100Conversation")
-})
-
-composer.command("text_to_image", async (ctx) => {
-  await ctx.conversation.enter("textToImageConversation")
-})
-
-composer.command("text_to_video", async (ctx) => {
-  await ctx.conversation.enter("textToVideoConversation")
-})
-
-composer.command("caption_for_ai_news", async (ctx) => {
-  await ctx.conversation.enter("createCaptionForNews")
-})
-
-composer.command("train_flux_model", async (ctx) => {
-  await ctx.conversation.enter("trainFluxModelConversation")
-})
-
-composer.command("image_to_video", async (ctx) => {
-  await ctx.conversation.enter("imageToVideoConversation")
-})
-
-composer.command("neuro_photo", async (ctx) => {
-  await ctx.conversation.enter("neuroPhotoConversation")
-})
-
-composer.command("image_to_prompt", async (ctx) => {
-  await ctx.conversation.enter("imageToPromptConversation")
-})
-
-composer.command("help", async (ctx) => {
-  await ctx.conversation.enter("helpConversation")
-})
-
-composer.command("avatar", async (ctx) => {
-  await ctx.conversation.enter("avatarConversation")
-})
-
-composer.command("text_to_image", async (ctx) => {
-  await ctx.conversation.enter("textToImageConversation")
-})
-
-composer.command("image_to_prompt", async (ctx) => {
-  await ctx.conversation.enter("imageToPromptConversation")
-})
-
-composer.command("train_flux_model", async (ctx) => {
-  await ctx.conversation.enter("trainFluxModelConversation")
-})
-
-composer.use(selectModelComposer)
-
-export default composer
+export { start } from "./start"
+export { neuroQuest } from "./neuro_quest"
+export { clipmaker } from "./clipmaker"
+export { leela } from "./leela"
+export { neuro_broker } from "./neuro_broker"
+export { invite } from "./invite"
+export { balance } from "./balance"
+export { selectModel } from "./select_model"
+export { generateImageConversation } from "./generateImageConversation"
+export { createBackgroundVideo } from "./createBackgroundVideo"
+export { avatarConversation } from "./avatar"
+export { voiceConversation } from "./voice"
+export { getUserData, setModel } from "../core/supabase/ai"
+export { answerAi } from "../core/openai/requests"
+export { textToSpeech } from "./text_to_speech"
+export { lipSyncConversation } from "./lipSyncConversation"
+export { leeSolarNumerolog } from "./lee_solar_numerolog"
+export { get100Conversation } from "./get100"
+export { captionForReels } from "./caption_for_reels"
+export { createTriggerReel } from "./trigger_reel"
+export { imageSizeConversation } from "./imagesize"
+export { buyRobokassa } from "./buy/buyRobokassa"
+export { leeSolarBroker } from "./lee_solar_broker"
+export { subtitles } from "./subtitles"
+export { textToImageConversation } from "./text_to_image"
+export { textToVideoConversation } from "./text_to_video"
+export { imageToVideoConversation } from "./image_to_video"
+export { imageToPromptConversation } from "./image_to_prompt"
+export { trainFluxModelConversation } from "./train_flux_model"
+export { neuroPhotoConversation } from "./neuro_photo"
+export { emailConversation } from "./emailConversation"
+export { priceConversation } from "./price"
+export { createAinews } from "./create_ainews"

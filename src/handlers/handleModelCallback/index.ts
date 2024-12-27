@@ -1,6 +1,6 @@
 // src/handlers/modelHandler.ts
-import { MyContext } from "../utils/types"
-import { setModel } from "../core/supabase/ai"
+import { MyContext } from "../../utils/types"
+import { setModel } from "../../core/supabase/ai"
 
 export async function handleModelCallback(model: string, ctx: MyContext) {
   if (!ctx.from) {

@@ -33,4 +33,4 @@ const leeSolarNumerolog = async (conversation: Conversation<MyContext>, ctx: MyC
   }
 }
 
-export default leeSolarNumerolog
+export { leeSolarNumerolog }

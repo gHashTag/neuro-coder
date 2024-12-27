@@ -1,7 +1,7 @@
 import { Context } from "grammy"
-import { starCost } from "../helpers/telegramStars"
-import { buy } from "../commands/buy"
-import { MyContext } from "../utils/types"
+import { starCost } from "../../helpers/telegramStars"
+import { buyRobokassa } from "../../commands/buy/buyRobokassa"
+import { MyContext } from "../../utils/types"
 
 interface BuyParams {
   ctx: Context
@@ -11,8 +11,8 @@ interface BuyParams {
 
 // Start of Selection
 export async function handleBuy({ ctx, data, isRu }: BuyParams) {
-  if (data.endsWith("top_up_balance")) {
-    await buy(ctx as MyContext)
+  if (data === "top_up_balance") {
+    await buyRobokassa(ctx as MyContext)
     return
   }
 

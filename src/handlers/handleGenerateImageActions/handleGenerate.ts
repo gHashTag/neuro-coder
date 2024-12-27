@@ -1,16 +1,16 @@
 import { InputFile } from "grammy"
-import { generateNeuroImage } from "../helpers/generateNeuroImage"
-import { getPrompt } from "../core/supabase/ai"
-import { buttonHandlers } from "../helpers/buttonHandlers"
-import { pulse } from "../helpers"
-import { MyContext } from "../utils/types"
+import { generateNeuroImage } from "../../helpers/generateNeuroImage"
+import { getPrompt } from "../../core/supabase/ai"
+import { buttonHandlers } from "../../helpers/buttonHandlers"
+import { pulse } from "../../helpers"
+import { MyContext } from "../../utils/types"
 import {
   sendInsufficientStarsMessage,
   getUserBalance,
   imageGenerationCost,
   sendBalanceMessage,
   updateUserBalance,
-} from "../helpers/telegramStars/telegramStars"
+} from "../../helpers/telegramStars/telegramStars"
 
 export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
@@ -61,6 +61,7 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
       await updateUserBalance(ctx.from.id, currentBalance - price)
 
       await sendBalanceMessage(ctx, isRu, currentBalance - price)
+      return
     }
   } catch (error) {
     console.error("Ошибка при генерации:", error)

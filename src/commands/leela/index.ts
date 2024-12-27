@@ -95,7 +95,7 @@ const leela = async (ctx: Context): Promise<void> => {
   }
 }
 
-export default leela
+export { leela }
 // async function testSlideshow() {
 //   const imageDir = path.join(process.cwd(), "src", "images");
 //   const images = [

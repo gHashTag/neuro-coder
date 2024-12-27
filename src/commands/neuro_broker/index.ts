@@ -264,4 +264,4 @@ const neuro_broker = async (ctx: Context): Promise<void> => {
   }
 }
 
-export default neuro_broker
+export { neuro_broker }

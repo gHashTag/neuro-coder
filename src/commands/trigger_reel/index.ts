@@ -106,7 +106,7 @@ const createTriggerReel = async (conversation: Conversation<MyContext>, ctx: MyC
   }
 }
 
-export default createTriggerReel
+export { createTriggerReel }
 
 // async function testSlideshow() {
 //     const imageDir = path.join(process.cwd(), "src", "images");
