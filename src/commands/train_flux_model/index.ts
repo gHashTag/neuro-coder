@@ -309,18 +309,48 @@ async function ensureSupabaseAuth(): Promise<void> {
 
 export async function trainFluxModelConversation(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
-  if (!ctx.from) {
-    await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
+
+  // Извлекаем аргументы команды
+  const args = ctx.message?.text?.split(" ")
+  let targetUserId: string
+  let username: string | undefined
+
+  if (args && args.length > 1) {
+    targetUserId = args[1]
+
+    // Проверяем, что ID является числом
+    if (!/^\d+$/.test(targetUserId)) {
+      await ctx.reply(isRu ? "❌ Неверный формат Telegram ID." : "❌ Invalid Telegram ID format.")
+      return
+    }
+
+    // Извлекаем username, если он указан
+    if (args.length > 2) {
+      username = args[2]
+    }
+  } else {
+    // Используем ID и username вызывающего пользователя, если аргументы не указаны
+    if (!ctx.from) {
+      await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя." : "❌ User identification error.")
+      return
+    }
+    targetUserId = ctx.from.id.toString()
+    username = ctx.from.username
+  }
+
+  if (!username) {
+    await ctx.reply(
+      isRu ? "❌ Для обучения модели необходимо указать username в настройках Telegram" : "❌ You need to set a username in Telegram settings to train a model",
+    )
     return
   }
 
-  const userId = ctx.from?.id.toString()
-  const username = ctx.from?.username
   const images: { buffer: Buffer; filename: string }[] = []
   let isCancelled = false
   let modelName = ""
+
   // Получаем текущий баланс пользователя
-  const currentBalance = await getUserBalance(ctx.from.id)
+  const currentBalance = await getUserBalance(Number(targetUserId))
   await sendCostMessage(ctx, isRu, trainingCostInStars)
   if (currentBalance < trainingCostInStars) {
     await sendInsufficientStarsMessage(ctx, isRu)
@@ -328,12 +358,7 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
   }
 
   // Снимаем звезды с баланса
-  await updateUserBalance(ctx.from.id, currentBalance - trainingCostInStars)
-
-  if (!userId) {
-    await ctx.reply(isRu ? "❌ Ошибка идентификации пользователя" : "❌ User identification error")
-    return
-  }
+  await updateUserBalance(Number(targetUserId), currentBalance - trainingCostInStars)
 
   if (!username) {
     await ctx.reply(
@@ -351,7 +376,7 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
 
     if (existingModel) {
       // Добавляем номер к имени модели, если такая уже существует
-      const { count } = await supabase.from("model_trainings").select("*", { count: "exact" }).eq("user_id", userId)
+      const { count } = await supabase.from("model_trainings").select("*", { count: "exact" }).eq("user_id", targetUserId)
       modelName = `${username.toLowerCase()}_${(count || 0) + 1}`
     }
 
@@ -442,9 +467,9 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
     // Проверяем авторизацию перед загрузкой
     await ensureSupabaseAuth()
 
-    // Загружаем архив в Supabase (userId уже проверен выше)
+    // Загружаем архив в Supabase
     await ctx.reply(isRu ? "⏳ Загружаю архив..." : "⏳ Uploading archive...")
-    const zipUrl = await uploadToSupabase(zipPath, userId)
+    const zipUrl = await uploadToSupabase(zipPath, targetUserId)
 
     const triggerWord = `${username.toLocaleUpperCase()}`
 
@@ -461,7 +486,7 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
         : `✅ Training started!\n\nYour model will be trained in 3-6 hours. Once completed, you can check its performance using the /neuro_photo command.`,
     )
 
-    await trainFluxModel(zipUrl, triggerWord, modelName, userId)
+    await trainFluxModel(zipUrl, triggerWord, modelName, targetUserId)
 
     // Очищаем временные файлы
     await fs.unlink(zipPath).catch(console.error)

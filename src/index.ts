@@ -302,10 +302,6 @@ composer.command("image_to_prompt", async (ctx) => {
   await ctx.conversation.enter("imageToPromptConversation")
 })
 
-composer.command("train_flux_model", async (ctx) => {
-  await ctx.conversation.enter("trainFluxModelConversation")
-})
-
 composer.command("select_model", async (ctx) => {
   await ctx.conversation.enter("selectModel")
 })
