@@ -8,7 +8,7 @@ import { getUserData, setModel } from "./core/supabase/ai"
 import { freeStorage } from "@grammyjs/storage-free"
 import { answerAi } from "./core/openai/requests"
 import { getUid, getUserModel } from "./core/supabase"
-import { handleAspectRatioChange, handleChangeSize, handleNeuroActions } from "./handlers"
+import { handleAspectRatioChange, handleChangeSize, handleModelCallback, handleNeuroActions } from "./handlers"
 import bot from "./core/bot"
 import { isRussian } from "./utils/language"
 import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
@@ -47,6 +47,7 @@ import {
   neuroPhotoConversation,
   emailConversation,
   priceConversation,
+  selectModel,
 } from "./commands"
 
 bot.api.config.use(hydrateFiles(bot.token))
@@ -93,6 +94,7 @@ bot.use(createConversation(imageToPromptConversation))
 bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))
 bot.use(createConversation(emailConversation))
+bot.use(createConversation(selectModel))
 bot.use(customMiddleware)
 
 composer.command("invite", invite)
@@ -305,7 +307,7 @@ composer.command("train_flux_model", async (ctx) => {
 })
 
 composer.command("select_model", async (ctx) => {
-  await ctx.conversation.enter("selectModelComposer")
+  await ctx.conversation.enter("selectModel")
 })
 
 bot.use(composer)
@@ -413,7 +415,7 @@ bot.on("callback_query:data", async (ctx) => {
         console.log("CASE: select_model_")
         const model = data.replace("select_model_", "")
         console.log("model", model)
-        await setModel(ctx.from.id.toString(), model)
+        await handleModelCallback(model, ctx)
         break
 
       case data.startsWith("neuro_"):

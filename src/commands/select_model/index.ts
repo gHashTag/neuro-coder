@@ -1,10 +1,10 @@
 import { InlineKeyboard } from "grammy"
-import { MyContext } from "../../utils/types"
+import { MyContext, MyConversation } from "../../utils/types"
 
 import { getAvailableModels } from "./getAvailableModels"
 
 // Функция для получения доступных моделей
-const selectModel = async (ctx: MyContext) => {
+const selectModel = async (conversation: MyConversation, ctx: MyContext) => {
   const isRu = ctx.from?.language_code === "ru"
 
   try {
@@ -14,10 +14,10 @@ const selectModel = async (ctx: MyContext) => {
     // Создаем кнопки для каждой модели, по 2 в ряд
     for (let i = 0; i < models.length; i += 2) {
       if (models[i]) {
-        keyboard.text(models[i], `model_${models[i]}`)
+        keyboard.text(models[i], `select_model_${models[i]}`)
       }
       if (models[i + 1]) {
-        keyboard.text(models[i + 1], `model_${models[i + 1]}`)
+        keyboard.text(models[i + 1], `select_model_${models[i + 1]}`)
       }
       keyboard.row()
     }
