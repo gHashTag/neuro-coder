@@ -192,13 +192,16 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
       await updateUserBalance(ctx.from.id, currentBalance - price)
       await sendBalanceMessage(ctx, isRu, currentBalance - price)
       await unlink(tempFilePath)
+      return
     } else {
       await ctx.reply(isRu ? "Произошла ошибка при создании видео" : "An error occurred while creating the video")
+      return
     }
   } catch (error) {
     console.error("Ошибка при создании видео:", error)
     await ctx.reply(
       isRu ? "Произошла ошибка при создании видео. Пожалуйста, попробуйте позже." : "An error occurred while creating the video. Please try again later.",
     )
+    return
   }
 }
