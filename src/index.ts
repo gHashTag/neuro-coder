@@ -4,7 +4,7 @@ import { development, production } from "./utils/launch"
 import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
 import { customMiddleware } from "./helpers"
-import { getUserData, setModel } from "./core/supabase/ai"
+import { getUserData } from "./core/supabase/ai"
 import { freeStorage } from "@grammyjs/storage-free"
 import { answerAi } from "./core/openai/requests"
 import { getUid, getUserModel } from "./core/supabase"
@@ -20,7 +20,6 @@ import {
   neuro_broker,
   leela,
   clipmaker,
-  invite,
   balance,
   neuroQuest,
   buyRobokassa,
@@ -48,6 +47,7 @@ import {
   emailConversation,
   priceConversation,
   selectModel,
+  inviterConversation,
 } from "./commands"
 
 bot.api.config.use(hydrateFiles(bot.token))
@@ -95,9 +95,14 @@ bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))
 bot.use(createConversation(emailConversation))
 bot.use(createConversation(selectModel))
+bot.use(createConversation(inviterConversation))
 bot.use(customMiddleware)
 
-composer.command("invite", invite)
+composer.command("invite", async (ctx) => {
+  console.log("CASE: start")
+  await ctx.conversation.enter("inviterConversation")
+  return
+})
 
 composer.command("start", async (ctx) => {
   console.log("CASE: start")
@@ -247,8 +252,6 @@ composer.command("soul", async (ctx) => {
 composer.command("voice", async (ctx) => {
   await ctx.conversation.enter("voiceConversation")
 })
-
-composer.command("invite", invite)
 
 composer.command("subtitles", async (ctx) => {
   await ctx.conversation.enter("subtitles")

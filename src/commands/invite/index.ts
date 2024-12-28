@@ -1,7 +1,7 @@
 import { getReferalsCount } from "../../core/supabase"
-import { MyContext } from "../../utils/types"
+import { MyContext, MyConversation } from "../../utils/types"
 
-export async function invite(ctx: MyContext) {
+export async function inviterConversation(conversation: MyConversation, ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
 
   const botUsername = ctx.me.username
