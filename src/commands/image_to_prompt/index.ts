@@ -1,4 +1,4 @@
-import { Conversation, ConversationFlavor } from "@grammyjs/conversations"
+import { Conversation } from "@grammyjs/conversations"
 import axios from "axios"
 import { MyContext } from "../../utils/types"
 

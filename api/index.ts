@@ -40,10 +40,11 @@ app.post("/api/synclabs-webhook", async (req, res) => {
       }
     }
 
-    res.status(200).json({ message: "Webhook processed successfully" })
+    return res.status(200).json({ message: "Webhook processed successfully" })
   } catch (error) {
     console.error("Ошибка обработки вебхука:", error)
     res.status(500).json({ error: "Internal server error" })
+    throw error
   }
 })
 

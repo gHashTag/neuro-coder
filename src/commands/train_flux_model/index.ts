@@ -11,7 +11,6 @@ import {
   getUserBalance,
   sendCostMessage,
   sendInsufficientStarsMessage,
-  starCost,
   trainingCostInStars,
   updateUserBalance,
 } from "../../helpers/telegramStars/telegramStars"

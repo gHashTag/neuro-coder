@@ -105,7 +105,7 @@ const template05_02 = async (ctx: Context): Promise<void> => {
     })
 
     await ctx.replyWithVideo(new InputFile(`${outputFilePath}/final_video.mp4`), { caption: textJson.reels.videoDescription })
-    // @ts-ignore
+    if (!video.filePath) throw new Error("Video file path is undefined")
     await ctx.replyWithVideo(new InputFile(video.filePath), { caption: textJson.reels.videoDescription })
     await ctx.reply("Video creation finished")
     const filePathToDelete = video.filePath || ""

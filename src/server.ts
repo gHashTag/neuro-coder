@@ -37,14 +37,14 @@ app.post("/api/synclabs-webhook", async (req, res) => {
       }
 
       console.log("Видео успешно обновлено:", id)
-      res.status(200).json({ message: "Видео успешно обработано" })
+      return res.status(200).json({ message: "Видео успешно обработано" })
     } else {
       console.log(`Получен статус ${status} для видео ${id}`)
-      res.status(200).json({ message: "Статус получен" })
+      return res.status(200).json({ message: "Статус получен" })
     }
   } catch (error) {
     console.error("Ошибка обработки вебхука:", error)
-    res.status(500).json({ error: "Внутренняя ошибка сервера" })
+    return res.status(500).json({ error: "Внутренняя ошибка сервера" })
   }
 })
 

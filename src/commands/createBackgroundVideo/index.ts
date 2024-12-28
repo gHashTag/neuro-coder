@@ -28,7 +28,7 @@ async function downloadVideo(url: string, outputPath: string): Promise<string> {
   })
 }
 
-async function concatenateVideos(videoUrls: string[], outputPath: string): Promise<string> {
+export async function concatenateVideos(videoUrls: string[], outputPath: string): Promise<string> {
   try {
     // Создаем временную директорию для скачивания видео
     const tempDir = path.join(__dirname, "temp")

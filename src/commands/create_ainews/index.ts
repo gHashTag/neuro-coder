@@ -6,12 +6,9 @@ const createAinews = async (conversation: Conversation<MyContext>, ctx: MyContex
   try {
     const isRu = ctx.from?.language_code === "ru"
     await ctx.replyWithChatAction("typing")
-    const greetingMessage = await ctx.reply(
-      isRu ? "🎥 Привет! Введите текст, который вы хотите превратить в новость." : "🎥 Hello! Write a text you want to turn into a news.",
-      {
-        reply_markup: { force_reply: true },
-      },
-    )
+    await ctx.reply(isRu ? "🎥 Привет! Введите текст, который вы хотите превратить в новость." : "🎥 Hello! Write a text you want to turn into a news.", {
+      reply_markup: { force_reply: true },
+    })
     // Проверяем, есть ли информация о пользователе
     if (!ctx.from) throw new Error("User not found")
 

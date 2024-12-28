@@ -1,11 +1,11 @@
-import { Context, InputFile } from "grammy"
+import { Context } from "grammy"
 
 import ffmpeg from "fluent-ffmpeg"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import path from "path"
 import fs from "fs"
 import { getSlides, makeTextLayers, overlayPhotoOnVideo, toShortVideo } from "../../../helpers"
-import { getHistory, setHistory } from "../../../core/supabase/ai"
+import { getHistory } from "../../../core/supabase/ai"
 import { getVideoUrl, uploadVideo } from "../../../core/supabase/video"
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path)

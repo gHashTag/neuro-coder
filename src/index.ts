@@ -13,7 +13,7 @@ import bot from "./core/bot"
 import { isRussian } from "./utils/language"
 import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
 import { MyContext, MyContextWithSession, SessionData } from "./utils/types"
-
+import { autoRetry } from "@grammyjs/auto-retry"
 import { handleLevelQuest } from "./handlers/handleLevelQuest"
 
 import {
@@ -51,6 +51,7 @@ import {
 } from "./commands"
 
 bot.api.config.use(hydrateFiles(bot.token))
+bot.api.config.use(autoRetry())
 
 console.log(`Starting bot in ${process.env.NODE_ENV} mode`)
 
@@ -68,6 +69,7 @@ function initial(): SessionData {
 }
 
 bot.use(session({ initial, storage: freeStorage<SessionData>(bot.token) }))
+
 bot.use(conversations<MyContextWithSession>())
 
 bot.use(createConversation(start))
@@ -107,6 +109,7 @@ composer.command("invite", async (ctx) => {
 composer.command("start", async (ctx) => {
   console.log("CASE: start")
   await ctx.conversation.enter("start")
+  return
 })
 
 composer.command("clipmaker", (ctx: MyContext) => clipmaker(ctx))
@@ -117,196 +120,244 @@ composer.command("neuro_broker", (ctx: MyContext) => neuro_broker(ctx))
 
 composer.command("caption_for_reels", async (ctx) => {
   await ctx.conversation.enter("captionForReels")
+  return
 })
 
 composer.command("neuro_quest", async (ctx) => {
   await ctx.conversation.enter("neuroQuest")
+  return
 })
 
 composer.command("price", async (ctx) => {
   await ctx.conversation.enter("priceConversation")
+  return
 })
 
 composer.command("lipsync", async (ctx) => {
   await ctx.conversation.enter("lipSyncConversation")
+  return
 })
 
 composer.command("b_roll", async (ctx) => {
   await ctx.conversation.enter("createBackgroundVideo")
+  return
 })
 
 composer.command("text_to_speech", async (ctx) => {
   await ctx.conversation.enter("textToSpeech")
+  return
 })
 
 composer.command("imagesize", async (ctx) => {
   await ctx.conversation.enter("imageSizeConversation")
+  return
 })
 
 composer.command("playom", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("buy", async (ctx) => {
   await ctx.conversation.enter("emailConversation")
+  return
 })
 
 composer.command("balance", balance)
 
 composer.command("trigger_reel", async (ctx) => {
   await ctx.conversation.enter("createTriggerReel")
+  return
 })
 
 composer.command("anatol777", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("anfi_vesna", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("vega_condominium", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("dpbelarusx", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("neuro_coder", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("lee_solar_numerolog", async (ctx) => {
   await ctx.conversation.enter("leeSolarNumerolog")
+  return
 })
 
 composer.command("lee_solar_broker", async (ctx) => {
   await ctx.conversation.enter("leeSolarBroker")
+  return
 })
 
 composer.command("yellowshoess", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("gimba", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("karin", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("svedovaya", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("evi", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("evii", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("kata", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("neuro_broker_00", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("neuro_broker_01", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("kirill_korolev", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("zavarikin", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("lekomtsev", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("chuklinov", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("lee_solar", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("muse_nataly", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
+  return
 })
 
 composer.command("soul", async (ctx) => {
   await ctx.conversation.enter("soulConversation")
+  return
 })
 
 composer.command("voice", async (ctx) => {
   await ctx.conversation.enter("voiceConversation")
+  return
 })
 
 composer.command("subtitles", async (ctx) => {
   await ctx.conversation.enter("subtitles")
+  return
 })
 
 composer.command("get100", async (ctx) => {
   await ctx.conversation.enter("get100Conversation")
+  return
 })
 
 composer.command("text_to_image", async (ctx) => {
   await ctx.conversation.enter("textToImageConversation")
+  return
 })
 
 composer.command("text_to_video", async (ctx) => {
   await ctx.conversation.enter("textToVideoConversation")
+  return
 })
 
 composer.command("caption_for_ai_news", async (ctx) => {
   await ctx.conversation.enter("createCaptionForNews")
+  return
 })
 
 composer.command("train_flux_model", async (ctx) => {
   await ctx.conversation.enter("trainFluxModelConversation")
+  return
 })
 
 composer.command("image_to_video", async (ctx) => {
   await ctx.conversation.enter("imageToVideoConversation")
+  return
 })
 
 composer.command("neuro_photo", async (ctx) => {
   await ctx.conversation.enter("neuroPhotoConversation")
+  return
 })
 
 composer.command("image_to_prompt", async (ctx) => {
   await ctx.conversation.enter("imageToPromptConversation")
+  return
 })
 
 composer.command("help", async (ctx) => {
   await ctx.conversation.enter("helpConversation")
+  return
 })
 
 composer.command("avatar", async (ctx) => {
   await ctx.conversation.enter("avatarConversation")
+  return
 })
 
 composer.command("text_to_image", async (ctx) => {
   await ctx.conversation.enter("textToImageConversation")
+  return
 })
 
 composer.command("image_to_prompt", async (ctx) => {
   await ctx.conversation.enter("imageToPromptConversation")
+  return
 })
 
 composer.command("select_model", async (ctx) => {
   await ctx.conversation.enter("selectModel")
+  return
 })
 
 bot.use(composer)

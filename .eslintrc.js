@@ -12,6 +12,7 @@ module.exports = {
     "prettier/prettier": "error",
     "@typescript-eslint/no-floating-promises": ["error"],
     "import/no-absolute-path": "error",
+    "consistent-return": "error"
   },
   overrides: [
     {
@@ -32,5 +33,5 @@ module.exports = {
       }
     }
   },
-  ignorePatterns: [".eslintrc.js"],
+  ignorePatterns: [".eslintrc.js", "dist"],
 }

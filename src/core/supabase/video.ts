@@ -11,14 +11,14 @@ export async function uploadVideo(filePath: string, bucket: string, fileName: st
 
     if (error) {
       console.error("Ошибка при загрузке видео:", error.message)
-      return
+      throw error
     }
 
     console.log("Видео успешно загружено:", data)
     return data
   } catch (error) {
     console.error("Ошибка при загрузке видео:", error)
-    return
+    throw error
   }
 }
 
@@ -28,6 +28,6 @@ export async function getVideoUrl(bucket: string, fileName: string) {
     return data.publicUrl
   } catch (e) {
     console.error("Ошибка при получении видео URL:", e)
-    return
+    throw e
   }
 }

@@ -1391,13 +1391,12 @@ export const customMiddleware: MiddlewareFn<MyContext> = async (ctx, next) => {
     }
 
     if (!user?.inviter) {
-      await ctx.conversation.enter("inviterConversation")
-      return
+      return await ctx.conversation.enter("inviterConversation")
     }
   }
 
   // Продолжаем выполнение следующих промежуточных обработчиков
-  await next()
+  return await next()
 }
 
 export async function createSlideshow(images: string[], audioPath: string, outputPath: string): Promise<string> {
@@ -1529,6 +1528,7 @@ export const createRender = async ({ template_id, modifications }: { template_id
     return renders
   } catch (error) {
     console.error("Error creating render:", error)
+    throw error
   }
 }
 
@@ -1563,7 +1563,7 @@ export async function getAudioDuration(filePath: string): Promise<number> {
   })
 }
 
-export async function imageToVideo(promptImage: string, promptText: string): Promise<void> {
+export async function imageToVideo(promptImage: string, promptText: string): Promise<string> {
   try {
     // Создаем задачу для генерации видео из изображения
     const imageToVideoTask = await clientRunway.imageToVideo.create({
@@ -1588,8 +1588,10 @@ export async function imageToVideo(promptImage: string, promptText: string): Pro
       return task.output
     } else {
       console.error("Задача завершилась с ошибкой.")
+      throw new Error("Задача завершилась с ошибкой.")
     }
   } catch (error) {
     console.error("Ошибка при создании видео из изображения:", error)
+    throw error
   }
 }

@@ -23,8 +23,13 @@ async function get100Conversation(conversation: Conversation<MyContext>, ctx: My
 
   const generatingMessage = await ctx.reply("Генерация изображения началась...")
 
+  if (!ctx?.chat?.id) {
+    await ctx.reply("Ошибка при генерации ")
+    return
+  }
+
   for (let i = 0; i < 100; i++) {
-    const result = await generateNeuroImage(text, model_type, ctx.from.id, ctx.chat?.id)
+    const result = await generateNeuroImage(text, model_type, ctx.from.id, ctx)
     if (!result) {
       await ctx.reply("Ошибка при генерации изображения")
       continue

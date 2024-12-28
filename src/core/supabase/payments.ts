@@ -1,45 +1,54 @@
 import { supabase } from "./"
 
-export async function sendPaymentInfo(user_id: string, level: string): Promise<any> {
-  const { data, error } = await supabase.from("payments").insert([{ user_id: user_id, level: level }])
+interface Payment {
+  id: string
+  amount: number
+  date: string
+}
+
+export async function sendPaymentInfo(user_id: string, level: string): Promise<Payment[]> {
+  const { data, error } = await supabase.from("payments").insert([{ user_id, level }]).single()
 
   if (error) {
     console.error("Error sending payment info:", error)
-  } else {
-    console.log("Payment info sent successfully:", data)
-    return data
+    throw new Error(`Failed to send payment info: ${error.message}`)
   }
+
+  if (!data) {
+    throw new Error("No data returned after inserting payment info.")
+  }
+
+  console.log("Payment info sent successfully:", data)
+  return data
 }
 
-export async function getPaymentsInfoByTelegramId(telegram_id: string): Promise<any> {
-  // Получаем user_id по username из таблицы users
+export async function getPaymentsInfoByTelegramId(telegram_id: string): Promise<Payment[]> {
   const { data: userData, error: userError } = await supabase.from("users").select("user_id").eq("telegram_id", telegram_id.toString()).single()
 
-  if (userError) {
+  if (userError || !userData) {
     console.error("Error fetching user ID:", userError)
-    return null
+    return []
   }
 
-  const user_id = userData?.user_id
+  const user_id = userData.user_id
 
-  // Получаем все строчки с данным user_id из таблицы payments
   const { data: paymentsData, error: paymentsError } = await supabase.from("payments").select("*").eq("user_id", user_id)
 
-  if (paymentsError) {
+  if (paymentsError || !paymentsData) {
     console.error("Error fetching payments info:", paymentsError)
-    return null
+    return []
   }
 
   return paymentsData
 }
 
-export async function getPaymentsInfoByUsername(username: string): Promise<any> {
+export async function getPaymentsInfoByUsername(username: string): Promise<Payment[]> {
   // Получаем user_id по username из таблицы users
   const { data: userData, error: userError } = await supabase.from("users").select("user_id").eq("username", username).single()
 
   if (userError) {
     console.error("Error fetching user ID:", userError)
-    return null
+    return []
   }
 
   const user_id = userData?.user_id
@@ -49,7 +58,7 @@ export async function getPaymentsInfoByUsername(username: string): Promise<any> 
 
   if (paymentsError) {
     console.error("Error fetching payments info:", paymentsError)
-    return null
+    return []
   }
 
   return paymentsData

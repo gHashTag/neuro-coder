@@ -1,7 +1,7 @@
 import { InputFile } from "grammy"
 import { promises as fs } from "fs"
 import { createSlideshow, generateImagesForMeditation, getMeditationSteps, translateText } from "../../helpers"
-import { InputMediaPhoto } from "grammy/types"
+import type { InputMediaPhoto } from "grammy/types"
 import { MyContext, Step } from "../../utils/types"
 
 export async function clipmaker(ctx: MyContext) {

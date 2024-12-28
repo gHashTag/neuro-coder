@@ -1,6 +1,6 @@
 import { replicate } from "../core/replicate"
 import { supabase } from "../core/supabase"
-import axios from "axios"
+import axios, { isAxiosError } from "axios"
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB - максимальный размер для Telegram
 
@@ -32,7 +32,7 @@ async function downloadFile(url: string): Promise<Buffer> {
     return buffer
   } catch (error) {
     console.error("Error downloading file:", error)
-    if (axios.isAxiosError(error)) {
+    if (isAxiosError(error)) {
       console.error("Axios error details:", {
         response: error.response?.data,
         status: error.response?.status,

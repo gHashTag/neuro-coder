@@ -34,6 +34,7 @@
     "@ffmpeg/ffmpeg": "^0.12.10",
     "@ffprobe-installer/ffprobe": "^2.1.2",
     "@gradio/client": "^1.8.0",
+    "@grammyjs/auto-retry": "^2.0.2",
     "@grammyjs/conversations": "^1.2.0",
     "@grammyjs/files": "^1.1.1",
     "@grammyjs/runner": "^2.0.3",
