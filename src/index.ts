@@ -91,13 +91,14 @@ bot.use(createConversation(subtitles))
 bot.use(createConversation(createAinews))
 bot.use(createConversation(textToImageConversation))
 bot.use(createConversation(textToVideoConversation))
-bot.use(createConversation(imageToVideoConversation))
+
 bot.use(createConversation(imageToPromptConversation))
 bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))
 bot.use(createConversation(emailConversation))
 bot.use(createConversation(selectModel))
 bot.use(createConversation(inviterConversation))
+// bot.use(createConversation(imageToVideoConversation))
 bot.use(customMiddleware)
 
 composer.command("invite", async (ctx) => {
