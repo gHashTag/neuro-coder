@@ -4,7 +4,6 @@ import Replicate from "replicate"
 import { unlink, writeFile } from "node:fs/promises"
 import { InputFile, InlineKeyboard } from "grammy"
 import axios from "axios"
-
 import {
   imageToVideoCost,
   sendBalanceMessage,
@@ -44,13 +43,9 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
   }
   await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
 
-  // Создаем инлайн клавиатуру с кнопками выбора сервиса
   const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper").text("Ray", "ray").text("I2VGen-XL", "i2vgen")
-
-  // Отправляем сообщение с кнопками
   await ctx.reply(isRu ? "Выберите сервис для генерации видео:" : "Choose video generation service:", { reply_markup: keyboard })
 
-  // Ждем ответ пользователя
   const serviceMsg = await conversation.wait()
   const service = serviceMsg.callbackQuery?.data
 
@@ -59,7 +54,6 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
     return
   }
 
-  // Отвечаем на callback query
   if (serviceMsg.callbackQuery) {
     await ctx.api.answerCallbackQuery(serviceMsg.callbackQuery.id)
   }
@@ -97,7 +91,6 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
     let videoUrl: string | undefined
 
     if (service === "minimax") {
-      // Minimax логика
       const replicate = new Replicate({
         auth: process.env.REPLICATE_API_TOKEN,
       })
@@ -114,7 +107,6 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
 
       videoUrl = typeof minimaxResult === "string" ? minimaxResult : undefined
     } else if (service === "haiper") {
-      // Haiper логика
       const replicate = new Replicate({
         auth: process.env.REPLICATE_API_TOKEN,
       })
@@ -133,7 +125,6 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
 
       videoUrl = typeof haiperResult === "string" ? haiperResult : undefined
     } else if (service === "ray") {
-      // Ray логика
       const replicate = new Replicate({
         auth: process.env.REPLICATE_API_TOKEN,
       })
@@ -151,7 +142,6 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
 
       videoUrl = typeof rayResult === "string" ? rayResult : undefined
     } else {
-      // Проверяем ориентацию фото
       const photo = imageMsg.message.photo[imageMsg.message.photo.length - 1]
       if (photo.width < photo.height) {
         await ctx.reply(
@@ -161,7 +151,6 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
         )
       }
 
-      // I2VGen-XL логика
       const replicate = new Replicate({
         auth: process.env.REPLICATE_API_TOKEN,
       })

@@ -44,6 +44,7 @@ export async function voiceConversation(conversation: Conversation<MyContext>, c
   if (userId) {
     const file = await ctx.api.getFile(fileId)
     const fileUrl = `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}`
+    console.log(fileUrl, "fileUrl")
     const voiceId = await createVoiceElevenLabs({
       fileUrl,
       username,

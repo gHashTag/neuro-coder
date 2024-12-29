@@ -473,54 +473,54 @@ Improved interaction with the bot.`,
   return
 }
 
+// export async function handleLevel10(ctx: MyContext) {
+//   const isRu = ctx.from?.language_code === "ru"
+//   await ctx.reply(
+//     isRu
+//       ? `🎬 Что такое B-roll?
+
+// B-roll — это дополнительный видеоматериал, который используется для улучшения основного видео. Он добавляет контекст, глубину и визуальный интерес к вашим проектам.
+
+// 🖌️ Как это работает?
+// 1. Введите команду /b_roll в нашем боте.
+// 2. Опишите, какой видеоматериал вам нужен.
+// 3. Получите B-roll видео, которое дополнит ваш проект!
+
+// 💡 Почему это важно?
+// Улучшите качество своих видеопроектов.
+// Добавьте визуальный интерес и глубину к вашим историям.
+// Используйте B-roll для создания профессиональных презентаций.
+
+// 📈 Примеры использования:
+// Создайте B-roll для вашего YouTube-канала.
+// Добавьте визуальные элементы к вашим бизнес-презентациям.
+// Поделитесь своими креативными идеями в социальных сетях.`
+//       : `🎥 What is B-roll?
+
+// B-roll is additional video material used to improve the main video. It adds context, depth, and visual interest to your projects.
+
+// 🖌️ How does it work?
+// 1. Enter the /b_roll command in our bot.
+// 2. Describe what video material you need.
+// 3. Get B-roll video that will complement your project!
+
+// 💡 Why is it important?
+// Improve the quality of your video projects.
+// Add visual interest and depth to your stories.
+// Use B-roll to create professional presentations.
+
+// 📈 Use cases:
+// Create B-roll for your YouTube channel.
+// Add visual elements to your business presentations.
+// Share your creative ideas on social networks.`,
+//     {
+//       reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_11"),
+//     },
+//   )
+//   return
+// }
+
 export async function handleLevel10(ctx: MyContext) {
-  const isRu = ctx.from?.language_code === "ru"
-  await ctx.reply(
-    isRu
-      ? `🎬 Что такое B-roll?
-
-B-roll — это дополнительный видеоматериал, который используется для улучшения основного видео. Он добавляет контекст, глубину и визуальный интерес к вашим проектам.
-
-🖌️ Как это работает?
-1. Введите команду /b_roll в нашем боте.
-2. Опишите, какой видеоматериал вам нужен.
-3. Получите B-roll видео, которое дополнит ваш проект!
-
-💡 Почему это важно?
-Улучшите качество своих видеопроектов.
-Добавьте визуальный интерес и глубину к вашим историям.
-Используйте B-roll для создания профессиональных презентаций.
-
-📈 Примеры использования:
-Создайте B-roll для вашего YouTube-канала.
-Добавьте визуальные элементы к вашим бизнес-презентациям.
-Поделитесь своими креативными идеями в социальных сетях.`
-      : `🎥 What is B-roll?
-
-B-roll is additional video material used to improve the main video. It adds context, depth, and visual interest to your projects.
-
-🖌️ How does it work?
-1. Enter the /b_roll command in our bot.
-2. Describe what video material you need.
-3. Get B-roll video that will complement your project!
-
-💡 Why is it important?
-Improve the quality of your video projects.
-Add visual interest and depth to your stories.
-Use B-roll to create professional presentations.
-
-📈 Use cases:
-Create B-roll for your YouTube channel.
-Add visual elements to your business presentations.
-Share your creative ideas on social networks.`,
-    {
-      reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_11"),
-    },
-  )
-  return
-}
-
-export async function handleLevel11(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   await ctx.reply(
     isRu
@@ -561,13 +561,13 @@ Create a music video or karaoke.
 Visualize podcasts or audiobooks.
 Share your creative ideas on social media.`,
     {
-      reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_12"),
+      reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_11"),
     },
   )
   return
 }
 
-export async function handleLevel12(ctx: MyContext) {
+export async function handleLevel11(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   await ctx.reply(
     isRu
@@ -608,13 +608,13 @@ Add subtitles to educational videos.
 Create a video with translation for an international audience.
 Share your creative ideas on social media.`,
     {
-      reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_13"),
+      reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_12"),
     },
   )
   return
 }
 
-export async function handleLevel13(ctx: MyContext) {
+export async function handleLevel12(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
 
   await ctx.reply(
