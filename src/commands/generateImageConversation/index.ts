@@ -1,6 +1,6 @@
 import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard } from "grammy"
-import { generateNeuroImage } from "../../helpers/generateNeuroImage"
+import { generateNeuroImage } from "../../services/generateNeuroImage"
 import { MyContext } from "../../utils/types"
 import { getGeneratedImages } from "../../core/supabase/ai"
 

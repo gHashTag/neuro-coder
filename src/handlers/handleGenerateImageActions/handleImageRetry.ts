@@ -1,6 +1,6 @@
 import { supabase } from "../../core/supabase"
 
-import { generateImage } from "../../helpers/generateReplicateImage"
+import { generateImage } from "../../services/generateReplicateImage"
 import { MyContext } from "../../utils/types"
 
 export async function handleImageRetry(ctx: MyContext, isRu: boolean) {

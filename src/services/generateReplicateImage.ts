@@ -1,6 +1,6 @@
 import axios from "axios"
 
-import { isDev } from "."
+import { isDev } from "../helpers"
 import { MyContext } from "../utils/types"
 
 export interface GenerationResult {

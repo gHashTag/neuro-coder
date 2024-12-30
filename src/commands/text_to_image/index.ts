@@ -2,7 +2,7 @@ import { Conversation } from "@grammyjs/conversations"
 import { InlineKeyboard } from "grammy"
 import { MyContext } from "../../utils/types"
 
-import { generateImage } from "../../helpers/generateReplicateImage"
+import { generateImage } from "../../services/generateReplicateImage"
 
 import { sendCostMessage, imageGenerationCost } from "../../helpers/telegramStars/telegramStars"
 

@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios"
 
-import { isDev } from "."
+import { isDev } from "../helpers"
 import { isRussian } from "../utils/language"
 import { MyContext } from "../utils/types"
 

@@ -1,4 +1,4 @@
-import { generateImage } from "../../helpers/generateReplicateImage"
+import { generateImage } from "../../services/generateReplicateImage"
 import { MyContext } from "../../utils/types"
 import { sendInsufficientStarsMessage, getUserBalance, imageGenerationCost } from "../../helpers/telegramStars/telegramStars"
 

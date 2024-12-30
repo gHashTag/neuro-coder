@@ -1,4 +1,4 @@
-import { generateNeuroImage } from "../../helpers/generateNeuroImage"
+import { generateNeuroImage } from "../../services/generateNeuroImage"
 import { getPrompt } from "../../core/supabase/ai"
 
 import { MyContext } from "../../utils/types"

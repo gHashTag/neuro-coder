@@ -1,7 +1,7 @@
 import { InputFile } from "grammy"
 import { getPrompt } from "../../core/supabase/ai"
 import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
-import { generateNeuroImage } from "../../helpers/generateNeuroImage"
+import { generateNeuroImage } from "../../services/generateNeuroImage"
 import { MyContext } from "../../utils/types"
 import { getUserBalance, imageNeuroGenerationCost, sendBalanceMessage, sendInsufficientStarsMessage, updateUserBalance } from "../../helpers/telegramStars"
 import { pulse } from "../../helpers"

@@ -1,7 +1,7 @@
 import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
 
-import { generateNeuroImage } from "../../helpers/generateNeuroImage"
+import { generateNeuroImage } from "../../services/generateNeuroImage"
 import { models } from "../../core/replicate"
 
 async function get100Conversation(conversation: Conversation<MyContext>, ctx: MyContext) {
