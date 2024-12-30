@@ -2,14 +2,7 @@ import { generateNeuroImage } from "../../services/generateNeuroImage"
 
 import { MyContext, MyConversation } from "../../utils/types"
 import { supabase } from "../../core/supabase"
-import {
-  getUserBalance,
-  imageNeuroGenerationCost,
-  sendCurrentBalanceMessage,
-  sendInsufficientStarsMessage,
-  sendCostMessage,
-  sendBalanceMessage,
-} from "../../helpers/telegramStars/telegramStars"
+import { getUserBalance, imageNeuroGenerationCost, sendInsufficientStarsMessage, sendBalanceMessage } from "../../helpers/telegramStars/telegramStars"
 
 interface UserModel {
   model_name: string

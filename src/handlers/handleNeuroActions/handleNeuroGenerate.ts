@@ -1,10 +1,8 @@
-import { InputFile } from "grammy"
 import { getPrompt } from "../../core/supabase/ai"
-import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
+
 import { generateNeuroImage } from "../../services/generateNeuroImage"
 import { MyContext } from "../../utils/types"
-import { getUserBalance, imageNeuroGenerationCost, sendBalanceMessage, sendInsufficientStarsMessage, updateUserBalance } from "../../helpers/telegramStars"
-import { pulse } from "../../helpers"
+import { getUserBalance, imageNeuroGenerationCost, sendInsufficientStarsMessage } from "../../helpers/telegramStars"
 
 export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {

@@ -8,13 +8,12 @@ import { getUserData } from "./core/supabase/ai"
 import { freeStorage } from "@grammyjs/storage-free"
 import { answerAi } from "./core/openai/requests"
 import { getUid, getUserModel } from "./core/supabase"
-import { handleAspectRatioChange, handleCallbackQuery, handleChangeSize, handleGenerateImageActions, handleModelCallback, handleNeuroActions } from "./handlers"
+import { handleCallbackQuery } from "./handlers"
 import bot from "./core/bot"
 import { isRussian } from "./utils/language"
 import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
 import { MyContext, MyContextWithSession, SessionData } from "./utils/types"
 import { autoRetry } from "@grammyjs/auto-retry"
-import { handleLevelQuest } from "./handlers/handleLevelQuest"
 
 import {
   neuro_broker,
@@ -22,16 +21,15 @@ import {
   clipmaker,
   balance,
   neuroQuest,
-  buyRobokassa,
   start,
   imageSizeConversation,
   textToSpeech,
+  voiceConversation,
   generateImageConversation,
   createTriggerReel,
   captionForReels,
   get100Conversation,
   avatarConversation,
-  voiceConversation,
   lipSyncConversation,
   createBackgroundVideo,
   subtitles,
@@ -46,7 +44,6 @@ import {
   selectModel,
   inviterConversation,
 } from "./commands"
-import { handleImprove } from "./handlers/handleGenerateImageActions/handleImprove"
 
 bot.api.config.use(hydrateFiles(bot.token))
 bot.api.config.use(autoRetry())
@@ -80,20 +77,19 @@ bot.use(createConversation(captionForReels))
 bot.use(createConversation(priceConversation))
 bot.use(createConversation(get100Conversation))
 bot.use(createConversation(avatarConversation))
-bot.use(createConversation(voiceConversation))
 bot.use(createConversation(lipSyncConversation))
 bot.use(createConversation(createBackgroundVideo))
 bot.use(createConversation(subtitles))
 bot.use(createConversation(createAinews))
 bot.use(createConversation(textToImageConversation))
 bot.use(createConversation(textToVideoConversation))
-
 bot.use(createConversation(imageToPromptConversation))
 bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))
 bot.use(createConversation(emailConversation))
 bot.use(createConversation(selectModel))
 bot.use(createConversation(inviterConversation))
+bot.use(createConversation(voiceConversation))
 // bot.use(createConversation(imageToVideoConversation))
 bot.use(customMiddleware)
 
@@ -273,6 +269,7 @@ composer.command("soul", async (ctx) => {
 })
 
 composer.command("voice", async (ctx) => {
+  console.log("CASE: voice")
   await ctx.conversation.enter("voiceConversation")
   return
 })
