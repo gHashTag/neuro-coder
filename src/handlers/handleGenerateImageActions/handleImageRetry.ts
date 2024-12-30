@@ -1,6 +1,5 @@
-import { InputFile } from "grammy"
 import { supabase } from "../../core/supabase"
-import { pulse } from "../../helpers"
+
 import { generateImage } from "../../helpers/generateReplicateImage"
 import { MyContext } from "../../utils/types"
 
@@ -26,33 +25,7 @@ export async function handleImageRetry(ctx: MyContext, isRu: boolean) {
   }
 
   console.log("Generating image 3")
-  const result = await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id)
-  console.log("result4", result)
-  if (!result) {
-    throw new Error("Не удалось сенерирвать изображение")
-  }
+  await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id, isRu, ctx)
 
-  // Отправляем новое изображение
-  if (Buffer.isBuffer(result.image)) {
-    await ctx.replyWithPhoto(new InputFile(result.image))
-  } else {
-    await ctx.replyWithPhoto(result.image)
-  }
-
-  // Отправляем в pulse
-  const pulseImage = Buffer.isBuffer(result.image) ? `data:image/jpeg;base64,${result.image.toString("base64")}` : result.image
-
-  await pulse(ctx, pulseImage, lastPrompt.prompt, `/${lastPrompt.model_type}`)
-
-  // Показываем те же кнопки снова
-  await ctx.reply("Что дальше?", {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: "🔄 Повторить генерацию", callback_data: "retry" }],
-        [{ text: "⬆️ Улучшить промпт", callback_data: "improve" }],
-        [{ text: "🎥 Сгенерировать видео", callback_data: "video" }],
-      ],
-    },
-  })
   return
 }

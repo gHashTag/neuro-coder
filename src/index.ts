@@ -46,6 +46,7 @@ import {
   selectModel,
   inviterConversation,
 } from "./commands"
+import { handleImprove } from "./handlers/handleGenerateImageActions/handleImprove"
 
 bot.api.config.use(hydrateFiles(bot.token))
 bot.api.config.use(autoRetry())
@@ -464,13 +465,18 @@ bot.on("callback_query:data", async (ctx) => {
         await handleNeuroActions(ctx, data, isRu)
         break
 
+      case data.startsWith("improve_photo_"):
+        console.log("CASE: improve_photo_")
+        await handleImprove(ctx, data, isRu)
+        break
+
       case data.startsWith("level_"):
         console.log("CASE: level_")
         await handleLevelQuest(ctx, data)
         break
 
       default:
-        console.error("Неизвестная команда:", data)
+        console.error("Неизвестная команда - callback_query:data:", data)
     }
     return
   } catch (error) {

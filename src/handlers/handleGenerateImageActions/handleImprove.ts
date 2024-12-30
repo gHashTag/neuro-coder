@@ -10,7 +10,7 @@ export async function handleImprove(ctx: MyContext, data: string, isRu: boolean)
   }
   await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
 
-  const promptId = data.split("_")[1]
+  const promptId = data.split("_")[2]
   console.log(promptId, "promptId")
   const promptData = await getPrompt(promptId)
   console.log(promptData, "promptData")
@@ -47,14 +47,14 @@ export async function handleImprove(ctx: MyContext, data: string, isRu: boolean)
       return
     }
 
-    // Показываем улучшенный промпт и спрашиваем подтверждение
-    await ctx.reply(isRu ? `Улучшенный промпт:\n${improvedPrompt}\n\nСгенерировать изображение?` : `Improved prompt:\n${improvedPrompt}\n\nGenerate image?`, {
+    await ctx.reply(isRu ? "Улучшенный промпт:\n```\n" + improvedPrompt + "\n```" : "Improved prompt:\n```\n" + improvedPrompt + "\n```", {
       reply_markup: {
         inline_keyboard: [
-          [{ text: isRu ? "✅ Да" : "✅ Yes", callback_data: `generate_1_${savedPrompt.prompt_id}` }],
+          [{ text: isRu ? "✅ Да. Cгенерировать изображение?" : "✅ Yes. Generate image?", callback_data: `generate_1_${savedPrompt.prompt_id}` }],
           [{ text: isRu ? "❌ Нет" : "❌ No", callback_data: "cancel" }],
         ],
       },
+      parse_mode: "MarkdownV2",
     })
     return
   } catch (error) {
