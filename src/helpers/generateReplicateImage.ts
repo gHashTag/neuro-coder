@@ -1,6 +1,7 @@
-import { models, replicate } from "../core/replicate"
 import axios from "axios"
-import { incrementGeneratedImages, getAspectRatio, savePrompt } from "../core/supabase/ai"
+
+import { isDev } from "."
+import { MyContext } from "../utils/types"
 
 export interface GenerationResult {
   image: string | Buffer
@@ -25,43 +26,25 @@ export async function fetchImage(url: string): Promise<Buffer> {
   return Buffer.from(response.data)
 }
 
-export const generateImage = async (prompt: string, model_type: string, telegram_id: number): Promise<GenerationResult> => {
+export const generateImage = async (prompt: string, model_type: string, telegram_id: number, isRu: boolean, ctx: MyContext) => {
   try {
-    await incrementGeneratedImages(telegram_id)
-    const aspect_ratio = await getAspectRatio(telegram_id)
-    console.log(aspect_ratio, "aspect_ratio generateImage")
-
-    const modelConfig = models[model_type]
-    console.log(modelConfig, "modelConfig")
-    if (!modelConfig) {
-      throw new Error(`Неподдерживаемый тип модели: ${model_type}`)
-    }
-
-    console.log(JSON.stringify(modelConfig), "modelConfig")
-
-    const input = modelConfig.getInput(`${modelConfig.word} ${prompt}`, aspect_ratio)
-    console.log(input, "input")
-    let output: ApiResponse = ""
-    let retries = 3
-
-    while (retries > 0) {
-      try {
-        // @ts-expect-error Replicate API возвращает string | string[] но не типизирован корректно
-        output = await replicate.run(modelConfig.key, { input })
-        const imageUrl = await processApiResponse(output)
-        const imageBuffer = await fetchImage(imageUrl)
-        const prompt_id = await savePrompt(prompt, modelConfig.key, imageUrl, telegram_id)
-
-        return { image: imageBuffer, prompt_id }
-      } catch (error) {
-        console.error(`Попытка ${4 - retries} не удалась:`, error)
-        retries--
-        if (retries === 0) throw error
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-      }
-    }
-
-    throw new Error("Все попытки генерации изображения исчерпаны")
+    const url = `${isDev ? "http://localhost:3000" : process.env.ELESTIO_URL}/generate/text-to-image`
+    console.log(url, "url")
+    await axios.post(
+      url,
+      {
+        prompt,
+        model: model_type,
+        telegram_id,
+        username: ctx.from?.username,
+        is_ru: isRu,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    )
   } catch (error) {
     console.error("Ошибка при генерации изображения:", error)
     throw error

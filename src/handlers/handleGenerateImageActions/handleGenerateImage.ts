@@ -1,14 +1,6 @@
-import { InputFile } from "grammy"
-import { pulse } from "../../helpers"
 import { generateImage } from "../../helpers/generateReplicateImage"
 import { MyContext } from "../../utils/types"
-import {
-  sendInsufficientStarsMessage,
-  getUserBalance,
-  imageGenerationCost,
-  incrementBalance,
-  sendBalanceMessage,
-} from "../../helpers/telegramStars/telegramStars"
+import { sendInsufficientStarsMessage, getUserBalance, imageGenerationCost } from "../../helpers/telegramStars/telegramStars"
 
 export async function handleGenerateImage(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
@@ -31,35 +23,7 @@ export async function handleGenerateImage(ctx: MyContext, data: string, isRu: bo
 
   try {
     console.log("Generating image 2")
-    const result = await generateImage(prompt, "sdxl", ctx.from.id)
-
-    if (!result) {
-      throw new Error("Failed to generate image")
-    }
-
-    // Отправляем сгенерированное изображение
-    const photoToSend = Buffer.isBuffer(result.image) ? new InputFile(result.image) : result.image
-
-    await ctx.replyWithPhoto(photoToSend)
-
-    // Отправляем в pulse
-    const pulseImage = Buffer.isBuffer(result.image) ? `data:image/jpeg;base64,${result.image.toString("base64")}` : result.image
-
-    await incrementBalance({ telegram_id: ctx.from.id.toString(), amount: imageGenerationCost })
-    const newBalance = await getUserBalance(ctx.from.id)
-    await sendBalanceMessage(ctx, isRu, newBalance)
-    await pulse(ctx, pulseImage, prompt, "/sdxl")
-
-    // Показываем кнопки для дальнейших действий
-    await ctx.reply(isRu ? "Что дальше?" : "What's next?", {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: isRu ? "🔄 Повторить генерацию" : "🔄 Regenerate", callback_data: "retry_image" }],
-          [{ text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: "improve" }],
-          [{ text: isRu ? "🎥 Сгенерировать видео" : "🎥 Generate video", callback_data: "video" }],
-        ],
-      },
-    })
+    await generateImage(prompt, "sdxl", ctx.from.id, isRu, ctx)
     return
   } catch (error) {
     console.error("Error generating image:", error)

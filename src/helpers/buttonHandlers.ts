@@ -13,7 +13,7 @@ export const buttonHandlers = async (ctx: MyContext, promptId: string) => {
           { text: "4️⃣", callback_data: `generate_4_${promptId}` },
         ],
         [
-          { text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_${promptId}` },
+          { text: isRu ? "⬆️ Улучшить промпт" : "⬆️ Improve prompt", callback_data: `improve_photo_${promptId}` },
           { text: isRu ? "📐 Изменить размер" : "📐 Change size", callback_data: "change_size" },
         ],
       ],

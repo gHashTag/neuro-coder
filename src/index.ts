@@ -8,7 +8,7 @@ import { getUserData } from "./core/supabase/ai"
 import { freeStorage } from "@grammyjs/storage-free"
 import { answerAi } from "./core/openai/requests"
 import { getUid, getUserModel } from "./core/supabase"
-import { handleAspectRatioChange, handleChangeSize, handleModelCallback, handleNeuroActions } from "./handlers"
+import { handleAspectRatioChange, handleChangeSize, handleGenerateImageActions, handleModelCallback, handleNeuroActions } from "./handlers"
 import bot from "./core/bot"
 import { isRussian } from "./utils/language"
 import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
@@ -34,13 +34,10 @@ import {
   voiceConversation,
   lipSyncConversation,
   createBackgroundVideo,
-  leeSolarNumerolog,
-  leeSolarBroker,
   subtitles,
   createAinews,
   textToImageConversation,
   textToVideoConversation,
-  imageToVideoConversation,
   imageToPromptConversation,
   trainFluxModelConversation,
   neuroPhotoConversation,
@@ -85,8 +82,6 @@ bot.use(createConversation(avatarConversation))
 bot.use(createConversation(voiceConversation))
 bot.use(createConversation(lipSyncConversation))
 bot.use(createConversation(createBackgroundVideo))
-bot.use(createConversation(leeSolarNumerolog))
-bot.use(createConversation(leeSolarBroker))
 bot.use(createConversation(subtitles))
 bot.use(createConversation(createAinews))
 bot.use(createConversation(textToImageConversation))
@@ -193,16 +188,6 @@ composer.command("dpbelarusx", async (ctx) => {
 
 composer.command("neuro_coder", async (ctx) => {
   await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("lee_solar_numerolog", async (ctx) => {
-  await ctx.conversation.enter("leeSolarNumerolog")
-  return
-})
-
-composer.command("lee_solar_broker", async (ctx) => {
-  await ctx.conversation.enter("leeSolarBroker")
   return
 })
 
@@ -445,6 +430,11 @@ bot.on("callback_query:data", async (ctx) => {
       case data === "change_size":
         console.log("CASE: change_size")
         await handleChangeSize({ ctx })
+        break
+
+      case data.startsWith("generate_"):
+        console.log("CASE: generate_")
+        await handleGenerateImageActions(ctx, data, isRu)
         break
 
       case data === "request_email":
