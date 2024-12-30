@@ -47,31 +47,7 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
       const numImages = parseInt(count)
       console.log("Generating", numImages, "images")
 
-      for (let i = 0; i < numImages; i++) {
-        console.log(`Starting generation of image ${i + 1}/${numImages}`)
-        const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx)
-
-        if (!result) {
-          console.error("Generation returned null result")
-          throw new Error("Failed to generate neuro image")
-        }
-
-        console.log("Generation successful, sending photo...")
-        const photoToSend = Buffer.isBuffer(result.image) ? new InputFile(result.image) : result.image
-        await ctx.replyWithPhoto(photoToSend)
-        const prompt = promptData.prompt
-        const model_type = promptData.model_type
-        await pulse(ctx, prompt, model_type, "neuro_generate")
-
-        if (numImages > 1) {
-          await ctx.reply(isRu ? `⏳ Сгенерировано ${i + 1} из ${numImages}...` : `⏳ Generated ${i + 1} of ${numImages}...`)
-        }
-      }
-      const newBalance = currentBalance - imageNeuroGenerationCost
-      await updateUserBalance(userId, newBalance)
-      await sendBalanceMessage(ctx, isRu, newBalance)
-      console.log("All images generated, showing buttons with promptId:", promptId)
-      await buttonNeuroHandlers(ctx, promptId)
+      await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx, numImages)
     } catch (error) {
       console.error("Error in generation loop:", error)
       throw error

@@ -1,6 +1,6 @@
 import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
-import { InputFile } from "grammy"
+
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
 import { models } from "../../core/replicate"
 
@@ -20,20 +20,7 @@ async function get100Conversation(conversation: Conversation<MyContext>, ctx: My
     return
   }
 
-  for (let i = 0; i < 100; i++) {
-    const result = await generateNeuroImage(message, model_type, ctx.from.id, ctx)
-    if (!result) {
-      await ctx.reply("Ошибка при генерации изображения")
-      continue
-    }
-
-    const { image } = result
-    if (Buffer.isBuffer(image)) {
-      await ctx.replyWithPhoto(new InputFile(image), { caption: `Фото: ${i + 1} / 100` })
-    } else {
-      await ctx.replyWithPhoto(image, { caption: `Фото: ${i + 1} / 100` })
-    }
-  }
+  await generateNeuroImage(message, model_type, ctx.from.id, ctx, 100)
 
   await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id)
   return

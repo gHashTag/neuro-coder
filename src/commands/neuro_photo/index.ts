@@ -1,18 +1,14 @@
-import { InputFile } from "grammy"
-import { pulse } from "../../helpers"
-
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
-import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
+
 import { MyContext, MyConversation } from "../../utils/types"
 import { supabase } from "../../core/supabase"
 import {
   getUserBalance,
   imageNeuroGenerationCost,
-  sendBalanceMessage,
   sendCurrentBalanceMessage,
   sendInsufficientStarsMessage,
-  updateUserBalance,
   sendCostMessage,
+  sendBalanceMessage,
 } from "../../helpers/telegramStars/telegramStars"
 
 interface UserModel {
@@ -57,12 +53,12 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
     return
   }
   const currentBalance = await getUserBalance(userId)
-  await sendCostMessage(ctx, isRu, imageNeuroGenerationCost)
+
   if (currentBalance < imageNeuroGenerationCost) {
     await sendInsufficientStarsMessage(ctx, isRu)
     return
   }
-  await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
+  await sendBalanceMessage(ctx, isRu, currentBalance)
 
   try {
     // Получаем последнюю обученную модель пользователя
@@ -97,39 +93,10 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
     const fullPrompt = `Fashionable ${userModel.trigger_word}, ${promptText}`
 
     // Отправляем сообщение о начале генерации
-    const loadingMsg = await ctx.reply(isRu ? "⏳ Генерирую изображение..." : "⏳ Generating image...")
+    await ctx.reply(isRu ? "⏳ Генерирую изображение..." : "⏳ Generating image...")
 
-    try {
-      const result = await generateNeuroImage(fullPrompt, userModel.model_url, userId, ctx)
-      console.log("Generation result:", result)
-
-      if (!result || !result.image || (Buffer.isBuffer(result.image) && result.image.length === 0)) {
-        throw new Error("Empty image received from generation")
-      }
-
-      // Отправляем сгенерированное изображение
-      const photoToSend = new InputFile(result.image as Buffer)
-      console.log("Photo to send:", typeof photoToSend, photoToSend instanceof InputFile ? "InputFile" : "not InputFile")
-
-      await ctx.replyWithPhoto(photoToSend)
-
-      // Снимаем звезды с баланса
-      const newBalance = currentBalance - imageNeuroGenerationCost
-      await updateUserBalance(userId, newBalance)
-      await sendBalanceMessage(ctx, isRu, newBalance)
-
-      // Отправляем в pulse с правильным model_type
-      const pulseImage = Buffer.isBuffer(result.image) ? `data:image/jpeg;base64,${result.image.toString("base64")}` : result.image
-      await pulse(ctx, pulseImage, fullPrompt, `/${userModel.model_name}`)
-
-      // Показываем кнопки для дальнейших действий
-      await buttonNeuroHandlers(ctx, result.prompt_id.toString())
-      return
-    } finally {
-      // Удаляем сообщение о загрузке
-      await ctx.api.deleteMessage(ctx.chat?.id || "", loadingMsg.message_id).catch(console.error)
-      return
-    }
+    await generateNeuroImage(fullPrompt, userModel.model_url, userId, ctx, 1)
+    return
   } catch (error) {
     console.error("Error in neuro_photo conversation:", error)
     await ctx.reply(isRu ? "❌ Произошла ошибка. Пожалуйста, попробуйте еще раз." : "❌ An error occurred. Please try again.")

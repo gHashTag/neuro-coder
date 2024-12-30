@@ -12,6 +12,7 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
     await ctx.reply(isRu ? "❌ Произошла ошибка" : "❌ An error occurred")
     return
   }
+
   try {
     // Показываем меню выбора модели
     await ctx.reply(isRu ? "🎨 Выберите модель для генерации:" : "🎨 Choose generation model:", {
@@ -84,26 +85,6 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
     const text = message.photo ? message.caption : message.text
 
     await generateImage(text || "", model_type || "", ctx.from.id, isRu, ctx)
-
-    // await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id)
-
-    // // Обработка изображения для pulse
-    // const pulseImage = Buffer.isBuffer(image) ? `data:image/jpeg;base64,${image.toString("base64")}` : image
-    // await pulse(ctx, pulseImage, text || "", `/${model_type}`)
-
-    // Обновляем баланс пользователя
-    // const newBalance = currentBalance - price
-    // console.log(newBalance, "newBalance")
-    // await updateUserBalance(ctx.from.id, newBalance)
-
-    // await sendBalanceMessage(ctx, isRu, newBalance)
-
-    // const info = await getGeneratedImages(ctx.from.id || 0)
-    // const { count, limit } = info
-
-    // if (count < limit) {
-    //   await buttonHandlers(ctx, prompt_id?.toString() || "")
-    // }
   } catch (error) {
     console.error("Error in generateImageConversation:", error)
     await ctx.reply(isRu ? `❌ Произошла ошибка: ${JSON.stringify(error)}` : `❌ An error occurred: ${JSON.stringify(error)}`)

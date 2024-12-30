@@ -1,7 +1,5 @@
-import { InputFile } from "grammy"
-
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
-import { buttonNeuroHandlers } from "../../helpers/buttonNeuroHandlers"
+
 import { getPrompt } from "../../core/supabase/ai"
 import { MyContext } from "../../utils/types"
 
@@ -29,21 +27,8 @@ export async function handleGenerateNeuroImproved(ctx: MyContext, data: string, 
   try {
     console.log("Generating neuro image...")
 
-    const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx)
-    console.log("Generation result with prompt_id:", result?.prompt_id)
-
-    if (!result) {
-      throw new Error("Failed to generate neuro image")
-    }
-
-    const photoToSend = Buffer.isBuffer(result.image) ? new InputFile(result.image) : result.image
-    console.log("Sending photo...")
-    await ctx.replyWithPhoto(photoToSend)
-    console.log("Photo sent")
-
-    console.log("Adding neuro buttons with prompt_id:", result.prompt_id)
-    await buttonNeuroHandlers(ctx as MyContext, result.prompt_id?.toString() || "")
-    console.log("Neuro buttons added")
+    await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx, 1)
+    return
   } catch (error) {
     console.error("Error in generate_improved_ handler:", error)
     await ctx.reply(

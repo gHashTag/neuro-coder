@@ -1,10 +1,8 @@
-import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
-import { InlineKeyboard, InputFile } from "grammy"
-import { getGeneratedImages } from "../../core/supabase/ai"
-import { buttonHandlers } from "../../helpers/buttonHandlers"
-
+import { InlineKeyboard } from "grammy"
 import { generateNeuroImage } from "../../helpers/generateNeuroImage"
+import { MyContext } from "../../utils/types"
+import { getGeneratedImages } from "../../core/supabase/ai"
 
 const generateImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
@@ -50,34 +48,15 @@ const generateImageConversation = async (conversation: Conversation<MyContext>, 
     }
     const fileUrl = message.document ? `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}` : ""
     console.log(fileUrl)
-    const generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
+
     if (!text) {
       throw new Error("Text is required")
     }
     if (!model_type) {
       throw new Error("Model type is required")
     }
-    const result = await generateNeuroImage(text, model_type, ctx.from.id, ctx)
-    if (!result) {
-      throw new Error("Failed to generate image")
-    }
-
-    const { image, prompt_id } = result
-
-    if (!image) {
-      throw new Error("Не удалось получить изображение")
-    }
-
-    await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id)
-
-    // Отправляем изображение
-    const photoToSend = Buffer.isBuffer(image) ? new InputFile(image) : image
-    await ctx.replyWithPhoto(photoToSend, {
-      caption: isRu ? "🎨 Изображение сгенерировано!" : "🎨 Image generated!",
-    })
-
-    // Показываем кнопки для дальнейших действий
-    await buttonHandlers(ctx, prompt_id?.toString() || "")
+    await generateNeuroImage(text, model_type, ctx.from.id, ctx, 1)
+    return
   } catch (error) {
     console.error("Error in generateImageConversation:", error)
     await ctx.reply(isRu ? `❌ Произошла ошибка: ${error}` : `❌ An error occurred: ${error}`)

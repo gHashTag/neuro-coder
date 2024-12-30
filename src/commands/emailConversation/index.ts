@@ -1,7 +1,7 @@
 import { MyContext } from "../../utils/types"
 import { Conversation } from "@grammyjs/conversations"
 import { saveUserEmail } from "../../core/supabase/payments"
-import { buyRobokassa } from "../buy/buyRobokassa"
+import { buyRobokassa } from "../../handlers/buy/buyRobokassa"
 
 export async function buy(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"

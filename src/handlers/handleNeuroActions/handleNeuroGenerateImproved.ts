@@ -26,22 +26,8 @@ export async function handleNeuroGenerateImproved(ctx: MyContext, data: string, 
 
     generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
 
-    // Генерируем одно изображение с улучшенным промптом
-    const result = await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx)
-    console.log("Generation result:", result)
-
-    if (!result) {
-      throw new Error("Failed to generate neuro image")
-    }
-
-    const photoToSend = Buffer.isBuffer(result.image) ? new InputFile(result.image) : result.image
-    console.log("Sending photo...")
-    await ctx.replyWithPhoto(photoToSend)
-    console.log("Photo sent")
-
-    // Показываем кнопки для дальнейших действий
-    console.log("Adding neuro buttons for prompt_id:", result.prompt_id)
-    await buttonNeuroHandlers(ctx, result.prompt_id?.toString() || "")
+    await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx, 1)
+    return
   } catch (error) {
     console.error("Error generating improved image:", error)
     await ctx.reply(
