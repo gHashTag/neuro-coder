@@ -7,7 +7,7 @@ import {
   imageToVideoCost,
   textToSpeechCost,
   textToVideoCost,
-  voiceCost,
+  speechGenerationCost,
   starCost,
 } from "../../helpers/telegramStars/telegramStars"
 
@@ -21,7 +21,7 @@ export async function priceConversation(conversation: MyConversation, ctx: MyCon
     - 🖼️ **Генерация изображения**: ${imageGenerationCost.toFixed(2)} ⭐️
     - 🤖 **Нейро-генерация изображения**: ${imageNeuroGenerationCost.toFixed(2)} ⭐️
     - 🎥 **Текст в видео**: ${textToVideoCost.toFixed(2)} ⭐️
-    - 🎤 **Голос**: ${voiceCost.toFixed(2)} ⭐️
+    - 🎤 **Голос**: ${speechGenerationCost.toFixed(2)} ⭐️
     - 🗣️ **Текст в речь**: ${textToSpeechCost.toFixed(2)} ⭐️
     - 📽️ **Изображение в видео**: ${imageToVideoCost.toFixed(2)} ⭐️
 
@@ -35,7 +35,7 @@ export async function priceConversation(conversation: MyConversation, ctx: MyCon
     - 🖼️ **Image generation**: ${imageGenerationCost.toFixed(2)} ⭐️
     - 🤖 **Neuro-image generation**: ${imageNeuroGenerationCost.toFixed(2)} ⭐️
     - 🎥 **Text to video**: ${textToVideoCost.toFixed(2)} ⭐️
-    - 🎤 **Voice**: ${voiceCost.toFixed(2)} ⭐️
+    - 🎤 **Voice**: ${speechGenerationCost.toFixed(2)} ⭐️
     - 🗣️ **Text to speech**: ${textToSpeechCost.toFixed(2)} ⭐️
     - 📽️ **Image to video**: ${imageToVideoCost.toFixed(2)} ⭐️
 

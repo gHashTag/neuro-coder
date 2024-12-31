@@ -8,7 +8,7 @@ const promptGenerationCost = 0.048 / starCost
 const imageGenerationCost = 0.12 / starCost
 const imageNeuroGenerationCost = 0.12 / starCost
 const textToVideoCost = 0.99 / starCost
-const voiceCost = 0.3 / starCost
+const speechGenerationCost = 0.3 / starCost
 const textToSpeechCost = 0.12 / starCost
 const imageToVideoCost = 0.99 / starCost
 
@@ -97,7 +97,7 @@ export {
   sendCurrentBalanceMessage,
   imageToVideoCost,
   textToSpeechCost,
-  voiceCost,
+  speechGenerationCost,
   promptGenerationCost,
   imageNeuroGenerationCost,
   sendCostMessage,
