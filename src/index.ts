@@ -43,6 +43,7 @@ import {
   priceConversation,
   selectModel,
   inviterConversation,
+  imageToVideoConversation,
 } from "./commands"
 
 bot.api.config.use(hydrateFiles(bot.token))
@@ -90,7 +91,7 @@ bot.use(createConversation(emailConversation))
 bot.use(createConversation(selectModel))
 bot.use(createConversation(inviterConversation))
 bot.use(createConversation(voiceConversation))
-// bot.use(createConversation(imageToVideoConversation))
+bot.use(createConversation(imageToVideoConversation))
 bot.use(customMiddleware)
 
 composer.command("invite", async (ctx) => {
