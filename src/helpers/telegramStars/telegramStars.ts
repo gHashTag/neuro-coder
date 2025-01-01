@@ -5,7 +5,7 @@ const starCost = 0.016
 
 const trainingCostInStars = 50 / starCost
 const promptGenerationCost = 0.048 / starCost
-const imageGenerationCost = 0.12 / starCost
+const textToImageGenerationCost = 0.12 / starCost
 const imageNeuroGenerationCost = 0.12 / starCost
 const textToVideoGenerationCost = 0.99 / starCost
 const textToVideoCost = 0.99 / starCost
@@ -99,7 +99,7 @@ export {
   calculateStars,
   trainingCostInStars,
   sendInsufficientStarsMessage,
-  imageGenerationCost,
+  textToImageGenerationCost,
   sendBalanceMessage,
   textToVideoCost,
   sendCurrentBalanceMessage,

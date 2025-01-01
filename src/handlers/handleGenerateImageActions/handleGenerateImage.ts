@@ -1,6 +1,6 @@
 import { generateImage } from "../../services/generateReplicateImage"
 import { MyContext } from "../../utils/types"
-import { sendInsufficientStarsMessage, getUserBalance, imageGenerationCost } from "../../helpers/telegramStars/telegramStars"
+import { sendInsufficientStarsMessage, getUserBalance, textToImageGenerationCost } from "../../helpers/telegramStars/telegramStars"
 
 export async function handleGenerateImage(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
@@ -13,7 +13,7 @@ export async function handleGenerateImage(ctx: MyContext, data: string, isRu: bo
   const currentBalance = await getUserBalance(ctx.from.id)
 
   // Проверяем, достаточно ли средств
-  if (currentBalance < imageGenerationCost) {
+  if (currentBalance < textToImageGenerationCost) {
     await sendInsufficientStarsMessage(ctx, isRu)
     return
   }

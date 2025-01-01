@@ -2,7 +2,7 @@ import { generateNeuroImage } from "../../services/generateNeuroImage"
 import { getPrompt } from "../../core/supabase/ai"
 
 import { MyContext } from "../../utils/types"
-import { sendInsufficientStarsMessage, getUserBalance, imageGenerationCost } from "../../helpers/telegramStars/telegramStars"
+import { sendInsufficientStarsMessage, getUserBalance, textToImageGenerationCost } from "../../helpers/telegramStars/telegramStars"
 
 export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean) {
   if (!ctx || !ctx.from) {
@@ -33,7 +33,7 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
     console.log("numImages", numImages)
 
     const currentBalance = await getUserBalance(ctx.from.id)
-    const price = imageGenerationCost
+    const price = textToImageGenerationCost
     if (currentBalance < price) {
       await sendInsufficientStarsMessage(ctx, isRu)
       return

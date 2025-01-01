@@ -2,7 +2,7 @@ import { MyContext, MyConversation } from "../../utils/types"
 import {
   trainingCostInStars,
   promptGenerationCost,
-  imageGenerationCost,
+  textToImageGenerationCost,
   imageNeuroGenerationCost,
   imageToVideoCost,
   textToSpeechCost,
@@ -18,7 +18,7 @@ export async function priceConversation(conversation: MyConversation, ctx: MyCon
     💰 **Стоимость всех услуг:**
     - 🧠 **Обучение модели**: ${trainingCostInStars.toFixed(2)} ⭐️
     - ✍️ **Генерация промпта**: ${promptGenerationCost.toFixed(2)} ⭐️
-    - 🖼️ **Генерация изображения**: ${imageGenerationCost.toFixed(2)} ⭐️
+    - 🖼️ **Генерация изображения из текста**: ${textToImageGenerationCost.toFixed(2)} ⭐️
     - 🤖 **Нейро-генерация изображения**: ${imageNeuroGenerationCost.toFixed(2)} ⭐️
     - 🎥 **Текст в видео**: ${textToVideoCost.toFixed(2)} ⭐️
     - 🎤 **Голос**: ${speechGenerationCost.toFixed(2)} ⭐️
@@ -32,7 +32,7 @@ export async function priceConversation(conversation: MyConversation, ctx: MyCon
     💰 **Price of all services:**
     - 🧠 **Training model**: ${trainingCostInStars.toFixed(2)} ⭐️
     - ✍️ **Prompt generation**: ${promptGenerationCost.toFixed(2)} ⭐️
-    - 🖼️ **Image generation**: ${imageGenerationCost.toFixed(2)} ⭐️
+    - 🖼️ **Text to image generation**: ${textToImageGenerationCost.toFixed(2)} ⭐️
     - 🤖 **Neuro-image generation**: ${imageNeuroGenerationCost.toFixed(2)} ⭐️
     - 🎥 **Text to video**: ${textToVideoCost.toFixed(2)} ⭐️
     - 🎤 **Voice**: ${speechGenerationCost.toFixed(2)} ⭐️
@@ -43,5 +43,5 @@ export async function priceConversation(conversation: MyConversation, ctx: MyCon
     💵 Top up balance /buy
     `
 
-  await ctx.reply(message, { parse_mode: "Markdown" })
+  await ctx.reply(message, { parse_mode: "MarkdownV2" })
 }

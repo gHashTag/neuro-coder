@@ -4,7 +4,7 @@ import { MyContext } from "../../utils/types"
 
 import { generateImage } from "../../services/generateReplicateImage"
 
-import { sendCostMessage, imageGenerationCost } from "../../helpers/telegramStars/telegramStars"
+import { getUserBalance, sendBalanceMessage, textToImageGenerationCost } from "../../helpers/telegramStars/telegramStars"
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
@@ -61,11 +61,11 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
       await ctx.reply(isRu ? "Генерация отменена" : "Generation cancelled")
       return
     }
+    const currentBalance = await getUserBalance(ctx.from.id)
 
-    await sendCostMessage(ctx, isRu, imageGenerationCost)
-
+    await sendBalanceMessage(currentBalance, textToImageGenerationCost, ctx, isRu)
     const model_type = modelResponse.callbackQuery.data
-    console.log(model_type, "model_type")
+
     const keyboard = new InlineKeyboard().text(isRu ? "Отменить генерацию" : "Cancel generation", "cancel")
 
     const greetingMessage = await ctx.reply(

@@ -85,9 +85,6 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
     // Добавляем trigger word к промпту
     const fullPrompt = `Fashionable ${userModel.trigger_word}, ${promptText}`
 
-    // Отправляем сообщение о начале генерации
-    await ctx.reply(isRu ? "⏳ Генерирую изображение..." : "⏳ Generating image...")
-
     await generateNeuroImage(fullPrompt, userModel.model_url, userId, ctx, 1)
     return
   } catch (error) {
