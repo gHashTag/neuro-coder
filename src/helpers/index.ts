@@ -11,14 +11,14 @@ import { MyContext, Step } from "../utils/types"
 
 import { createWriteStream, promises as fs } from "fs"
 
-import { InputFile, MiddlewareFn } from "grammy"
-import { createUser, supabase } from "../core/supabase"
-import { bot } from ".."
+import { InputFile } from "grammy"
 import { ElevenLabsClient } from "elevenlabs"
 import { v4 as uuid } from "uuid"
 
 import { triggerWord } from "../commands/neuro_broker/mock"
 import { replicate } from "../core/replicate"
+import bot from "../core/bot"
+import { supabase } from "../core/supabase"
 
 if (!process.env.CREATOMATE_API_KEY) {
   throw new Error("CREATOMATE_API_KEY is not set")
@@ -1350,53 +1350,6 @@ export const sendPaymentNotification = async (amount: number, stars: number, tel
     console.error("Ошибка при отправке уведомления об оплате:", error)
     throw new Error("Ошибка при отправке уведомления об оплате")
   }
-}
-
-export const customMiddleware: MiddlewareFn<MyContext> = async (ctx, next) => {
-  if (process.env.NODE_ENV === "development") {
-    // Пропускаем проверку для режима разработки
-    return await next()
-  }
-
-  const username = ctx.from?.username || ""
-  const telegram_id = ctx.from?.id
-  // const chatMember = await bot.api.getChatMember("@neuro_coder_ai", telegram_id || 0)
-  // console.log(chatMember, "chatMember")
-  // const isSubscribed = chatMember.status === "member" || chatMember.status === "administrator" || chatMember.status === "creator"
-
-  // if (!isSubscribed) {
-  //   const isRu = ctx.from?.language_code === "ru"
-  //   await ctx.reply(
-  //     isRu ? "Пожалуйста, подпишитесь на наш канал, чтобы продолжить использование бота. 😊" : "Please subscribe to our channel to continue using the bot. 😊",
-  //     {
-  //       reply_markup: {
-  //         inline_keyboard: [[{ text: "Подписаться", url: `t.me/neuro_coder_ai` }]],
-  //       },
-  //     },
-  //   )
-  //   return
-  // }
-
-  if (telegram_id) {
-    // Ваша логика здесь
-    console.log(username, telegram_id, "username, telegram_id")
-    await createUser({ username, telegram_id: telegram_id.toString() })
-
-    // Проверка наличия инвайтера
-    const { data: user, error } = await supabase.from("users").select("inviter").eq("telegram_id", telegram_id.toString()).maybeSingle()
-
-    if (error) {
-      console.error(`Ошибка при проверке инвайтера: ${error.message}`)
-      throw new Error(`Ошибка при проверке инвайтера: ${error.message}`)
-    }
-
-    if (!user?.inviter) {
-      return await ctx.conversation.enter("inviterConversation")
-    }
-  }
-
-  // Продолжаем выполнение следующих промежуточных обработчиков
-  return await next()
 }
 
 export async function createSlideshow(images: string[], audioPath: string, outputPath: string): Promise<string> {

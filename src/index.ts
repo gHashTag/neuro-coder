@@ -3,7 +3,7 @@ import { Composer, session } from "grammy"
 import { development, production } from "./utils/launch"
 import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
-import { customMiddleware } from "./helpers"
+
 import { getUserData } from "./core/supabase/ai"
 import { freeStorage } from "@grammyjs/storage-free"
 import { answerAi } from "./core/openai/requests"
@@ -12,7 +12,7 @@ import { handleCallbackQuery } from "./handlers"
 import bot from "./core/bot"
 import { isRussian } from "./utils/language"
 import { incrementBalance, starCost } from "./helpers/telegramStars/telegramStars"
-import { MyContext, MyContextWithSession, SessionData } from "./utils/types"
+import { adapter, MyContext, MyContextWithSession, SessionData } from "./utils/types"
 import { autoRetry } from "@grammyjs/auto-retry"
 
 import {
@@ -45,6 +45,9 @@ import {
   inviterConversation,
   imageToVideoConversation,
 } from "./commands"
+import { subscriptionMiddleware } from "./middleware/subscription"
+
+import { chatMembers } from "@grammyjs/chat-members"
 
 bot.api.config.use(hydrateFiles(bot.token))
 bot.api.config.use(autoRetry())
@@ -67,6 +70,10 @@ function initial(): SessionData {
 bot.use(session({ initial, storage: freeStorage<SessionData>(bot.token) }))
 
 bot.use(conversations<MyContextWithSession>())
+bot.use(createConversation(inviterConversation))
+
+bot.use(chatMembers(adapter))
+bot.use(subscriptionMiddleware)
 
 bot.use(createConversation(start))
 bot.use(createConversation(neuroQuest))
@@ -89,10 +96,9 @@ bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))
 bot.use(createConversation(emailConversation))
 bot.use(createConversation(selectModel))
-bot.use(createConversation(inviterConversation))
+
 bot.use(createConversation(voiceConversation))
 bot.use(createConversation(imageToVideoConversation))
-bot.use(customMiddleware)
 
 composer.command("invite", async (ctx) => {
   console.log("CASE: start")
