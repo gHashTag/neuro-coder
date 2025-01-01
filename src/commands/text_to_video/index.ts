@@ -1,6 +1,6 @@
 import { Conversation } from "@grammyjs/conversations"
 import type { MyContext } from "../../utils/types"
-import { textToVideoCost, sendCostMessage } from "../../helpers/telegramStars/telegramStars"
+import { textToVideoCost, sendBalanceMessage, getUserBalance, sendInsufficientStarsMessage } from "../../helpers/telegramStars/telegramStars"
 import { generateTextToVideo } from "../../services/generateTextToVideo"
 import { InlineKeyboard } from "grammy"
 import { isRussian } from "../../utils/language"
@@ -16,11 +16,18 @@ export const textToVideoConversation = async (conversation: Conversation<MyConte
       throw new Error(isRu ? "Не удалось определить username" : "Could not identify username")
     }
 
+    const currentBalance = await getUserBalance(ctx.from.id)
     const price = textToVideoCost
-    await sendCostMessage(ctx, isRu, price)
+
+    if (currentBalance < price) {
+      await sendInsufficientStarsMessage(ctx, isRu)
+      return
+    }
+
+    await sendBalanceMessage(currentBalance, price, ctx, isRu)
 
     // Создаем клавиатуру для выбора модели
-    const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper")
+    const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper").text("Ray", "ray").text("I2VGen-XL", "i2vgen")
 
     // Запрашиваем модель
     await ctx.reply(isRu ? "Выберите модель для генерации:" : "Choose generation model:", { reply_markup: keyboard })

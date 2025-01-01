@@ -4,7 +4,7 @@ import { MyContext } from "../../utils/types"
 
 import { generateImage } from "../../services/generateReplicateImage"
 
-import { getUserBalance, sendBalanceMessage, textToImageGenerationCost } from "../../helpers/telegramStars/telegramStars"
+import { getUserBalance, sendBalanceMessage, sendInsufficientStarsMessage, textToImageGenerationCost } from "../../helpers/telegramStars/telegramStars"
 
 const textToImageConversation = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
   const isRu = ctx.from?.language_code === "ru"
@@ -62,6 +62,11 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
       return
     }
     const currentBalance = await getUserBalance(ctx.from.id)
+    const price = textToImageGenerationCost
+    if (currentBalance < price) {
+      await sendInsufficientStarsMessage(ctx, isRu)
+      return
+    }
 
     await sendBalanceMessage(currentBalance, textToImageGenerationCost, ctx, isRu)
     const model_type = modelResponse.callbackQuery.data
@@ -83,8 +88,13 @@ const textToImageConversation = async (conversation: Conversation<MyContext>, ct
     if (!message || !ctx.from?.id) return
 
     const text = message.photo ? message.caption : message.text
-
-    await generateImage(text || "", model_type || "", ctx.from.id, isRu, ctx)
+    if (!text) {
+      await generateImage(text || "", model_type || "", ctx.from.id, isRu, ctx)
+      return
+    } else {
+      await ctx.reply(isRu ? "❌ Промпт не найден" : "❌ Prompt not found")
+      return
+    }
   } catch (error) {
     console.error("Error in generateImageConversation:", error)
     await ctx.reply(isRu ? `❌ Произошла ошибка: ${JSON.stringify(error)}` : `❌ An error occurred: ${JSON.stringify(error)}`)

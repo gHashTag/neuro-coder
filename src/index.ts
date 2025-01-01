@@ -36,7 +36,7 @@ import {
   createAinews,
   textToImageConversation,
   textToVideoConversation,
-  imageToPromptConversation,
+  imageToPrompt,
   trainFluxModelConversation,
   neuroPhotoConversation,
   emailConversation,
@@ -91,12 +91,11 @@ bot.use(createConversation(subtitles))
 bot.use(createConversation(createAinews))
 bot.use(createConversation(textToImageConversation))
 bot.use(createConversation(textToVideoConversation))
-bot.use(createConversation(imageToPromptConversation))
+bot.use(createConversation(imageToPrompt))
 bot.use(createConversation(trainFluxModelConversation))
 bot.use(createConversation(neuroPhotoConversation))
 bot.use(createConversation(emailConversation))
 bot.use(createConversation(selectModel))
-
 bot.use(createConversation(voiceConversation))
 bot.use(createConversation(imageToVideoConversation))
 
@@ -170,106 +169,6 @@ composer.command("trigger_reel", async (ctx) => {
   return
 })
 
-composer.command("anatol777", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("anfi_vesna", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("vega_condominium", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("dpbelarusx", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("neuro_coder", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("yellowshoess", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("gimba", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("karin", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("svedovaya", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("evi", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("evii", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("kata", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("neuro_broker_00", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("neuro_broker_01", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("kirill_korolev", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("zavarikin", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("lekomtsev", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("chuklinov", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("lee_solar", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
-composer.command("muse_nataly", async (ctx) => {
-  await ctx.conversation.enter("generateImageConversation")
-  return
-})
-
 composer.command("soul", async (ctx) => {
   await ctx.conversation.enter("soulConversation")
   return
@@ -278,11 +177,6 @@ composer.command("soul", async (ctx) => {
 composer.command("voice", async (ctx) => {
   console.log("CASE: voice")
   await ctx.conversation.enter("voiceConversation")
-  return
-})
-
-composer.command("subtitles", async (ctx) => {
-  await ctx.conversation.enter("subtitles")
   return
 })
 
@@ -321,11 +215,6 @@ composer.command("neuro_photo", async (ctx) => {
   return
 })
 
-composer.command("image_to_prompt", async (ctx) => {
-  await ctx.conversation.enter("imageToPromptConversation")
-  return
-})
-
 composer.command("help", async (ctx) => {
   await ctx.conversation.enter("helpConversation")
   return
@@ -342,7 +231,7 @@ composer.command("text_to_image", async (ctx) => {
 })
 
 composer.command("image_to_prompt", async (ctx) => {
-  await ctx.conversation.enter("imageToPromptConversation")
+  await ctx.conversation.enter("imageToPrompt")
   return
 })
 
@@ -385,6 +274,7 @@ bot.on("message:successful_payment", async (ctx) => {
     "-1001978334539",
     `💫 Пользователь @${ctx.from.username} (ID: ${ctx.from.id}) пополнил баланс на ${stars} звезд! (Стоимость звезды: $${starCost})`,
   )
+  return
 })
 
 bot.on("message:text", async (ctx) => {

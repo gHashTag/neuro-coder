@@ -9,7 +9,7 @@ if (!process.env.HUGGINGFACE_TOKEN) {
   throw new Error("HUGGINGFACE_TOKEN is not set")
 }
 
-export const imageToPromptConversation = async (conversation: Conversation<MyContext>, ctx: MyContext) => {
+export const imageToPrompt = async (conversation: Conversation<MyContext>, ctx: MyContext) => {
   if (!ctx.from?.id) {
     await ctx.reply("User ID not found")
     return

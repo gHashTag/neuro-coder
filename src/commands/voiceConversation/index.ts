@@ -1,6 +1,7 @@
 import { MyContext, MyConversation } from "../../utils/types"
 import { generateVoiceAvatar } from "../../services/generateVoiceAvatar"
 import { isRussian } from "../../utils/language"
+import { sendInsufficientStarsMessage, sendBalanceMessage, getUserBalance, voiceConversationCost } from "../../helpers/telegramStars/telegramStars"
 
 export async function voiceConversation(conversation: MyConversation, ctx: MyContext): Promise<void> {
   const isRu = isRussian(ctx)
@@ -9,11 +10,18 @@ export async function voiceConversation(conversation: MyConversation, ctx: MyCon
     await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
     return
   }
+  const currentBalance = await getUserBalance(ctx.from.id)
+  const price = voiceConversationCost
+  if (currentBalance < price) {
+    await sendInsufficientStarsMessage(ctx, isRu)
+    return
+  }
+  await sendBalanceMessage(currentBalance, price, ctx, isRu)
 
   try {
     // Сначала отправляем инструкцию пользователю
     await ctx.reply(
-      isRu ? "Пожалуйста, отправьте голосовое сообщение для создания голосового аватара" : "Please send a voice message to create your voice avatar",
+      isRu ? "🎙️ Пожалуйста, отправьте голосовое сообщение для создания голосового аватара" : "🎙️ Please send a voice message to create your voice avatar",
     )
 
     // Получаем сообщение
@@ -22,7 +30,7 @@ export async function voiceConversation(conversation: MyConversation, ctx: MyCon
 
     // Остальная логика без изменений...
     if (!message.message?.voice && !message.message?.audio) {
-      await ctx.reply(isRu ? "Пожалуйста, отправьте голосовое сообщение" : "Please send a voice message")
+      await ctx.reply(isRu ? "🎙️ Пожалуйста, отправьте голосовое сообщение" : "🎙️ Please send a voice message")
       return
     }
 
@@ -41,8 +49,13 @@ export async function voiceConversation(conversation: MyConversation, ctx: MyCon
     const fileUrl = `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}`
     console.log(fileUrl, "fileUrl")
 
-    await generateVoiceAvatar(fileUrl, ctx.from.id, ctx, isRu)
-    return
+    if (fileUrl) {
+      console.log("File URL found")
+      await generateVoiceAvatar(fileUrl, ctx.from.id, ctx, isRu)
+      return
+    } else {
+      throw new Error("File URL not found")
+    }
   } catch (error) {
     console.error("Error in handleVoiceMessage:", error)
     await ctx.reply(

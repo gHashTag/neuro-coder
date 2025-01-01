@@ -3,13 +3,7 @@ import { MyContext } from "../../utils/types"
 
 import { InlineKeyboard } from "grammy"
 import axios from "axios"
-import {
-  imageToVideoCost,
-  sendCurrentBalanceMessage,
-  sendInsufficientStarsMessage,
-  getUserBalance,
-  sendCostMessage,
-} from "../../helpers/telegramStars/telegramStars"
+import { imageToVideoCost, sendInsufficientStarsMessage, getUserBalance, sendBalanceMessage } from "../../helpers/telegramStars/telegramStars"
 import { generateImageToVideo, VideoModel } from "../../services/generateImageToVideo"
 
 export const downloadFile = async (url: string): Promise<Buffer> => {
@@ -34,12 +28,12 @@ export const imageToVideoConversation = async (conversation: Conversation<MyCont
   }
   const currentBalance = await getUserBalance(ctx.from.id)
   const price = imageToVideoCost
-  await sendCostMessage(ctx, isRu, price)
+
   if (currentBalance < price) {
     await sendInsufficientStarsMessage(ctx, isRu)
     return
   }
-  await sendCurrentBalanceMessage(ctx, isRu, currentBalance)
+  await sendBalanceMessage(currentBalance, price, ctx, isRu)
 
   const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper").text("Ray", "ray").text("I2VGen-XL", "i2vgen")
   await ctx.reply(isRu ? "Выберите сервис для генерации видео:" : "Choose video generation service:", { reply_markup: keyboard })

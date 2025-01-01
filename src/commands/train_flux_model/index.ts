@@ -9,7 +9,7 @@ import { replicate } from "../../core/replicate"
 import { createModelTraining, updateModelTraining, ModelTrainingUpdate, supabase } from "../../core/supabase"
 import {
   getUserBalance,
-  sendCostMessage,
+  sendBalanceMessage,
   sendInsufficientStarsMessage,
   trainingCostInStars,
   updateUserBalance,
@@ -350,11 +350,13 @@ export async function trainFluxModelConversation(conversation: MyConversation, c
 
   // Получаем текущий баланс пользователя
   const currentBalance = await getUserBalance(Number(targetUserId))
-  await sendCostMessage(ctx, isRu, trainingCostInStars)
+
   if (currentBalance < trainingCostInStars) {
     await sendInsufficientStarsMessage(ctx, isRu)
     return
   }
+
+  await sendBalanceMessage(currentBalance, trainingCostInStars, ctx, isRu)
 
   // Снимаем звезды с баланса
   await updateUserBalance(Number(targetUserId), currentBalance - trainingCostInStars)

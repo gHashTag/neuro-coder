@@ -2,7 +2,7 @@ import { Conversation } from "@grammyjs/conversations"
 import { MyContext } from "../../utils/types"
 
 import { getVoiceId } from "../../core/supabase"
-import { textToSpeechCost, sendCostMessage } from "../../helpers/telegramStars/telegramStars"
+import { textToSpeechCost, sendBalanceMessage, sendInsufficientStarsMessage, getUserBalance } from "../../helpers/telegramStars/telegramStars"
 import { generateTextToSpeech } from "../../services/generateTextToSpeech"
 import { isRussian } from "../../utils/language"
 
@@ -13,8 +13,15 @@ const textToSpeech = async (conversation: Conversation<MyContext>, ctx: MyContex
     if (!ctx.from) {
       throw new Error("User not found")
     }
+    const currentBalance = await getUserBalance(ctx.from.id)
+    const price = textToSpeechCost
 
-    await sendCostMessage(ctx, isRu, textToSpeechCost)
+    if (currentBalance < price) {
+      await sendInsufficientStarsMessage(ctx, isRu)
+      return
+    }
+
+    await sendBalanceMessage(currentBalance, price, ctx, isRu)
 
     const requestText = await ctx.reply(isRu ? "✍️ Отправьте текст, для преобразования его в голос" : "✍️ Send text, to convert it to voice")
     const { message } = await conversation.wait()

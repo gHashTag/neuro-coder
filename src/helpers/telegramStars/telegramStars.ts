@@ -3,7 +3,7 @@ import { MyContext } from "../../utils/types"
 
 const starCost = 0.016
 
-const trainingCostInStars = 50 / starCost
+const trainingCostInStars = 20 / starCost
 const promptGenerationCost = 0.048 / starCost
 const textToImageGenerationCost = 0.12 / starCost
 const imageNeuroGenerationCost = 0.12 / starCost
@@ -14,6 +14,7 @@ const textToSpeechCost = 0.12 / starCost
 const imageToVideoCost = 0.99 / starCost
 const imageToVideoGenerationCost = 0.99 / starCost
 const imageToPromptCost = 0.03 / starCost
+const voiceConversationCost = 0.99 / starCost
 
 async function incrementBalance({ telegram_id, amount }: { telegram_id: string; amount: number }) {
   const { data, error } = await supabase.from("users").select("balance").eq("telegram_id", telegram_id).single()
@@ -81,16 +82,6 @@ const sendBalanceMessage = async (newBalance: number, cost: number, ctx: MyConte
   )
 }
 
-const sendCurrentBalanceMessage = async (ctx: MyContext, isRu: boolean, currentBalance: number) => {
-  await ctx.reply(isRu ? `Ваш текущий баланс: ${currentBalance.toFixed(2)} ⭐️` : `Your current balance: ${currentBalance.toFixed(2)} ⭐️`)
-  return
-}
-
-const sendCostMessage = async (ctx: MyContext, isRu: boolean, cost: number) => {
-  await ctx.reply(isRu ? `Стоимость: ${cost.toFixed(2)} ⭐️` : `Cost: ${cost.toFixed(2)} ⭐️`)
-  return
-}
-
 export {
   incrementBalance,
   starCost,
@@ -102,14 +93,13 @@ export {
   textToImageGenerationCost,
   sendBalanceMessage,
   textToVideoCost,
-  sendCurrentBalanceMessage,
   imageToVideoCost,
   textToSpeechCost,
   speechGenerationCost,
   promptGenerationCost,
   imageNeuroGenerationCost,
-  sendCostMessage,
   imageToPromptCost,
   textToVideoGenerationCost,
   imageToVideoGenerationCost,
+  voiceConversationCost,
 }

@@ -3,7 +3,6 @@ import {
   handleLevel1,
   handleLevel10,
   handleLevel11,
-  handleLevel12,
   handleLevel2,
   handleLevel3,
   handleLevel4,
@@ -90,10 +89,6 @@ export async function handleLevelQuest(ctx: MyContext, data: string) {
     case 11:
       console.log("CASE: level_11")
       await handleLevel11(ctx)
-      break
-    case 12:
-      console.log("CASE: level_12")
-      await handleLevel12(ctx)
       break
     default:
       console.error("Неизвестный уровень:", level)

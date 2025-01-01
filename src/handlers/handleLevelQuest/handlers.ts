@@ -569,53 +569,6 @@ Share your creative ideas on social media.`,
 
 export async function handleLevel11(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
-  await ctx.reply(
-    isRu
-      ? `🎬 Добавьте субтитры к вашему видео! 🎬
-
-Хотите сделать ваше видео более доступным и понятным? С помощью команды /subtitles вы можете легко добавить субтитры к вашим видеороликам! 🌟✨
-
-📝 Как это работает?
-1. Введите команду /subtitles в нашем боте.
-2. Загрузите видео и текст субтитров.
-3. Получите видео с идеально синхронизированными субтитрами!
-
-🎥 Почему это важно?
-Сделайте ваше видео доступным для большего количества зрителей.
-Улучшите понимание и восприятие вашего контента.
-Используйте субтитры для обучения и презентаций.
-
-💡 Примеры использования:
-Добавьте субтитры к обучающим видео.
-Создайте видео с переводом для международной аудитории.
-Поделитесь своими креативными идеями в социальных сетях.`
-      : `🎬 Add subtitles to your video! 🎬
-
-Want to make your video more accessible and understandable? With the /subtitles command, you can easily add subtitles to your videos! 🌟✨
-
-📝 How does it work?
-1. Enter the /subtitles command in our bot.
-2. Upload the video and subtitle text.
-3. Get a video with perfectly synchronized subtitles!
-
-🎥 Why is it important?
-Make your video accessible to more viewers.
-Improve understanding and perception of your content.
-Use subtitles for learning and presentations.
-
-💡 Use cases:
-Add subtitles to educational videos.
-Create a video with translation for an international audience.
-Share your creative ideas on social media.`,
-    {
-      reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_12"),
-    },
-  )
-  return
-}
-
-export async function handleLevel12(ctx: MyContext) {
-  const isRu = ctx.from?.language_code === "ru"
 
   await ctx.reply(
     isRu
