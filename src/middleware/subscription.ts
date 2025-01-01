@@ -29,9 +29,10 @@ async function checkSubscription(ctx: MyContextChatMembers): Promise<boolean> {
 export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: () => Promise<void>) => {
   try {
     // Проверяем, что команда /start
-    if (ctx.message?.text !== "/start") {
+    if (!ctx.message?.text?.startsWith("/start")) {
       return await next()
     }
+
     if (!ctx.from) {
       console.error("No user data found in context")
       return await ctx.reply("Error: No user data found")
