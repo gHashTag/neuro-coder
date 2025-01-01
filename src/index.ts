@@ -16,7 +16,6 @@ import { adapter, MyContext, MyContextWithSession, SessionData } from "./utils/t
 import { autoRetry } from "@grammyjs/auto-retry"
 
 import {
-  neuro_broker,
   leela,
   clipmaker,
   balance,
@@ -114,8 +113,6 @@ composer.command("start", async (ctx) => {
 composer.command("clipmaker", (ctx: MyContext) => clipmaker(ctx))
 
 composer.command("leela", (ctx: MyContext) => leela(ctx))
-
-composer.command("neuro_broker", (ctx: MyContext) => neuro_broker(ctx))
 
 composer.command("caption_for_reels", async (ctx) => {
   await ctx.conversation.enter("captionForReels")

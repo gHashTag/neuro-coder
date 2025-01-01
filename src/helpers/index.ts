@@ -15,7 +15,6 @@ import { InputFile } from "grammy"
 import { ElevenLabsClient } from "elevenlabs"
 import { v4 as uuid } from "uuid"
 
-import { triggerWord } from "../commands/neuro_broker/mock"
 import { replicate } from "../core/replicate"
 import bot from "../core/bot"
 import { supabase } from "../core/supabase"
@@ -1211,6 +1210,8 @@ export async function getMeditationSteps({ prompt }: { prompt: string }) {
 if (!process.env.OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY is not set")
 }
+
+const triggerWord = "KATA"
 
 export async function translateText(text: string, targetLang: string): Promise<string> {
   try {
