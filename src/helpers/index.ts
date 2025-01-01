@@ -65,6 +65,7 @@ export const elevenlabs = new ElevenLabsClient({
 console.log("ElevenLabs client initialized")
 
 export const isDev = process.env.NODE_ENV === "development"
+console.log("isDev", isDev)
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 
