@@ -7,10 +7,13 @@ const trainingCostInStars = 50 / starCost
 const promptGenerationCost = 0.048 / starCost
 const imageGenerationCost = 0.12 / starCost
 const imageNeuroGenerationCost = 0.12 / starCost
+const textToVideoGenerationCost = 0.99 / starCost
 const textToVideoCost = 0.99 / starCost
-const speechGenerationCost = 0.3 / starCost
+const speechGenerationCost = 0.12 / starCost
 const textToSpeechCost = 0.12 / starCost
 const imageToVideoCost = 0.99 / starCost
+const imageToVideoGenerationCost = 0.99 / starCost
+const imageToPromptCost = 0.03 / starCost
 
 async function incrementBalance({ telegram_id, amount }: { telegram_id: string; amount: number }) {
   const { data, error } = await supabase.from("users").select("balance").eq("telegram_id", telegram_id).single()
@@ -29,8 +32,13 @@ async function incrementBalance({ telegram_id, amount }: { telegram_id: string; 
 }
 
 async function getUserBalance(userId: number): Promise<number> {
-  const { data, error } = await supabase.from("users").select("balance").eq("telegram_id", userId.toString()).single()
-
+  console.log("userId", userId)
+  const { data, error } = await supabase
+    .from("users")
+    .select("balance, telegram_id, user_id, first_name, last_name, username")
+    .eq("telegram_id", userId.toString())
+    .single()
+  console.log("data", data)
   if (error) {
     if (error.code === "PGRST116") {
       console.error(`Пользователь с ID ${userId} не найден.`)
@@ -65,11 +73,11 @@ async function sendInsufficientStarsMessage(ctx: MyContext, isRu: boolean) {
   await ctx.reply(message)
 }
 
-const sendBalanceMessage = async (ctx: MyContext, isRu: boolean, newBalance: number) => {
+const sendBalanceMessage = async (newBalance: number, cost: number, ctx: MyContext, isRu: boolean) => {
   await ctx.reply(
     isRu
-      ? `Стоимость: ${imageGenerationCost.toFixed(2)} ⭐️\nВаш новый баланс: ${newBalance.toFixed(2)} ⭐️`
-      : `Cost: ${imageGenerationCost.toFixed(2)} ⭐️\nYour new balance: ${newBalance.toFixed(2)} ⭐️`,
+      ? `Стоимость: ${cost.toFixed(2)} ⭐️\nВаш баланс: ${newBalance.toFixed(2)} ⭐️`
+      : `Cost: ${cost.toFixed(2)} ⭐️\nYour balance: ${newBalance.toFixed(2)} ⭐️`,
   )
 }
 
@@ -101,4 +109,7 @@ export {
   promptGenerationCost,
   imageNeuroGenerationCost,
   sendCostMessage,
+  imageToPromptCost,
+  textToVideoGenerationCost,
+  imageToVideoGenerationCost,
 }

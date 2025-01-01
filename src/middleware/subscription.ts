@@ -18,17 +18,20 @@ async function checkSubscription(ctx: MyContextChatMembers): Promise<boolean> {
       throw new Error("User ID is undefined")
     }
     const chatMember = await bot.api.getChatMember("@neuro_blogger_group", ctx.from?.id)
-    console.log("chatMember", chatMember)
     return ["member", "administrator", "creator"].includes(chatMember.status)
   } catch (error) {
     console.error("Error checking subscription:", error)
-    return true
+    throw error
   }
 }
 
 // Основной middleware
 export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: () => Promise<void>) => {
   try {
+    // Проверяем, что команда /start
+    if (ctx.message?.text !== "/start") {
+      return await next()
+    }
     if (!ctx.from) {
       console.error("No user data found in context")
       return await ctx.reply("Error: No user data found")
@@ -76,8 +79,6 @@ export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: ()
       inviter,
     }
 
-    console.log("userData", userData)
-
     await createUser(userData)
 
     return await next()
@@ -85,6 +86,7 @@ export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: ()
     console.error("Critical error in subscriptionMiddleware:", error)
     const isRu = ctx.from?.language_code === "ru"
     return await ctx.reply(isRu ? "Произошла критическая ошибка. Пожалуйста, попробуйте позже." : "A critical error occurred. Please try again later.")
+    throw error
   }
 }
 
@@ -123,6 +125,6 @@ async function getUserPhotoUrl(ctx: MyContextChatMembers, userId: number): Promi
     return photoUrl
   } catch (error) {
     console.error("Error getting user profile photo:", error)
-    return null
+    throw error
   }
 }

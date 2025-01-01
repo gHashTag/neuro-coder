@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios"
 import { isDev } from "../helpers"
-import { MyContext } from "../utils/types"
+
 import { InlineKeyboard } from "grammy"
 
 export type VideoModel = "minimax" | "haiper" | "ray" | "i2vgen"

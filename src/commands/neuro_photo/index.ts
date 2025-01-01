@@ -51,7 +51,7 @@ export async function neuroPhotoConversation(conversation: MyConversation, ctx: 
     await sendInsufficientStarsMessage(ctx, isRu)
     return
   }
-  await sendBalanceMessage(ctx, isRu, currentBalance)
+  await sendBalanceMessage(currentBalance, imageNeuroGenerationCost, ctx, isRu)
 
   try {
     // Получаем последнюю обученную модель пользователя
