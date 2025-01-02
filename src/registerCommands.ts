@@ -38,6 +38,7 @@ import { setupLevelHandlers } from "handlers/setupLevelHandlers"
 import { menuCommand } from "commands/menuCommand"
 import { inviteCommand } from "commands/inviteCommand"
 import { emailCommand } from "commands/emailCommand"
+import { priceCommand } from "commands/priceCommand"
 
 export const myComposer = new Composer<MyContext>()
 
@@ -154,6 +155,10 @@ export function registerCommands(bot: Telegraf<MyContext>) {
     await neuroQuestCommand(ctx)
   })
 
+  myComposer.command("price", async (ctx) => {
+    await priceCommand(ctx)
+  })
+
   // composer.command("clipmaker", (ctx) => clipmakerCommand(ctx))
 
   // composer.command("leela", (ctx) => leelaCommand(ctx))
@@ -164,10 +169,6 @@ export function registerCommands(bot: Telegraf<MyContext>) {
 
   // composer.command("neuro_quest", async (ctx) => {
   //   await ctx.scene.enter("neuroQuestCommand")
-  // })
-
-  // composer.command("price", async (ctx) => {
-  //   await ctx.scene.enter("priceCommand")
   // })
 
   // composer.command("lipsync", async (ctx) => {
