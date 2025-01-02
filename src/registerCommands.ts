@@ -1,10 +1,9 @@
-import { Telegraf, Composer, Scenes, session, Middleware } from "telegraf"
+import { Telegraf, Composer, Scenes, session } from "telegraf"
 import { MyContext, SessionData } from "./interfaces"
 
 import { startCommand } from "./commands/startCommand"
 import { neuroQuestCommand } from "./commands/neuroQuestCommand"
-import { clipmakerCommand } from "./commands/clipmakerCommand"
-import { leelaCommand } from "./commands/leelaCommand"
+
 import { topUpBalanceCommand } from "./commands/topUpBalanceCommand"
 import { balanceCommand } from "./commands/balanceCommand"
 import { selectModelCommand } from "./commands/selectModelCommand"
@@ -31,8 +30,8 @@ import { selectModelCommand } from "./commands/selectModelCommand"
 // import { createAinewsCommand } from "./commands/createAinewsCommand"
 import { mainMenu } from "./menu/mainMenu"
 import { handleCallbackQuery } from "./handlers/handleCallbackQuery"
-import { avatarWizard } from "./scenes/avatarWizard"
-import { subscriptionMiddleware } from "./middleware/subscription"
+import { avatarWizard, imageToPromptWizard } from "./scenes"
+// import { subscriptionMiddleware } from "./middleware/subscription"
 import { imageModelMenu } from "./menu/imageModelMenu"
 
 import { setupLevelHandlers } from "handlers/setupLevelHandlers"
@@ -78,6 +77,7 @@ export const stage = new Scenes.Stage<MyContext>([
   balanceScene,
   topUpBalanceScene,
   avatarWizard,
+  imageToPromptWizard,
   // clipmakerScene,
   // leelaScene,
   // selectModelScene,
@@ -284,7 +284,7 @@ export function registerCommands(bot: Telegraf<MyContext>) {
 
   myComposer.hears(["🔍 Описание из изображения", "🔍 Image to Prompt"], async (ctx) => {
     console.log("CASE: Описание из изображения")
-    await ctx.scene.enter("imageToPromptCommand")
+    await ctx.scene.enter("imageToPromptWizard")
   })
 
   myComposer.hears(["👥 Пригласить друга", "👥 Invite a friend"], async (ctx) => {

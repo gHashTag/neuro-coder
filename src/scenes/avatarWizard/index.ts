@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf"
 import { MyContext } from "../../interfaces"
 import { updateUserSoul } from "../../core/supabase"
-import { isRussian } from "utils/language"
+import { isRussian } from "../../utils/language"
 
 interface WizardSessionData extends Scenes.WizardSessionData {
   company?: string
