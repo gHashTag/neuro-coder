@@ -1,7 +1,7 @@
 import { Keyboard } from "grammy"
 import { MyContext } from "../utils/types"
 
-export async function showModelMenu(ctx: MyContext) {
+export async function imageModelMenu(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   const keyboard = new Keyboard()
     .text("Flux 1.1Pro Ultra")

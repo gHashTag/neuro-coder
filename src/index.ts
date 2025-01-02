@@ -29,7 +29,6 @@ bot.use(composer)
 setBotCommands(bot as Bot<MyContext>)
 
 // Register commands
-registerCommands()
 
 bot.on("pre_checkout_query", async (ctx) => {
   await ctx.answerPreCheckoutQuery(true)
@@ -41,6 +40,8 @@ bot.on("message:successful_payment", handleSuccessfulPayment)
 bot.on("message:text", handleTextMessage)
 
 bot.on("callback_query:data", handleCallback)
+
+registerCommands()
 
 bot.catch((err) => {
   const ctx = err.ctx
@@ -57,5 +58,9 @@ bot.catch((err) => {
       console.error("Ошибка отправки сообщения об ошибке поьзователю:", e)
     })
 })
+
+// Enable graceful stop
+process.once("SIGINT", () => bot.stop())
+process.once("SIGTERM", () => bot.stop())
 
 export { bot }

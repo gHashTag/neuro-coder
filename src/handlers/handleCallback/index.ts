@@ -27,5 +27,6 @@ export async function handleCallback(ctx: MyContext) {
       console.error("Не удалось ответить на callback query:", e)
       await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")
     }
+    throw error
   }
 }

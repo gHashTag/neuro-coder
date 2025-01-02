@@ -10,16 +10,14 @@ if (!process.env.HUGGINGFACE_TOKEN) {
 }
 
 export const imageToPromptCommand = async (conversation: Conversation<MyContext>, ctx: MyContext) => {
-  if (!ctx.from?.id) {
-    await ctx.reply("User ID not found")
-    return
-  }
-
   const isRu = ctx.from?.language_code === "ru"
-
-  console.log("Starting image_to_prompt conversation")
-
   try {
+    console.log("CASE: imageToPromptCommand")
+    if (!ctx.from?.id) {
+      await ctx.reply("User ID not found")
+      return
+    }
+
     const userId = ctx.from?.id
     const currentBalance = await getUserBalance(userId)
 
@@ -42,19 +40,13 @@ export const imageToPromptCommand = async (conversation: Conversation<MyContext>
     // Отправляем сообщение о начале обработки
     await ctx.reply(isRu ? "⏳ Генерирую промпт..." : "⏳ Generating prompt...")
 
-    try {
-      // Получаем файл изображения
-      const photoSize = imageMsg.message.photo[imageMsg.message.photo.length - 1]
-      console.log("Getting file info for photo:", photoSize.file_id)
-      const file = await ctx.api.getFile(photoSize.file_id)
-      const imageUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`
-      await generateImageToPrompt(imageUrl, ctx.from.id, ctx, isRu)
-      return
-    } catch (error) {
-      console.error("Error in image_to_prompt conversation:", error)
-      await ctx.reply(isRu ? "❌ Произошла ошибка. Пожалуйста, попробуйте еще раз или позже." : "❌ An error occurred. Please try again or later.")
-      throw error
-    }
+    // Получаем файл изображения
+    const photoSize = imageMsg.message.photo[imageMsg.message.photo.length - 1]
+    console.log("Getting file info for photo:", photoSize.file_id)
+    const file = await ctx.api.getFile(photoSize.file_id)
+    const imageUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`
+    await generateImageToPrompt(imageUrl, ctx.from.id, ctx, isRu)
+    return
   } catch (error) {
     console.error("Error in image_to_prompt conversation:", error)
     await ctx.reply(isRu ? "❌ Произошла ошибка. Пожалуйста, попробуйте еще раз или позже." : "❌ An error occurred. Please try again or later.")

@@ -19,6 +19,9 @@ export interface Step {
 export interface SessionData {
   selectedModel?: string
   text?: string
+  conversation?: {
+    [key: string]: any
+  }
 }
 
 // Определяем тип контекста
