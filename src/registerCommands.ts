@@ -36,6 +36,7 @@ import { imageModelMenu } from "./menu/imageModelMenu"
 
 import { setupLevelHandlers } from "handlers/setupLevelHandlers"
 import { menuCommand } from "commands/menuCommand"
+import { inviteCommand } from "commands/inviteCommand"
 
 export const myComposer = new Composer<MyContext>()
 
@@ -136,10 +137,10 @@ export function registerCommands(bot: Telegraf<MyContext>) {
     await ctx.scene.enter("menuCommand")
   })
 
-  // composer.command("invite", async (ctx) => {
-  //   console.log("CASE: invite")
-  //   await ctx.scene.enter("inviteCommand")
-  // })
+  myComposer.command("invite", async (ctx) => {
+    console.log("CASE: invite")
+    await inviteCommand(ctx)
+  })
 
   // composer.command("clipmaker", (ctx) => clipmakerCommand(ctx))
 
