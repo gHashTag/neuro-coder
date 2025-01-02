@@ -5,9 +5,10 @@ import { handleModelCallback, handleTextMessage } from "./handlers"
 import bot from "./core/bot"
 
 import { setBotCommands } from "./setCommands"
-import { myComposer, registerCommands, stage } from "./registerCommands"
+import { registerCommands, stage } from "./registerCommands"
 import { handleCallback } from "./handlers/handleCallback"
 import { MyContext, MyTextMessageContext } from "./interfaces"
+import myComposer from "./hearsHandlers"
 
 if (process.env.NODE_ENV === "development") {
   development(bot).catch(console.error)

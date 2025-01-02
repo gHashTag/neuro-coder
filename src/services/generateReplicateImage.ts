@@ -26,7 +26,7 @@ export async function fetchImage(url: string): Promise<Buffer> {
   return Buffer.from(response.data)
 }
 
-export const generateImage = async (prompt: string, model_type: string, telegram_id: number, isRu: boolean, ctx: MyContext) => {
+export const generateImage = async (prompt: string, model_type: string, num_images: number, telegram_id: number, isRu: boolean, ctx: MyContext) => {
   try {
     const url = `${isDev ? "http://localhost:3000" : process.env.ELESTIO_URL}/generate/text-to-image`
     console.log(url, "url")
@@ -35,6 +35,7 @@ export const generateImage = async (prompt: string, model_type: string, telegram
       {
         prompt,
         model: model_type,
+        num_images,
         telegram_id,
         username: ctx.from?.username,
         is_ru: isRu,

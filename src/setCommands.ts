@@ -13,16 +13,16 @@ export function setBotCommands(bot: Telegraf<MyContext>) {
       description: "👤 Menu / Главное меню",
     },
     {
-      command: "price",
-      description: "💰 Price / Цена",
-    },
-    {
       command: "invite",
       description: "👥 Invite a friend / Пригласить друга",
     },
     {
+      command: "price",
+      description: "⭐️ Price / Цена",
+    },
+    {
       command: "buy",
-      description: "💰 Top up balance / Пополнить баланс",
+      description: "💵 Top up balance / Пополнить баланс",
     },
     {
       command: "balance",

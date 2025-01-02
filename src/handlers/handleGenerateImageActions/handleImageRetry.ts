@@ -10,7 +10,6 @@ export async function handleImageRetry(ctx: MyContext, isRu: boolean) {
       return
     }
 
-    await ctx.answerCallbackQuery()
     // Получаем последний промпт пользователя
     const { data: lastPrompt } = await supabase
       .from("prompts_history")
@@ -26,7 +25,7 @@ export async function handleImageRetry(ctx: MyContext, isRu: boolean) {
     }
 
     console.log("Generating image 3")
-    await generateImage(lastPrompt.prompt, lastPrompt.model_type, ctx.from.id, isRu, ctx)
+    await generateImage(lastPrompt.prompt, lastPrompt.model_type, 1, ctx.from.id, isRu, ctx)
     return
   } catch (error) {
     console.error("Error in handleImageRetry:", error)

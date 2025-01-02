@@ -1,3 +1,5 @@
 export * from "./avatarWizard"
 export * from "./imageToPromptWizard"
 export * from "./emailWizard"
+export * from "./textPromptToImageWizard"
+export * from "./improvePromptWizard"

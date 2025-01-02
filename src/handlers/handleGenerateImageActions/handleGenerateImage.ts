@@ -25,9 +25,9 @@ export async function handleGenerateImage(ctx: MyContext, data: string, isRu: bo
     // Отправляем сообщение о начале генерации
     generatingMsg = await ctx.reply(isRu ? "⏳ Генерирую изображение..." : "⏳ Generating image...")
 
+    ctx.session.prompt = prompt
     try {
-      console.log("Generating image 2")
-      await generateImage(prompt, "sdxl", ctx.from.id, isRu, ctx)
+      await generateImage(prompt, "sdxl", 1, ctx.from.id, isRu, ctx)
       return
     } catch (error) {
       console.error("Error generating image:", error)
