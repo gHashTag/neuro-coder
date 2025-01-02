@@ -5,7 +5,7 @@ import { MyTextMessageContext } from "../../interfaces"
 
 export async function handleTextMessage(ctx: MyTextMessageContext) {
   console.log("CASE: handleTextMessage")
-  console.log(ctx)
+
   if (ctx.message?.text?.startsWith("/")) {
     console.log("SKIP")
     return

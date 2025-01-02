@@ -31,13 +31,12 @@ import { selectModelCommand } from "./commands/selectModelCommand"
 // import { createAinewsCommand } from "./commands/createAinewsCommand"
 import { mainMenu } from "./menu/mainMenu"
 import { handleCallbackQuery } from "./handlers/handleCallbackQuery"
-
+import { avatarWizard } from "./scenes/avatarWizard"
 import { subscriptionMiddleware } from "./middleware/subscription"
 import { imageModelMenu } from "./menu/imageModelMenu"
 
 import { setupLevelHandlers } from "handlers/setupLevelHandlers"
 import { menuCommand } from "commands/menuCommand"
-import { isRussian } from "utils/language"
 
 export const myComposer = new Composer<MyContext>()
 
@@ -46,12 +45,13 @@ export const neuroQuestScene = new Scenes.WizardScene<MyContext>("neuroQuestComm
 export const menuScene = new Scenes.WizardScene<MyContext>("menuCommand", menuCommand)
 export const balanceScene = new Scenes.WizardScene<MyContext>("balanceCommand", balanceCommand)
 export const topUpBalanceScene = new Scenes.WizardScene<MyContext>("topUpBalanceCommand", topUpBalanceCommand)
+
 // export const clipmakerScene = new Scenes.WizardScene<MyContext>("clipmakerCommand").enter(clipmakerCommand)
 // export const leelaScene = new Scenes.WizardScene<MyContext>("leelaCommand").enter(leelaCommand)
 
 // export const selectModelScene = new Scenes.WizardScene<MyContext>("selectModelCommand").enter(selectModelCommand)
 // export const createBackgroundVideoScene = new Scenes.WizardScene<MyContext>("createBackgroundVideoCommand").enter(createBackgroundVideoCommand)
-// export const avatarScene = new Scenes.WizardScene<MyContext>("avatarCommand").enter(avatarCommand)
+
 // export const voiceScene = new Scenes.WizardScene<MyContext>("voiceCommand").enter(voiceCommand)
 // export const textToSpeechScene = new Scenes.WizardScene<MyContext>("textToSpeechCommand").enter(textToSpeechCommand)
 // export const lipSyncConversationScene = new Scenes.WizardScene<MyContext>("lipSyncConversationCommand").enter(lipSyncConversationCommand)
@@ -77,11 +77,11 @@ export const stage = new Scenes.Stage<MyContext>([
   menuScene,
   balanceScene,
   topUpBalanceScene,
+  avatarWizard,
   // clipmakerScene,
   // leelaScene,
   // selectModelScene,
   // createBackgroundVideoScene,
-  // avatarScene,
   // voiceScene,
   // textToSpeechScene,
   // lipSyncConversationScene,
@@ -239,7 +239,7 @@ export function registerCommands(bot: Telegraf<MyContext>) {
   // Обработчики `hears`
   myComposer.hears(["🆔 Создать аватар", "🆔 Create Avatar"], async (ctx) => {
     console.log("CASE: Создать аватар")
-    await ctx.scene.enter("avatarCommand")
+    await ctx.scene.enter("avatarWizard")
   })
 
   myComposer.hears(["🌟 Выбор модели ИИ", "🌟 Select AI Model"], async (ctx) => {
