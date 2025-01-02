@@ -150,6 +150,10 @@ export function registerCommands(bot: Telegraf<MyContext>) {
 
   myComposer.command("balance", (ctx) => balanceCommand(ctx))
 
+  myComposer.command("help", async (ctx) => {
+    await neuroQuestCommand(ctx)
+  })
+
   // composer.command("clipmaker", (ctx) => clipmakerCommand(ctx))
 
   // composer.command("leela", (ctx) => leelaCommand(ctx))
@@ -221,10 +225,6 @@ export function registerCommands(bot: Telegraf<MyContext>) {
 
   // composer.command("neuro_photo", async (ctx) => {
   //   await ctx.scene.enter("neuroPhotoCommand")
-  // })
-
-  // composer.command("help", async (ctx) => {
-  //   await ctx.scene.enter("neuroQuestCommand")
   // })
 
   // composer.command("avatar", async (ctx) => {
