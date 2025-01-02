@@ -6,13 +6,13 @@
     "allowJs": true,
     "outDir": "./dist",
     "strict": true,
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "esModuleInterop": true,
     "noImplicitAny": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
   },
-  "baseUrl": "./src",
-  "include": ["src/**/*", "api/**/*", ".eslintrc.js", "tsconfig.json"]
+  "include": ["src/**/*", "api/**/*", ".eslintrc.js", "tsconfig.json"],
+  "exclude": ["node_modules", "dist"]
 }
     

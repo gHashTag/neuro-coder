@@ -9,7 +9,14 @@
     "dev": "nodemon -r tsconfig-paths/register src/index.ts",
     "lint": "eslint . --cache --ext .ts,.js",
     "dev:server": "nodemon src/server.ts",
-    "format": "prettier --write 'src/**/*.ts'"
+    "format": "prettier --write 'src/**/*.ts'",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "src/**/*.{js,ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ]
   },
   "repository": {
     "type": "git",
@@ -73,6 +80,8 @@
     "eslint-config-prettier": "^8.10.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
     "nodemon": "^2.0.15",
     "prettier": "^2.8.8",
     "ts-node": "^10.4.0",
