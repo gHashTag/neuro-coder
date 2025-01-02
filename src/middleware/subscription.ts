@@ -1,10 +1,13 @@
 import { SessionFlavor, Context, InlineKeyboard } from "grammy"
-import { createUser, getUid } from "../core/supabase"
+import { createUser, getTelegramIdByUserId, getUid } from "../core/supabase"
 import { ChatMembersFlavor } from "@grammyjs/chat-members"
 import { MyContext, SessionData } from "../utils/types"
 
 import { ConversationFlavor } from "@grammyjs/conversations"
 import { bot } from "../index"
+import { isRussian } from "src/utils/language"
+import { getUserBalance, incrementBalance } from "src/helpers/telegramStars"
+import { pulse } from "src/helpers"
 
 // Обновляем тип контекста
 export type MyContextChatMembers = Context & SessionFlavor<SessionData> & ConversationFlavor & ChatMembersFlavor
@@ -27,6 +30,7 @@ async function checkSubscription(ctx: MyContextChatMembers): Promise<boolean> {
 
 // Основной middleware
 export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: () => Promise<void>) => {
+  const isRu = isRussian(ctx)
   try {
     // Проверяем, что команда /start
     if (!ctx.message?.text?.startsWith("/start")) {
@@ -74,7 +78,6 @@ export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: ()
       mode: "clean",
       model: "gpt-4-turbo",
       count: 0,
-      limit: 200,
       aspect_ratio: "9:16",
       balance: 100,
       inviter,
@@ -82,11 +85,25 @@ export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: ()
 
     await createUser(userData)
 
+    if (inviter) {
+      const inviterTelegramId = await getTelegramIdByUserId(inviter)
+      if (inviterTelegramId) {
+        const balance = await getUserBalance(inviterTelegramId)
+        await bot.api.sendMessage(
+          inviterTelegramId,
+          isRu
+            ? `🔗 Новый пользователь зарегистрировался по вашей ссылке: @${finalUsername}. \n🎁 За каждого приглашенного друга вы получаете дополнительные 100 звезд для генерации!\n🤑 Ваш новый баланс: ${balance}⭐️ `
+            : `🔗 New user registered through your link: @${finalUsername}. \n🎁 For each friend you invite, you get additional 100 stars for generation!\n🤑 Your new balance: ${balance}⭐️`,
+        )
+        await incrementBalance({ telegram_id: inviterTelegramId.toString(), amount: 100 })
+        await pulse(ctx, "createUser", "invite", "invite")
+      }
+    }
     return await next()
   } catch (error) {
     console.error("Critical error in subscriptionMiddleware:", error)
-    const isRu = ctx.from?.language_code === "ru"
-    return await ctx.reply(isRu ? "Произошла критическая ошибка. Пожалуйста, попробуйте позже." : "A critical error occurred. Please try again later.")
+
+    await ctx.reply(isRu ? "Произошла критическая ошибка. Пожалуйста, попробуйте позже." : "A critical error occurred. Please try again later.")
     throw error
   }
 }
@@ -109,10 +126,7 @@ async function getUserPhotoUrl(ctx: MyContextChatMembers, userId: number): Promi
     const photoSizes = userPhotos.photos[0]
     const largestPhoto = photoSizes[photoSizes.length - 1]
 
-    console.log("Largest photo:", largestPhoto)
-
     const file = await ctx.api.getFile(largestPhoto.file_id)
-    console.log("File info:", file)
 
     if (!file.file_path) {
       console.log("No file_path in response")

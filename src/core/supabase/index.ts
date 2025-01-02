@@ -30,7 +30,7 @@ interface CreateUserData {
 }
 
 export const createUser = async (userData: CreateUserData) => {
-  const { username, telegram_id, first_name, last_name, is_bot, language_code, photo_url, chat_id, mode, model, count, limit, aspect_ratio, balance, inviter } =
+  const { username, telegram_id, first_name, last_name, is_bot, language_code, photo_url, chat_id, mode, model, count, aspect_ratio, balance, inviter } =
     userData
 
   let inviterUser
@@ -61,7 +61,6 @@ export const createUser = async (userData: CreateUserData) => {
       mode,
       model,
       count,
-      limit,
       aspect_ratio,
       balance,
       ...(!existingUser.inviter && isInviter ? { inviter } : {}),
@@ -86,7 +85,6 @@ export const createUser = async (userData: CreateUserData) => {
       mode,
       model,
       count,
-      limit,
       aspect_ratio,
       balance,
       ...(isInviter ? { inviter } : {}),
@@ -206,4 +204,20 @@ export const getUserModel = async (telegram_id: string): Promise<string> => {
   }
 
   return data?.model || "gpt-4o"
+}
+
+export const getTelegramIdByUserId = async (userId: string): Promise<number | null> => {
+  try {
+    const { data, error } = await supabase.from("users").select("telegram_id").eq("user_id", userId).single()
+
+    if (error) {
+      console.error("Ошибка при получении telegram_id:", error)
+      return null
+    }
+
+    return data?.telegram_id || null
+  } catch (error) {
+    console.error("Ошибка в getTelegramIdByUserId:", error)
+    throw error
+  }
 }

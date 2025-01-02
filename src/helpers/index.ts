@@ -1294,7 +1294,7 @@ export const generateVoice = async (text: string, voiceId: string) => {
   }
 }
 
-export const pulse = async (ctx: MyContext, image: string, prompt: string, command: string) => {
+export const pulse = async (ctx: MyContext, image: string | null, prompt: string, command: string) => {
   try {
     if (process.env.NODE_ENV === "development") return
 
@@ -1303,17 +1303,26 @@ export const pulse = async (ctx: MyContext, image: string, prompt: string, comma
       ctx.from?.id
     } сгенерировал изображение с промптом: ${truncatedPrompt} \n\n Команда: ${command}`
 
-    // Если изображение начинается с data:image/, нужно получить только base64
-    let imageToSend = image
-    if (image.startsWith("data:image/")) {
-      imageToSend = image.split(",")[1]
+    if (image) {
+      // Если изображение начинается с data:image/, нужно получить только base64
+      let imageToSend = image
+      if (image.startsWith("data:image/")) {
+        imageToSend = image.split(",")[1]
+      }
+
+      // Преобразуем base64 в буфер
+      const imageBuffer = Buffer.from(imageToSend, "base64")
+
+      // Отправляем как InputFile
+      await bot.api.sendPhoto("-4166575919", new InputFile(imageBuffer), { caption })
+    } else {
+      // Отправляем текст, если изображения нет
+      const textMessage = `@${ctx.from?.username || "Пользователь без username"} Telegram ID: ${
+        ctx.from?.id
+      } использовал команду: ${command} с промптом: ${truncatedPrompt}`
+      await bot.api.sendMessage("-4166575919", textMessage)
     }
-
-    // Преобразуем base64 в буфер
-    const imageBuffer = Buffer.from(imageToSend, "base64")
-
-    // Отправляем как InputFile
-    await bot.api.sendPhoto("-4166575919", new InputFile(imageBuffer), { caption })
+    return
   } catch (error) {
     console.error("Ошибка при отправке пульса:", error)
     throw new Error("Ошибка при отправке пульса")
@@ -1321,23 +1330,28 @@ export const pulse = async (ctx: MyContext, image: string, prompt: string, comma
 }
 
 export const upgradePrompt = async (prompt: string) => {
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [
-      {
-        role: "system",
-        content: "You are a helpful assistant that upgrades the given prompt for image generation. Return only the upgraded prompt. ",
-      },
-      {
-        role: "user",
-        content: prompt,
-      },
-    ],
-    temperature: 0.7,
-    max_tokens: 1000,
-  })
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful assistant that upgrades the given prompt for image generation. Return only the upgraded prompt. ",
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 1000,
+    })
 
-  return completion.choices[0].message.content
+    return completion.choices[0].message.content
+  } catch (error) {
+    console.error("Error in upgradePrompt:", error)
+    throw error
+  }
 }
 
 export const sendPaymentNotification = async (amount: number, stars: number, telegramId: string, language: string, username: string) => {
