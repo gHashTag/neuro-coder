@@ -5,30 +5,30 @@ import { MyContext } from "../../utils/types"
 import { sendInsufficientStarsMessage, getUserBalance, textToImageGenerationCost } from "../../helpers/telegramStars/telegramStars"
 
 export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean) {
-  if (!ctx || !ctx.from) {
-    await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
-    return
-  }
-
-  if (ctx.callbackQuery && ctx.callbackQuery.id) {
-    await ctx.answerCallbackQuery({
-      text: isRu ? "Генерация началась" : "Generation started",
-      show_alert: false,
-    })
-  } else {
-    console.error("Отсутствует ID callback query")
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, count, promptId] = data.split("_")
-  const promptData = await getPrompt(promptId)
-  if (!promptData) {
-    await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
-    return
-  }
-
-  await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
-
   try {
+    if (!ctx || !ctx.from) {
+      await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
+      return
+    }
+
+    if (ctx.callbackQuery && ctx.callbackQuery.id) {
+      await ctx.answerCallbackQuery({
+        text: isRu ? "Генерация началась" : "Generation started",
+        show_alert: false,
+      })
+    } else {
+      console.error("Отсутствует ID callback query")
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_, count, promptId] = data.split("_")
+    const promptData = await getPrompt(promptId)
+    if (!promptData) {
+      await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+      return
+    }
+
+    await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
+
     const numImages = parseInt(count)
     console.log("numImages", numImages)
 
@@ -41,8 +41,10 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
       await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx, numImages)
       return
     }
+    return
   } catch (error) {
     console.error("Ошибка при генерации:", error)
     await ctx.reply(isRu ? "Произошла ошибка при генерации. Пожалуйста, попробуйте позже." : "An error occurred during generation. Please try again later.")
+    throw error
   }
 }

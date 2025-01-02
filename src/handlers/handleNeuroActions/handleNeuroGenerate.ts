@@ -5,31 +5,31 @@ import { MyContext } from "../../utils/types"
 import { getUserBalance, imageNeuroGenerationCost, sendInsufficientStarsMessage } from "../../helpers/telegramStars"
 
 export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: boolean) {
-  if (!ctx || !ctx.from) {
-    await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
-    return
-  }
-
-  const userId = ctx.from.id
-
-  const currentBalance = await getUserBalance(userId)
-  if (currentBalance < imageNeuroGenerationCost) {
-    await sendInsufficientStarsMessage(ctx, isRu)
-    return
-  }
-
-  console.log("Received neuro_generate_ callback with data:", data)
-
-  const parts = data.split("_")
-  console.log("Split parts:", parts)
-
-  const count = parts[2]
-  const promptId = parts[3]
-  console.log("Extracted count and promptId:", { count, promptId })
-
   let generatingMessage: { message_id: number } | null = null
 
   try {
+    if (!ctx || !ctx.from) {
+      await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
+      return
+    }
+
+    const userId = ctx.from.id
+
+    const currentBalance = await getUserBalance(userId)
+    if (currentBalance < imageNeuroGenerationCost) {
+      await sendInsufficientStarsMessage(ctx, isRu)
+      return
+    }
+
+    console.log("Received neuro_generate_ callback with data:", data)
+
+    const parts = data.split("_")
+    console.log("Split parts:", parts)
+
+    const count = parts[2]
+    const promptId = parts[3]
+    console.log("Extracted count and promptId:", { count, promptId })
+
     const promptData = await getPrompt(promptId)
     console.log("Retrieved prompt data:", promptData)
 

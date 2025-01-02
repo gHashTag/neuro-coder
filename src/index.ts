@@ -3,14 +3,13 @@ import { Bot } from "grammy"
 import { development, production } from "./utils/launch"
 import { hydrateFiles } from "@grammyjs/files"
 
-import { handleTextMessage } from "./handlers"
+import { handleTextMessage, handleSuccessfulPayment } from "./handlers"
 import bot from "./core/bot"
 import { MyContext } from "./utils/types"
 import { autoRetry } from "@grammyjs/auto-retry"
 import { setBotCommands } from "./setCommands"
 import { composer, registerCommands } from "./registerCommands"
-import { handleSuccessfulPayment } from "handlers/handleSuccessfulPayment"
-import { handleCallback } from "handlers/handleCallback"
+import { handleCallback } from "./handlers/handleCallback"
 
 if (process.env.NODE_ENV === "development") {
   development(bot).catch(console.error)

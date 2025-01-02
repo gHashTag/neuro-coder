@@ -5,25 +5,25 @@ import { MyContext } from "../../utils/types"
 import { InlineKeyboard } from "grammy"
 
 export async function handleNeuroImprove(ctx: MyContext, data: string, isRu: boolean) {
-  if (!ctx || !ctx.from) {
-    await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
-    return
-  }
-  console.log("Starting neuro_improve handler")
-  const promptId = data.replace("neuro_improve_", "")
-  console.log("Prompt ID:", promptId)
-
-  const promptData = await getPrompt(promptId)
-  console.log("Original prompt data:", promptData)
-
-  if (!promptData) {
-    await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
-    return
-  }
-
-  await ctx.reply(isRu ? "⏳ Начинаю улучшение промпта..." : "⏳ Starting prompt improvement...")
-
   try {
+    if (!ctx || !ctx.from) {
+      await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
+      return
+    }
+    console.log("Starting neuro_improve handler")
+    const promptId = data.replace("neuro_improve_", "")
+    console.log("Prompt ID:", promptId)
+
+    const promptData = await getPrompt(promptId)
+    console.log("Original prompt data:", promptData)
+
+    if (!promptData) {
+      await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+      return
+    }
+
+    await ctx.reply(isRu ? "⏳ Начинаю улучшение промпта..." : "⏳ Starting prompt improvement...")
+
     const improvedPrompt = await upgradePrompt(promptData.prompt)
     console.log("Improved prompt:", improvedPrompt)
 

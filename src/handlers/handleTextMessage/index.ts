@@ -36,8 +36,10 @@ export async function handleTextMessage(ctx: MyContext) {
     }
 
     await ctx.reply(response)
+    return
   } catch (error) {
     console.error("Error in GPT response:", error)
     await ctx.reply(ctx.from?.language_code === "ru" ? "Произошла ошибка при обработке запроса" : "An error occurred while processing your request")
+    throw error
   }
 }

@@ -4,17 +4,16 @@ import { generateNeuroImage } from "../../services/generateNeuroImage"
 import { MyContext } from "../../utils/types"
 
 export async function handleNeuroGenerateImproved(ctx: MyContext, data: string, isRu: boolean) {
-  if (!ctx || !ctx.from) {
-    await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
-    return
-  }
-  console.log("Starting generation of improved prompt")
-  const promptId = data.replace("neuro_generate_improved_", "")
-  console.log("Generating with prompt ID:", promptId)
-
   let generatingMessage: { message_id: number } | null = null
-
   try {
+    if (!ctx || !ctx.from) {
+      await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
+      return
+    }
+    console.log("Starting generation of improved prompt")
+    const promptId = data.replace("neuro_generate_improved_", "")
+    console.log("Generating with prompt ID:", promptId)
+
     const promptData = await getPrompt(promptId)
     console.log("Retrieved prompt data:", promptData)
 

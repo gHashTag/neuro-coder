@@ -2,20 +2,20 @@ import { getPrompt } from "../../core/supabase/ai"
 import { MyContext } from "../../utils/types"
 
 export async function handleNeuroVideo(ctx: MyContext, data: string, isRu: boolean) {
-  if (!ctx || !ctx.from) {
-    await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
-    return
-  }
-  // Обработка создания видео из нейро-изображения
-  const promptId = data.replace("neuro_video_", "")
-  const promptData = await getPrompt(promptId)
-
-  if (!promptData) {
-    await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
-    return
-  }
-
   try {
+    if (!ctx || !ctx.from) {
+      await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
+      return
+    }
+    // Обработка создания видео из нейро-изображения
+    const promptId = data.replace("neuro_video_", "")
+    const promptData = await getPrompt(promptId)
+
+    if (!promptData) {
+      await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+      return
+    }
+
     await ctx.conversation.enter("imageToVideo")
   } catch (error) {
     console.error("Error starting video generation:", error)

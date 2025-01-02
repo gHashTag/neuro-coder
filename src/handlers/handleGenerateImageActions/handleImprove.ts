@@ -4,25 +4,25 @@ import { MyContext } from "../../utils/types"
 import { supabase } from "../../core/supabase"
 
 export async function handleImprove(ctx: MyContext, data: string, isRu: boolean) {
-  if (!ctx || !ctx.from) {
-    await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
-    return
-  }
-  await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
-
-  const promptId = data.split("_")[2]
-  console.log(promptId, "promptId")
-  const promptData = await getPrompt(promptId)
-  console.log(promptData, "promptData")
-
-  if (!promptData) {
-    await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
-    return
-  }
-
-  await ctx.reply(isRu ? "⏳ Начинаю улучшение промпта..." : "⏳ Starting prompt improvement...")
-
   try {
+    if (!ctx || !ctx.from) {
+      await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
+      return
+    }
+    await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
+
+    const promptId = data.split("_")[2]
+    console.log(promptId, "promptId")
+    const promptData = await getPrompt(promptId)
+    console.log(promptData, "promptData")
+
+    if (!promptData) {
+      await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
+      return
+    }
+
+    await ctx.reply(isRu ? "⏳ Начинаю улучшение промпта..." : "⏳ Starting prompt improvement...")
+
     const improvedPrompt = await upgradePrompt(promptData.prompt)
     if (!improvedPrompt) {
       await ctx.reply(isRu ? "Не удалось улучшить промпт" : "Failed to improve prompt")

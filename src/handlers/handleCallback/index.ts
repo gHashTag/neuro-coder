@@ -1,16 +1,16 @@
-import { handleCallbackQuery } from "handlers/handleCallbackQuery"
-import { isRussian } from "utils/language"
-import { MyContext } from "utils/types"
+import { handleCallbackQuery } from "../../handlers/handleCallbackQuery"
+import { isRussian } from "../../utils/language"
+import { MyContext } from "../../utils/types"
 
 export async function handleCallback(ctx: MyContext) {
-  console.log("CASE: callback_query:data")
   const isRu = isRussian(ctx)
-
-  if (!ctx.callbackQuery) {
-    throw new Error("No callback query")
-  }
-
   try {
+    console.log("CASE: callback_query:data")
+
+    if (!ctx.callbackQuery) {
+      throw new Error("No callback query")
+    }
+
     const data = ctx.callbackQuery.data
     await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
     if (!data) {
@@ -18,6 +18,7 @@ export async function handleCallback(ctx: MyContext) {
     }
 
     await handleCallbackQuery(ctx, data, isRu)
+    return
   } catch (error) {
     console.error("Ошибка при обработке callback query:", error)
     try {

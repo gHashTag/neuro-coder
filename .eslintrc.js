@@ -13,6 +13,7 @@ module.exports = {
     "@typescript-eslint/no-floating-promises": ["error"],
     "import/no-absolute-path": "error",
     "consistent-return": "error",
+
   },
   overrides: [
     {
