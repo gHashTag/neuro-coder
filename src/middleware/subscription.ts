@@ -57,8 +57,8 @@ export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: ()
     if (!isSubscribed) {
       return await ctx.reply(
         language_code === "ru"
-          ? "Пожалуйста, подпишитесь на наш канал, чтобы продолжить использование бота. 😊"
-          : "Please subscribe to our channel to continue using the bot. 😊",
+          ? "❗️ВНИМАНИЕ\nВы видите это сообщение потому что не подписаны на канал @neuro_blogger_group\n Группа нужна для того чтобы вы могли задать вопросы и получить помощь. Пожалуйста, подпишитесь на наш канал, чтобы продолжить использование бота."
+          : "❗️ATTENTION\nYou see this message because you are not subscribed to the channel @neuro_blogger_group\nThe group is needed so that you can ask questions and get help. Please subscribe to our channel to continue using the bot.",
         {
           reply_markup: new InlineKeyboard().url(language_code === "ru" ? "Подписаться" : "Subscribe", "https://t.me/neuro_blogger_group"),
         },

@@ -1,5 +1,5 @@
 require("dotenv").config()
-import { Composer, session } from "grammy"
+import { Bot, Composer, Context, session } from "grammy"
 import { development, production } from "./utils/launch"
 import { hydrateFiles } from "@grammyjs/files"
 import { conversations, createConversation } from "@grammyjs/conversations"
@@ -47,9 +47,14 @@ import {
 import { subscriptionMiddleware } from "./middleware/subscription"
 
 import { chatMembers } from "@grammyjs/chat-members"
+import { createMainMenu } from "./menu"
+import { setBotCommands } from "setCommands"
 
 bot.api.config.use(hydrateFiles(bot.token))
 bot.api.config.use(autoRetry())
+
+// Set bot commands
+setBotCommands(bot as Bot<MyContext>)
 
 console.log(`Starting bot in ${process.env.NODE_ENV} mode`)
 
@@ -101,6 +106,13 @@ bot.use(createConversation(imageToVideoConversation))
 composer.command("invite", async (ctx) => {
   console.log("CASE: start")
   await ctx.conversation.enter("inviterConversation")
+  return
+})
+
+bot.command("menu", async (ctx) => {
+  const isRu = ctx.from?.language_code === "ru"
+  const mainMenu = createMainMenu(isRu)
+  await ctx.reply(isRu ? "🏠 Главное меню\nВыберите нужный раздел 👇" : "🏠 Main menu\nChoose the section 👇", { reply_markup: mainMenu })
   return
 })
 
@@ -239,6 +251,54 @@ composer.command("select_model", async (ctx) => {
 
 bot.use(composer)
 
+composer.hears(["🌟 Создать аватар", "🌟 Create Avatar"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Создать аватар" : "You selected: Create Avatar")
+})
+
+composer.hears(["🌟 Выбор модели ИИ", "🌟 Select AI Model"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Выбор модели ИИ" : "You selected: Select AI Model")
+})
+
+composer.hears(["🎨 Обучить FLUX", "🎨 Train FLUX"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Обучить FLUX" : "You selected: Train FLUX")
+})
+
+composer.hears(["📸 Нейрофото", "📸 NeuroPhoto"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Нейрофото" : "You selected: NeuroPhoto")
+})
+
+composer.hears(["🎥 Видео из текста", "🎥 Text to Video"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Видео из текста" : "You selected: Text to Video")
+})
+
+composer.hears(["🎥 Изображение в видео", "🎥 Image to Video"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Изображение в видео" : "You selected: Image to Video")
+})
+
+composer.hears(["🔊 Текст в речь", "🔊 Text to Speech"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Текст в речь" : "You selected: Text to Speech")
+})
+
+composer.hears(["🎤 Голос для аватара", "🎤 Voice for Avatar"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Голос для аватара" : "You selected: Voice for Avatar")
+})
+
+composer.hears(["🖼️ Изображение из текста", "🖼️ Text to Image"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Изображение из текста" : "You selected: Text to Image")
+})
+
+composer.hears(["🔍 Описание из изображения", "🔍 Image to Prompt"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Описание из изображения" : "You selected: Image to Prompt")
+})
+
+composer.hears(["👥 Пригласить друга", "👥 Invite a friend"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Пригласить друга" : "You selected: Invite a friend")
+})
+
+composer.hears(["❓ Помощь", "❓ Help"], async (ctx) => {
+  await ctx.reply(ctx.from?.language_code === "ru" ? "Вы выбрали: Помощь" : "You selected: Help")
+})
+
 bot.on("pre_checkout_query", async (ctx) => {
   await ctx.answerPreCheckoutQuery(true)
   return
@@ -332,93 +392,6 @@ bot.on("callback_query:data", async (ctx) => {
     }
   }
 })
-
-if (process.env.NODE_ENV === "production") {
-  // Добавляем sequentialize middleware только в development
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  bot.api.setMyCommands([
-    {
-      command: "start",
-      description: "👋 Start bot / Запустить бота",
-    },
-    {
-      command: "avatar",
-      description: "👤 Tell about yourself / Рассказать о себе",
-    },
-    {
-      command: "train_flux_model",
-      description: "🎨 Train FLUX model / Обучить модель FLUX",
-    },
-    {
-      command: "neuro_photo",
-      description: "🤖 Generate your photos / Сгенерировать ваши фото",
-    },
-    {
-      command: "image_to_prompt",
-      description: "🔍 Generate prompt from image / Сгенерировать промпт из изображения",
-    },
-    {
-      command: "text_to_image",
-      description: "🎨 Generate image from text / Сгенерировать изображение из текста",
-    },
-    {
-      command: "text_to_video",
-      description: "🎥 Generate video from text / Сгенерировать видео из текста",
-    },
-    {
-      command: "image_to_video",
-      description: "🎥 Generate video from image / Сгенерировать видео из изображения",
-    },
-    {
-      command: "voice",
-      description: "🎤 Add voice to avatar / Добавить аватару голос",
-    },
-    {
-      command: "text_to_speech",
-      description: "🎤 Convert text to speech / Преобразовать текст в речь",
-    },
-    {
-      command: "select_model",
-      description: "🤖 Select model / Выбрать модель",
-    },
-    {
-      command: "b_roll",
-      description: "🎥 Create B-roll / Создать B-roll",
-    },
-    {
-      command: "lipsync",
-      description: "🎥 Lipsync / Синхронизация губ",
-    },
-    {
-      command: "subtitles",
-      description: "🎥 Create subtitles / Создать субтитры",
-    },
-    {
-      command: "invite",
-      description: "👥 Invite a friend / Пригласить друга",
-    },
-    {
-      command: "buy",
-      description: "💰 Top up balance / Пополнить баланс",
-    },
-    {
-      command: "balance",
-      description: "💰 Balance / Баланс",
-    },
-    {
-      command: "select_model",
-      description: "🤖 Select model / Выбрать модель",
-    },
-    {
-      command: "b_roll",
-      description: "🎥 Create B-roll / Создать B-roll",
-    },
-    {
-      command: "help",
-      description: "🤖 Help / Помощь",
-    },
-  ])
-}
 
 bot.catch((err) => {
   const ctx = err.ctx
