@@ -1,4 +1,4 @@
-import { Telegraf, Composer, Scenes, session } from "telegraf"
+import { Telegraf, Composer, Scenes, session, Middleware } from "telegraf"
 import { MyContext, SessionData } from "./interfaces"
 
 import { startCommand } from "./commands/startCommand"
@@ -8,97 +8,102 @@ import { leelaCommand } from "./commands/leelaCommand"
 import { topUpBalanceCommand } from "./commands/topUpBalanceCommand"
 import { balanceCommand } from "./commands/balanceCommand"
 import { selectModelCommand } from "./commands/selectModelCommand"
-import { createBackgroundVideoCommand } from "./commands/createBackgroundVideoCommand"
-import { avatarCommand } from "./commands/avatarCommand"
-import { voiceCommand } from "./commands/voiceCommand"
-import { textToSpeechCommand } from "./commands/textToSpeechCommand"
-import { lipSyncConversationCommand } from "./commands/lipSyncConversationCommand"
-import { get100Command } from "./commands/get100Command"
-import { captionForReelsCommand } from "./commands/captionForReelsCommand"
-import { createTriggerReelCommand } from "./commands/createTriggerReelCommand"
-import { imageSizeCommand } from "./commands/imageSizeCommand"
-import { subtitlesCommand } from "./commands/subtitlesCommand"
-import { textPromptToImageCommand } from "./commands/textPromptToImageCommand"
-import { textToVideoCommand } from "./commands/textToVideoCommand"
-import { imageToVideoCommand } from "./commands/imageToVideoCommand"
-import { imageToPromptCommand } from "./commands/imageToPromptCommand"
-import { trainFluxModelCommand } from "./commands/trainFluxModelCommand"
-import { neuroPhotoCommand } from "./commands/neuroPhotoCommand"
-import { emailCommand } from "./commands/emailCommand"
-import { priceCommand } from "./commands/priceCommand"
-import { inviteCommand } from "./commands/inviteCommand"
+// import { createBackgroundVideoCommand } from "./commands/createBackgroundVideoCommand"
+// import { avatarCommand } from "./commands/avatarCommand"
+// import { voiceCommand } from "./commands/voiceCommand"
+// import { textToSpeechCommand } from "./commands/textToSpeechCommand"
+// import { lipSyncConversationCommand } from "./commands/lipSyncConversationCommand"
+// import { get100Command } from "./commands/get100Command"
+// import { captionForReelsCommand } from "./commands/captionForReelsCommand"
+// import { createTriggerReelCommand } from "./commands/createTriggerReelCommand"
+// import { imageSizeCommand } from "./commands/imageSizeCommand"
+// import { subtitlesCommand } from "./commands/subtitlesCommand"
+// import { textPromptToImageCommand } from "./commands/textPromptToImageCommand"
+// import { textToVideoCommand } from "./commands/textToVideoCommand"
+// import { imageToVideoCommand } from "./commands/imageToVideoCommand"
+// import { imageToPromptCommand } from "./commands/imageToPromptCommand"
+// import { trainFluxModelCommand } from "./commands/trainFluxModelCommand"
+// import { neuroPhotoCommand } from "./commands/neuroPhotoCommand"
+// import { emailCommand } from "./commands/emailCommand"
+// import { priceCommand } from "./commands/priceCommand"
+// import { inviteCommand } from "./commands/inviteCommand"
+// import { menuCommand } from "./commands/menuCommand"
+// import { createAinewsCommand } from "./commands/createAinewsCommand"
 import { mainMenu } from "./menu/mainMenu"
 import { handleCallbackQuery } from "./handlers/handleCallbackQuery"
-import { createAinewsCommand } from "./commands/createAinewsCommand"
+
 import { subscriptionMiddleware } from "./middleware/subscription"
 import { imageModelMenu } from "./menu/imageModelMenu"
-import { menuCommand } from "./commands/menuCommand"
+
 import { setupLevelHandlers } from "handlers/setupLevelHandlers"
+import { menuCommand } from "commands/menuCommand"
 
 export const myComposer = new Composer<MyContext>()
 
-export const startScene = new Scenes.WizardScene<MyContext>("startCommand").enter(startCommand)
-export const neuroQuestScene = new Scenes.WizardScene<MyContext>("neuroQuestCommand").enter(neuroQuestCommand)
-export const clipmakerScene = new Scenes.WizardScene<MyContext>("clipmakerCommand").enter(clipmakerCommand)
-export const leelaScene = new Scenes.WizardScene<MyContext>("leelaCommand").enter(leelaCommand)
-export const balanceScene = new Scenes.WizardScene<MyContext>("balanceCommand").enter(balanceCommand)
-export const topUpBalanceScene = new Scenes.WizardScene<MyContext>("topUpBalanceCommand").enter(topUpBalanceCommand)
-export const selectModelScene = new Scenes.WizardScene<MyContext>("selectModelCommand").enter(selectModelCommand)
-export const createBackgroundVideoScene = new Scenes.WizardScene<MyContext>("createBackgroundVideoCommand").enter(createBackgroundVideoCommand)
-export const avatarScene = new Scenes.WizardScene<MyContext>("avatarCommand").enter(avatarCommand)
-export const voiceScene = new Scenes.WizardScene<MyContext>("voiceCommand").enter(voiceCommand)
-export const textToSpeechScene = new Scenes.WizardScene<MyContext>("textToSpeechCommand").enter(textToSpeechCommand)
-export const lipSyncConversationScene = new Scenes.WizardScene<MyContext>("lipSyncConversationCommand").enter(lipSyncConversationCommand)
-export const get100Scene = new Scenes.WizardScene<MyContext>("get100Command").enter(get100Command)
-export const captionForReelsScene = new Scenes.WizardScene<MyContext>("captionForReelsCommand").enter(captionForReelsCommand)
-export const createTriggerReelScene = new Scenes.WizardScene<MyContext>("createTriggerReelCommand").enter(createTriggerReelCommand)
-export const imageSizeScene = new Scenes.WizardScene<MyContext>("imageSizeCommand").enter(imageSizeCommand)
-export const subtitlesScene = new Scenes.WizardScene<MyContext>("subtitlesCommand").enter(subtitlesCommand)
-export const textPromptToImageScene = new Scenes.WizardScene<MyContext>("textPromptToImageCommand").enter(textPromptToImageCommand)
-export const textToVideoScene = new Scenes.WizardScene<MyContext>("textToVideoCommand").enter(textToVideoCommand)
-export const imageToVideoScene = new Scenes.WizardScene<MyContext>("imageToVideoCommand").enter(imageToVideoCommand)
-export const imageToPromptScene = new Scenes.WizardScene<MyContext>("imageToPromptCommand").enter(imageToPromptCommand)
-export const trainFluxModelScene = new Scenes.WizardScene<MyContext>("trainFluxModelCommand").enter(trainFluxModelCommand)
-export const neuroPhotoScene = new Scenes.WizardScene<MyContext>("neuroPhotoCommand").enter(neuroPhotoCommand)
-export const emailScene = new Scenes.WizardScene<MyContext>("emailCommand").enter(emailCommand)
-export const priceScene = new Scenes.WizardScene<MyContext>("priceCommand").enter(priceCommand)
-export const inviteScene = new Scenes.WizardScene<MyContext>("inviteCommand").enter(inviteCommand)
-export const createAinewsScene = new Scenes.WizardScene<MyContext>("createAinewsCommand").enter(createAinewsCommand)
-export const menuScene = new Scenes.WizardScene<MyContext>("menuCommand").enter(menuCommand)
+export const startScene = new Scenes.WizardScene<MyContext>("startCommand", startCommand)
+export const neuroQuestScene = new Scenes.WizardScene<MyContext>("neuroQuestCommand", neuroQuestCommand)
+export const menuScene = new Scenes.WizardScene<MyContext>("menuCommand", menuCommand)
+export const balanceScene = new Scenes.WizardScene<MyContext>("balanceCommand", balanceCommand)
+export const topUpBalanceScene = new Scenes.WizardScene<MyContext>("topUpBalanceCommand", topUpBalanceCommand)
+// export const clipmakerScene = new Scenes.WizardScene<MyContext>("clipmakerCommand").enter(clipmakerCommand)
+// export const leelaScene = new Scenes.WizardScene<MyContext>("leelaCommand").enter(leelaCommand)
 
-const stage = new Scenes.Stage<MyContext>([
+// export const selectModelScene = new Scenes.WizardScene<MyContext>("selectModelCommand").enter(selectModelCommand)
+// export const createBackgroundVideoScene = new Scenes.WizardScene<MyContext>("createBackgroundVideoCommand").enter(createBackgroundVideoCommand)
+// export const avatarScene = new Scenes.WizardScene<MyContext>("avatarCommand").enter(avatarCommand)
+// export const voiceScene = new Scenes.WizardScene<MyContext>("voiceCommand").enter(voiceCommand)
+// export const textToSpeechScene = new Scenes.WizardScene<MyContext>("textToSpeechCommand").enter(textToSpeechCommand)
+// export const lipSyncConversationScene = new Scenes.WizardScene<MyContext>("lipSyncConversationCommand").enter(lipSyncConversationCommand)
+// export const get100Scene = new Scenes.WizardScene<MyContext>("get100Command").enter(get100Command)
+// export const captionForReelsScene = new Scenes.WizardScene<MyContext>("captionForReelsCommand").enter(captionForReelsCommand)
+// export const createTriggerReelScene = new Scenes.WizardScene<MyContext>("createTriggerReelCommand").enter(createTriggerReelCommand)
+// export const imageSizeScene = new Scenes.WizardScene<MyContext>("imageSizeCommand").enter(imageSizeCommand)
+// export const subtitlesScene = new Scenes.WizardScene<MyContext>("subtitlesCommand").enter(subtitlesCommand)
+// export const textPromptToImageScene = new Scenes.WizardScene<MyContext>("textPromptToImageCommand").enter(textPromptToImageCommand)
+// export const textToVideoScene = new Scenes.WizardScene<MyContext>("textToVideoCommand").enter(textToVideoCommand)
+// export const imageToVideoScene = new Scenes.WizardScene<MyContext>("imageToVideoCommand").enter(imageToVideoCommand)
+// export const imageToPromptScene = new Scenes.WizardScene<MyContext>("imageToPromptCommand").enter(imageToPromptCommand)
+// export const trainFluxModelScene = new Scenes.WizardScene<MyContext>("trainFluxModelCommand").enter(trainFluxModelCommand)
+// export const neuroPhotoScene = new Scenes.WizardScene<MyContext>("neuroPhotoCommand").enter(neuroPhotoCommand)
+// export const emailScene = new Scenes.WizardScene<MyContext>("emailCommand").enter(emailCommand)
+// export const priceScene = new Scenes.WizardScene<MyContext>("priceCommand").enter(priceCommand)
+// export const inviteScene = new Scenes.WizardScene<MyContext>("inviteCommand").enter(inviteCommand)
+// export const createAinewsScene = new Scenes.WizardScene<MyContext>("createAinewsCommand").enter(createAinewsCommand)
+
+export const stage = new Scenes.Stage<MyContext>([
   startScene,
   neuroQuestScene,
-  clipmakerScene,
-  leelaScene,
+  menuScene,
   balanceScene,
   topUpBalanceScene,
-  selectModelScene,
-  createBackgroundVideoScene,
-  avatarScene,
-  voiceScene,
-  textToSpeechScene,
-  lipSyncConversationScene,
-  get100Scene,
-  captionForReelsScene,
-  createTriggerReelScene,
-  imageSizeScene,
-  subtitlesScene,
-  textPromptToImageScene,
-  textToVideoScene,
-  imageToVideoScene,
-  imageToPromptScene,
-  trainFluxModelScene,
-  neuroPhotoScene,
-  emailScene,
-  priceScene,
-  inviteScene,
-  createAinewsScene,
+  // clipmakerScene,
+  // leelaScene,
+  // selectModelScene,
+  // createBackgroundVideoScene,
+  // avatarScene,
+  // voiceScene,
+  // textToSpeechScene,
+  // lipSyncConversationScene,
+  // get100Scene,
+  // captionForReelsScene,
+  // createTriggerReelScene,
+  // imageSizeScene,
+  // subtitlesScene,
+  // textPromptToImageScene,
+  // textToVideoScene,
+  // imageToVideoScene,
+  // imageToPromptScene,
+  // trainFluxModelScene,
+  // neuroPhotoScene,
+  // emailScene,
+  // priceScene,
+  // inviteScene,
+  // createAinewsScene,
   menuScene,
 ])
 
 export function registerCommands(bot: Telegraf<MyContext>) {
-  myComposer.use(
+  bot.use(
     session({
       defaultSession: (): SessionData => ({
         selectedModel: "",
@@ -107,8 +112,7 @@ export function registerCommands(bot: Telegraf<MyContext>) {
     }),
   )
 
-  myComposer.use(stage.middleware())
-  myComposer.use(subscriptionMiddleware)
+  // bot.use(subscriptionMiddleware as Middleware<MyContext>)
 
   setupLevelHandlers(bot as Telegraf<MyContext>)
 
@@ -292,6 +296,11 @@ export function registerCommands(bot: Telegraf<MyContext>) {
   myComposer.hears(["💎 Пополнить баланс", "💎 Top up balance"], async (ctx) => {
     console.log("CASE: Пополнить баланс")
     await ctx.scene.enter("topUpBalanceCommand")
+  })
+
+  myComposer.hears(["🤑 Баланс", "🤑 Balance"], async (ctx) => {
+    console.log("CASE: Баланс")
+    await ctx.scene.enter("balanceCommand")
   })
 
   myComposer.hears(["Flux 1.1Pro Ultra", "SDXL", "SD 3.5 Turbo", "Recraft v3", "Photon"], async (ctx) => {

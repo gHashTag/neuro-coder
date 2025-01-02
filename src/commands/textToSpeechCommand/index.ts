@@ -39,7 +39,7 @@ const textToSpeechCommand = async (ctx: MyContext): Promise<void> => {
       return
     }
 
-    await ctx.api.deleteMessage(ctx.chat?.id || "", requestText.message_id)
+    await ctx.telegram.deleteMessage(ctx.chat?.id || "", requestText.message_id)
     return
   } catch (error) {
     console.error(error)

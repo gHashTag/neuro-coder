@@ -41,7 +41,7 @@ export const imageToPromptCommand = async (ctx: MyContext) => {
     // Получаем файл изображения
     const photoSize = imageMsg.message.photo[imageMsg.message.photo.length - 1]
     console.log("Getting file info for photo:", photoSize.file_id)
-    const file = await ctx.api.getFile(photoSize.file_id)
+    const file = await ctx.telegram.getFile(photoSize.file_id)
     const imageUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`
     await generateImageToPrompt(imageUrl, ctx.from.id, ctx, isRu)
     return

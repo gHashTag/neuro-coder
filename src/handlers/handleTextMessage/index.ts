@@ -1,10 +1,11 @@
 import { answerAi } from "../../core/openai/requests"
 import { getUserModel } from "../../core/supabase"
 import { getUserData } from "../../core/supabase/ai"
-import { MyContext } from "../../interfaces"
+import { MyTextMessageContext } from "../../interfaces"
 
-export async function handleTextMessage(ctx: MyContext) {
+export async function handleTextMessage(ctx: MyTextMessageContext) {
   console.log("CASE: handleTextMessage")
+  console.log(ctx)
   if (ctx.message?.text?.startsWith("/")) {
     console.log("SKIP")
     return

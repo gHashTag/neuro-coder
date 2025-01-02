@@ -8,6 +8,7 @@ export async function startMenu(ctx: MyContext, isRu: boolean) {
       Markup.keyboard([
         [Markup.button.callback(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "level_0")],
         [Markup.button.callback(isRu ? "💎 Пополнить баланс" : "💎 Top up balance", "top_up_balance")],
+        [Markup.button.callback(isRu ? "🤑 Баланс" : "🤑 Balance", "balance")],
       ]),
     )
   } catch (error) {

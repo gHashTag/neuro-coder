@@ -4,7 +4,7 @@ import { getCaptionForNews } from "../../helpers"
 const captionForReelsCommand = async (ctx: MyContext): Promise<void> => {
   try {
     const isRu = ctx.from?.language_code === "ru"
-    await ctx.replyWithChatAction("typing")
+    await ctx.sendChatAction("typing")
     await ctx.reply(
       isRu
         ? "🎥 Привет! Введите текст, который вы хотите превратить в описание для роликов."

@@ -11,14 +11,6 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
       return
     }
 
-    if (ctx.callbackQuery && ctx.callbackQuery.id) {
-      await ctx.answerCallbackQuery({
-        text: isRu ? "Генерация началась" : "Generation started",
-        show_alert: false,
-      })
-    } else {
-      console.error("Отсутствует ID callback query")
-    }
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, count, promptId] = data.split("_")
     const promptData = await getPrompt(promptId)

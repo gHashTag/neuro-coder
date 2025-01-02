@@ -5,7 +5,7 @@ import { MyContext } from "../../interfaces"
 const createTriggerReelCommand = async (ctx: MyContext): Promise<void> => {
   try {
     const isRu = ctx.from?.language_code === "ru"
-    await ctx.replyWithChatAction("typing")
+    await ctx.sendChatAction("typing")
     await ctx.reply(
       isRu
         ? "📱 Привет! Введите URL сайта, который вы хотите превратить в тригер рил."

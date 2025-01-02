@@ -1,6 +1,7 @@
 import { Markup } from "telegraf"
 
 export function mainMenu(isRu: boolean) {
+  console.log("CASE: mainMenu")
   return Markup.keyboard([
     [Markup.button.text(isRu ? "🆔 Создать аватар" : "🆔 Create Avatar")],
     [Markup.button.text(isRu ? "🌟 Выбор модели ИИ" : "🌟 Select AI Model")],

@@ -1,9 +1,9 @@
-import { MyContext } from "../../interfaces"
+import { MyContext, MyTextMessageContext, MyWizardSession } from "../../interfaces"
 import { createClient } from "pexels"
 import axios from "axios"
 import fs from "fs"
 import path from "path"
-
+import { Scenes } from "telegraf"
 import ffmpeg from "fluent-ffmpeg"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import ffprobeInstaller from "@ffprobe-installer/ffprobe"
@@ -120,9 +120,9 @@ const resizeVideo = async (inputPath: string, outputPath: string): Promise<void>
   })
 }
 
-export async function createBackgroundVideoCommand(ctx: MyContext) {
+export async function createBackgroundVideoCommand(ctx: MyTextMessageContext & Scenes.SceneContextScene<MyContext, MyWizardSession>) {
   const isRu = ctx.from?.language_code === "ru"
-  await ctx.replyWithChatAction("typing")
+  await ctx.sendChatAction("typing")
 
   try {
     await ctx.reply(isRu ? "Отправьте поисковый запрос для B-roll видео" : "Send search query for B-roll video", {
@@ -130,7 +130,7 @@ export async function createBackgroundVideoCommand(ctx: MyContext) {
         force_reply: true,
       },
     })
-    const query = (await ctx.wait()).message?.text
+    const query = ctx.message?.text
 
     if (!query) {
       await ctx.reply(isRu ? "Ошибка: Поисковый запрос не предоставлен" : "Error: Search query not provided")
@@ -153,7 +153,7 @@ export async function createBackgroundVideoCommand(ctx: MyContext) {
     // Отправляем каждое видео отдельно
     for (let i = 0; i < videoUrls.length; i++) {
       try {
-        await ctx.replyWithChatAction("upload_video")
+        await ctx.sendChatAction("upload_video")
 
         const videoNumber = String(i + 1).padStart(2, "0")
         const tempFile = path.join(videoDir, `temp_${videoNumber}.mp4`)
@@ -169,7 +169,7 @@ export async function createBackgroundVideoCommand(ctx: MyContext) {
         // Отправляем видео
         const video = fs.createReadStream(bgVideoPath)
         console.log(video, "video")
-        await ctx.replyWithVideo(video)
+        await ctx.replyWithVideo(bgVideoPath)
 
         // Удаляем только временный файл
         fs.unlinkSync(tempFile)

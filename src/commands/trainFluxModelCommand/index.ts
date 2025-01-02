@@ -412,7 +412,7 @@ export async function trainFluxModelCommand(ctx: MyContext) {
 
       if (msg.message?.photo) {
         const photo = msg.message.photo[msg.message.photo.length - 1]
-        const file = await ctx.api.getFile(photo.file_id)
+        const file = await ctx.telegram.getFile(photo.file_id)
 
         if (!file.file_path) {
           await ctx.reply(isRu ? "❌ Ошибка получения файла" : "❌ Error getting file")

@@ -1,4 +1,5 @@
-import { Context, Scenes } from "telegraf"
+import { Context, NarrowedContext, Scenes } from "telegraf"
+import type { Update, Message } from "telegraf/typings/core/types/typegram"
 
 export interface Step {
   step: string
@@ -40,3 +41,5 @@ export interface MyContext extends Context {
 
 // Создайте новый тип, объединяющий MyContext и WizardContext
 export type MyWizardContext = MyContext & Scenes.WizardContext<MyWizardSession>
+
+export type MyTextMessageContext = NarrowedContext<MyContext, Update.MessageUpdate<Message.TextMessage>>

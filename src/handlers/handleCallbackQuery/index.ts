@@ -25,12 +25,12 @@ export async function handleCallbackQuery(ctx: MyContext, data: string, isRu: bo
 
       case data === "request_email":
         console.log("CASE: request_email")
-        await ctx.conversation.enter("emailConversation")
+        // await ctx.conversation.enter("emailConversation")
         break
 
       case data.startsWith("size_"):
         console.log("CASE: size_")
-        await handleAspectRatioChange({ ctx })
+        await handleAspectRatioChange(ctx)
         break
 
       case data === "top_up_balance":

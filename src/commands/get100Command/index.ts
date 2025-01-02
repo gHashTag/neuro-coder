@@ -21,7 +21,7 @@ async function get100Command(ctx: MyContext) {
 
   await generateNeuroImage(message, model_type, ctx.from.id, ctx, 100)
 
-  await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id)
+  await ctx.telegram.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id)
   return
 }
 

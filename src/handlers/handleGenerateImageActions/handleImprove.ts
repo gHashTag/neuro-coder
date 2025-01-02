@@ -9,7 +9,6 @@ export async function handleImprove(ctx: MyContext, data: string, isRu: boolean)
       await ctx.reply(isRu ? "Ошибка идентификации пользователя" : "User identification error")
       return
     }
-    await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
 
     const promptId = data.split("_")[2]
     console.log(promptId, "promptId")

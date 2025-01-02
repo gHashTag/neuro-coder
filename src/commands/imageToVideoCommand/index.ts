@@ -51,7 +51,7 @@ export const imageToVideoCommand = async (ctx: MyContext): Promise<string | unde
   }
 
   if (serviceMsg.callbackQuery) {
-    await ctx.api.answerCallbackQuery(serviceMsg.callbackQuery.id)
+    await ctx.telegram.answerCallbackQuery(serviceMsg.callbackQuery.id)
   }
 
   await ctx.reply(isRu ? "Пожалуйста, отправьте изображение" : "Please send an image")
@@ -81,7 +81,7 @@ export const imageToVideoCommand = async (ctx: MyContext): Promise<string | unde
     await ctx.reply(isRu ? "Начинаю обработку изображения..." : "Processing image...")
 
     const photo = imageMsg.message.photo[imageMsg.message.photo.length - 1]
-    const file = await ctx.api.getFile(photo.file_id)
+    const file = await ctx.telegram.getFile(photo.file_id)
     const filePath = file.file_path
 
     if (!filePath) {

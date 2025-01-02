@@ -16,7 +16,7 @@ export async function handleNeuroVideo(ctx: MyContext, data: string, isRu: boole
       return
     }
 
-    await ctx.conversation.enter("imageToVideo")
+    // await ctx.conversation.enter("imageToVideo")
   } catch (error) {
     console.error("Error starting video generation:", error)
     await ctx.reply(

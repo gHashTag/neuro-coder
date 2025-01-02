@@ -50,17 +50,11 @@ const client = new Creatomate.Client(process.env.CREATOMATE_API_KEY)
 
 console.log("Environment check:", {
   nodeEnv: process.env.NODE_ENV,
-  elevenLabsKeyExists: !!process.env.ELEVENLABS_API_KEY,
-  elevenLabsKeyPrefix: process.env.ELEVENLABS_API_KEY?.substring(0, 5),
 })
 
-console.log("ELEVENLABS_API_KEY:", process.env.ELEVENLABS_API_KEY?.substring(0, 5) + "...")
-
-console.log("Initializing ElevenLabs client...")
 export const elevenlabs = new ElevenLabsClient({
   apiKey: process.env.ELEVENLABS_API_KEY,
 })
-console.log("ElevenLabs client initialized")
 
 export const isDev = process.env.NODE_ENV === "development"
 console.log("isDev", isDev)

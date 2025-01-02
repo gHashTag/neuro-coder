@@ -41,7 +41,7 @@ export const textPromptToImageCommand = async (ctx: MyContext): Promise<void> =>
 
     const { message, callbackQuery } = await ctx.wait()
     if (callbackQuery?.data === "cancel") {
-      await ctx.api.deleteMessage(ctx.chat?.id || "", greetingMessage.message_id)
+      await ctx.telegram.deleteMessage(ctx.chat?.id || "", greetingMessage.message_id)
       await ctx.reply(isRu ? "❌ Генерация отменена" : "❌ Generation cancelled")
       return
     }

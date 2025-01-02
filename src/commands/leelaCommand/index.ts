@@ -11,7 +11,7 @@ ffmpeg.setFfmpegPath(ffmpegInstaller.path)
 const leelaCommand = async (ctx: Context): Promise<void> => {
   try {
     // Отправляем уведомление пользователю, что бот печатает
-    await ctx.replyWithChatAction("typing")
+    await ctx.sendChatAction("typing")
 
     // Проверяем, есть ли информация о пользователе
     if (!ctx.from) throw new Error("User not found")

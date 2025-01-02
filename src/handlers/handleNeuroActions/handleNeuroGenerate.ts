@@ -59,7 +59,7 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
     )
   } finally {
     if (generatingMessage) {
-      await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id).catch((e) => console.error("Error deleting message:", e))
+      await ctx.telegram.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id).catch((e) => console.error("Error deleting message:", e))
     }
   }
 }

@@ -40,13 +40,13 @@ export async function voiceCommand(ctx: MyContext): Promise<void> {
       throw new Error("File ID not found")
     }
 
-    const file = await ctx.api.getFile(fileId)
+    const file = await ctx.telegram.getFile(fileId)
     console.log(file, "file")
     if (!file.file_path) {
       throw new Error("File path not found")
     }
 
-    const fileUrl = `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}`
+    const fileUrl = `https://api.telegram.org/file/bot${ctx.telegram.token}/${file.file_path}`
     console.log(fileUrl, "fileUrl")
 
     if (fileUrl) {

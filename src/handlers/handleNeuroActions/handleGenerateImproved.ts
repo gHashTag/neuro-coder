@@ -19,7 +19,6 @@ export async function handleGenerateNeuroImproved(ctx: MyContext, data: string, 
     if (!promptData) {
       console.log("No prompt data found")
       await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
-      await ctx.answerCallbackQuery()
       return
     }
 

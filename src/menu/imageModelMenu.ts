@@ -12,5 +12,7 @@ export async function imageModelMenu(ctx: MyContext) {
     [Markup.button.text(isRu ? "Вернуться в главное меню" : "Return to main menu")],
   ]).resize()
 
-  await ctx.reply(isRu ? "🎨 Выберите модель для генерации:" : "🎨 Choose a model for generation:", { reply_markup: keyboard })
+  await ctx.reply(isRu ? "🎨 Выберите модель для генерации:" : "🎨 Choose a model for generation:", {
+    reply_markup: keyboard.reply_markup,
+  })
 }

@@ -5,9 +5,9 @@ import { handleTextMessage } from "./handlers"
 import bot from "./core/bot"
 
 import { setBotCommands } from "./setCommands"
-import { myComposer, registerCommands } from "./registerCommands"
+import { myComposer, registerCommands, stage } from "./registerCommands"
 import { handleCallback } from "./handlers/handleCallback"
-import { MyContext } from "./interfaces"
+import { MyContext, MyTextMessageContext } from "./interfaces"
 
 if (process.env.NODE_ENV === "development") {
   development(bot).catch(console.error)
@@ -17,10 +17,11 @@ if (process.env.NODE_ENV === "development") {
 
 console.log(`Starting bot in ${process.env.NODE_ENV} mode`)
 
-bot.use(myComposer.middleware())
-
 setBotCommands(bot)
 registerCommands(bot)
+
+bot.use(stage.middleware())
+bot.use(myComposer.middleware())
 
 bot.on("pre_checkout_query", async (ctx) => {
   await ctx.answerPreCheckoutQuery(true)
@@ -28,9 +29,8 @@ bot.on("pre_checkout_query", async (ctx) => {
 })
 
 // bot.on("successful_payment", handleSuccessfulPayment)
-
-bot.on("text", (ctx: MyContext) => handleTextMessage(ctx))
-bot.on("callback_query", (ctx: MyContext) => handleCallback(ctx))
+bot.action("callback_query", (ctx: MyContext) => handleCallback(ctx))
+bot.on("text", (ctx: MyTextMessageContext) => handleTextMessage(ctx))
 
 bot.catch((err) => {
   const error = err as Error

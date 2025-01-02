@@ -1,6 +1,6 @@
 import { Markup } from "telegraf"
 import { createUser, getTelegramIdByUserId, getUid } from "../core/supabase"
-import { MyContext } from "../interfaces"
+import { MyContext, MyTextMessageContext } from "../interfaces"
 
 import { bot } from "../index"
 import { isRussian } from "../utils/language"
@@ -23,7 +23,7 @@ async function checkSubscription(ctx: MyContext): Promise<boolean> {
 }
 
 // Основной middleware
-export const subscriptionMiddleware = async (ctx: MyContext, next: () => Promise<void>) => {
+export const subscriptionMiddleware = async (ctx: MyTextMessageContext, next: () => Promise<void>) => {
   const isRu = isRussian(ctx)
   try {
     // Проверяем, что команда /start
@@ -49,14 +49,14 @@ export const subscriptionMiddleware = async (ctx: MyContext, next: () => Promise
 
     const isSubscribed = await checkSubscription(ctx)
     if (!isSubscribed) {
-      return await ctx.reply(
+      const message =
         language_code === "ru"
           ? "❗️ВНИМАНИЕ\nВы видите это сообщение потому что не подписаны на канал @neuro_blogger_group\n Группа нужна для того чтобы вы могли задать вопросы и получить помощь. Пожалуйста, подпишитесь на наш канал, чтобы продолжить использование бота."
-          : "❗️ATTENTION\nYou see this message because you are not subscribed to the channel @neuro_blogger_group\nThe group is needed so that you can ask questions and get help. Please subscribe to our channel to continue using the bot.",
-        {
-          reply_markup: Markup.inlineKeyboard([Markup.button.url(language_code === "ru" ? "Подписаться" : "Subscribe", "https://t.me/neuro_blogger_group")]),
-        },
-      )
+          : "❗️ATTENTION\nYou see this message because you are not subscribed to the channel @neuro_blogger_group\nThe group is needed so that you can ask questions and get help. Please subscribe to our channel to continue using the bot."
+      await ctx.reply(message, {
+        reply_markup: Markup.inlineKeyboard([Markup.button.url(language_code === "ru" ? "Подписаться" : "Subscribe", "https://t.me/neuro_blogger_group")])
+          .reply_markup,
+      })
     }
 
     // Создаем пользователя с inviter из start параметра
@@ -101,13 +101,10 @@ export const subscriptionMiddleware = async (ctx: MyContext, next: () => Promise
   }
 }
 
-async function getUserPhotoUrl(ctx: MyContextChatMembers, userId: number): Promise<string | null> {
+async function getUserPhotoUrl(ctx: MyContext, userId: number): Promise<string | null> {
   try {
     // Получаем массив фотографий профиля
-    const userPhotos = await ctx.telegram.getUserProfilePhotos(userId, {
-      limit: 1,
-      offset: 0,
-    })
+    const userPhotos = await ctx.telegram.getUserProfilePhotos(userId)
 
     // Проверяем есть ли фотографии
     if (userPhotos.total_count === 0) {

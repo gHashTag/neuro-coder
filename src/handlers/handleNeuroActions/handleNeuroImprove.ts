@@ -50,10 +50,14 @@ export async function handleNeuroImprove(ctx: MyContext, data: string, isRu: boo
 
     // Показываем улучшенный промпт и спрашиваем подтверждение
     await ctx.reply(isRu ? `Улучшенный промпт:\n${improvedPrompt}\n\nСгенерировать изображение?` : `Improved prompt:\n${improvedPrompt}\n\nGenerate image?`, {
-      reply_markup: Markup.inlineKeyboard([
-        Markup.button.callback(isRu ? "✅ Да" : "✅ Yes", `neuro_generate_improved_${savedPrompt.prompt_id}`),
-        Markup.button.callback(isRu ? "❌ Нет" : "❌ No", "neuro_cancel"),
-      ]),
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: "✅ Да", callback_data: `neuro_generate_improved_${savedPrompt.prompt_id}` },
+            { text: "❌ Нет", callback_data: "neuro_cancel" },
+          ],
+        ],
+      },
     })
   } catch (error) {
     console.error("Error improving neuro prompt:", error)

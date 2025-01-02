@@ -6,7 +6,7 @@ import { MyContext, Step } from "../../interfaces"
 export async function clipmakerCommand(ctx: MyContext) {
   try {
     // Отправляем уведомление пользователю, что бот печатает
-    await ctx.replyWithChatAction("typing")
+    await ctx.sendChatAction("typing")
 
     // Проверяем, есть ли информация о пользователе
     if (!ctx.from) throw new Error("User not found")

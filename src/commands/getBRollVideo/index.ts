@@ -3,7 +3,7 @@ import { generateLipSync } from "../../helpers/generateLipSync"
 
 export async function getBRollVideo(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
-  await ctx.replyWithChatAction("typing")
+  await ctx.sendChatAction("typing")
   try {
     await ctx.reply(isRu ? "Отправьте URL видео" : "Send video URL")
     const videoUrl = (await ctx.wait()).message?.text
