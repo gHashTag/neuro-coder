@@ -173,7 +173,7 @@ export function registerCommands() {
   })
 
   composer.command("help", async (ctx) => {
-    await ctx.conversation.enter("helpCommand")
+    await ctx.conversation.enter("neuroQuestCommand")
   })
 
   composer.command("avatar", async (ctx) => {
@@ -233,6 +233,6 @@ export function registerCommands() {
   })
 
   composer.hears(["❓ Помощь", "❓ Help"], async (ctx) => {
-    await ctx.conversation.enter("helpCommand")
+    await ctx.conversation.enter("neuroQuestCommand")
   })
 }
