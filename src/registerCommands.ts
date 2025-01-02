@@ -119,11 +119,19 @@ export function registerCommands(bot: Telegraf<MyContext>) {
   // Регистрация команд
   myComposer.command("start", async (ctx) => {
     console.log("CASE: start")
-    await ctx.scene.enter("startCommand")
+    await neuroQuestCommand(ctx)
+  })
+
+  startScene.on("message", (ctx) => {
+    console.log("CASE: startScene", ctx.message)
+  })
+
+  neuroQuestScene.on("message", (ctx) => {
+    console.log("CASE: neuroQuestScene", ctx.message)
   })
 
   myComposer.command("menu", async (ctx) => {
-    console.log("CASE: menu")
+    console.log("CASE: myComposer.command menu")
     await ctx.scene.enter("menuCommand")
   })
 
@@ -295,12 +303,12 @@ export function registerCommands(bot: Telegraf<MyContext>) {
 
   myComposer.hears(["💎 Пополнить баланс", "💎 Top up balance"], async (ctx) => {
     console.log("CASE: Пополнить баланс")
-    await ctx.scene.enter("topUpBalanceCommand")
+    await topUpBalanceCommand(ctx)
   })
 
   myComposer.hears(["🤑 Баланс", "🤑 Balance"], async (ctx) => {
     console.log("CASE: Баланс")
-    await ctx.scene.enter("balanceCommand")
+    await balanceCommand(ctx)
   })
 
   myComposer.hears(["Flux 1.1Pro Ultra", "SDXL", "SD 3.5 Turbo", "Recraft v3", "Photon"], async (ctx) => {
