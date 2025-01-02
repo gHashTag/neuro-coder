@@ -1,0 +1,5 @@
+file '/Users/playra/neuro-coder/src/commands/createBackgroundVideo/temp/video0.mp4'
+file '/Users/playra/neuro-coder/src/commands/createBackgroundVideo/temp/video1.mp4'
+file '/Users/playra/neuro-coder/src/commands/createBackgroundVideo/temp/video2.mp4'
+file '/Users/playra/neuro-coder/src/commands/createBackgroundVideo/temp/video3.mp4'
+file '/Users/playra/neuro-coder/src/commands/createBackgroundVideo/temp/video4.mp4'

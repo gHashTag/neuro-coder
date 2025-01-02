@@ -2,7 +2,7 @@ import { Keyboard } from "grammy"
 
 export function createMainMenu(isRu: boolean) {
   return new Keyboard()
-    .text(isRu ? "🌟 Создать аватар" : "🌟 Create Avatar")
+    .text(isRu ? "🆔 Создать аватар" : "🆔 Create Avatar")
     .text(isRu ? "🌟 Выбор модели ИИ" : "🌟 Select AI Model")
     .row()
     .text(isRu ? "🎨 Обучить FLUX" : "🎨 Train FLUX")

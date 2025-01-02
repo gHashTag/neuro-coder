@@ -102,8 +102,6 @@ export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: ()
     return await next()
   } catch (error) {
     console.error("Critical error in subscriptionMiddleware:", error)
-
-    await ctx.reply(isRu ? "Произошла критическая ошибка. Пожалуйста, попробуйте позже." : "A critical error occurred. Please try again later.")
     throw error
   }
 }
