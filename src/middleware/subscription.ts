@@ -5,9 +5,9 @@ import { MyContext, SessionData } from "../utils/types"
 
 import { ConversationFlavor } from "@grammyjs/conversations"
 import { bot } from "../index"
-import { isRussian } from "src/utils/language"
-import { getUserBalance, incrementBalance } from "src/helpers/telegramStars"
-import { pulse } from "src/helpers"
+import { isRussian } from "../utils/language"
+import { getUserBalance, incrementBalance } from "../helpers/telegramStars"
+import { pulse } from "../helpers"
 
 // Обновляем тип контекста
 export type MyContextChatMembers = Context & SessionFlavor<SessionData> & ConversationFlavor & ChatMembersFlavor
