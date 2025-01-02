@@ -30,13 +30,14 @@ import { selectModelCommand } from "./commands/selectModelCommand"
 // import { createAinewsCommand } from "./commands/createAinewsCommand"
 import { mainMenu } from "./menu/mainMenu"
 import { handleCallbackQuery } from "./handlers/handleCallbackQuery"
-import { avatarWizard, imageToPromptWizard } from "./scenes"
+import { avatarWizard, emailWizard, imageToPromptWizard } from "./scenes"
 // import { subscriptionMiddleware } from "./middleware/subscription"
 import { imageModelMenu } from "./menu/imageModelMenu"
 
 import { setupLevelHandlers } from "handlers/setupLevelHandlers"
 import { menuCommand } from "commands/menuCommand"
 import { inviteCommand } from "commands/inviteCommand"
+import { emailCommand } from "commands/emailCommand"
 
 export const myComposer = new Composer<MyContext>()
 
@@ -79,6 +80,7 @@ export const stage = new Scenes.Stage<MyContext>([
   topUpBalanceScene,
   avatarWizard,
   imageToPromptWizard,
+  emailWizard,
   // clipmakerScene,
   // leelaScene,
   // selectModelScene,
@@ -142,6 +144,12 @@ export function registerCommands(bot: Telegraf<MyContext>) {
     await inviteCommand(ctx)
   })
 
+  myComposer.command("buy", async (ctx) => {
+    await ctx.scene.enter("emailWizard")
+  })
+
+  myComposer.command("balance", (ctx) => balanceCommand(ctx))
+
   // composer.command("clipmaker", (ctx) => clipmakerCommand(ctx))
 
   // composer.command("leela", (ctx) => leelaCommand(ctx))
@@ -173,12 +181,6 @@ export function registerCommands(bot: Telegraf<MyContext>) {
   // composer.command("imagesize", async (ctx) => {
   //   await ctx.scene.enter("imageSizeCommand")
   // })
-
-  // composer.command("buy", async (ctx) => {
-  //   await ctx.scene.enter("emailCommand")
-  // })
-
-  // composer.command("balance", (ctx) => balanceCommand(ctx))
 
   // composer.command("trigger_reel", async (ctx) => {
   //   await ctx.scene.enter("createTriggerReelCommand")
