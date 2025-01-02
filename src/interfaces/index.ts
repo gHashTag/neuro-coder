@@ -24,13 +24,11 @@ export interface SessionData {
 }
 
 export interface MyWizardSession extends Scenes.WizardSessionData {
-  selectedModel: string
-  text: string
+  myWizardSessionProp: number
 }
 
 export interface MySession extends Scenes.WizardSession<MyWizardSession> {
   selectedModel: string
-  text: string
 }
 
 export interface MyContext extends Context {
@@ -40,4 +38,5 @@ export interface MyContext extends Context {
   wizard: Scenes.WizardContextWizard<MyContext>
 }
 
+// Создайте новый тип, объединяющий MyContext и WizardContext
 export type MyWizardContext = MyContext & Scenes.WizardContext<MyWizardSession>

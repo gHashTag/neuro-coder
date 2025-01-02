@@ -1,5 +1,5 @@
 import { Telegraf, Composer, Scenes, session } from "telegraf"
-import { MyContext, MySession } from "./interfaces"
+import { MyContext, SessionData } from "./interfaces"
 
 import { startCommand } from "./commands/startCommand"
 import { neuroQuestCommand } from "./commands/neuroQuestCommand"
@@ -100,7 +100,7 @@ const stage = new Scenes.Stage<MyContext>([
 export function registerCommands(bot: Telegraf<MyContext>) {
   myComposer.use(
     session({
-      defaultSession: (): MySession => ({
+      defaultSession: (): SessionData => ({
         selectedModel: "",
         text: "",
       }),

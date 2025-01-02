@@ -1,7 +1,7 @@
 import { Telegraf } from "telegraf"
-import { MyContextWithSession } from "../interfaces"
+import { MyContext } from "../interfaces"
 
-const production = async (bot: Telegraf<MyContextWithSession>): Promise<void> => {
+const production = async (bot: Telegraf<MyContext>): Promise<void> => {
   try {
     await bot.telegram.deleteWebhook({ drop_pending_updates: true })
     console.log("Old webhook deleted")
@@ -25,7 +25,7 @@ const production = async (bot: Telegraf<MyContextWithSession>): Promise<void> =>
   }
 }
 
-const development = async (bot: Telegraf<MyContextWithSession>): Promise<void> => {
+const development = async (bot: Telegraf<MyContext>): Promise<void> => {
   try {
     await bot.telegram.deleteWebhook({ drop_pending_updates: true })
     console.log("[SERVER] Webhook deleted, starting polling...")

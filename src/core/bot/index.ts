@@ -1,5 +1,6 @@
-import { Telegraf, Scenes } from "telegraf"
+import { Telegraf } from "telegraf"
+import { MyContext } from "../../interfaces"
 
-const bot = new Telegraf<Scenes.WizardContext>(process.env.BOT_TOKEN || "")
+const bot = new Telegraf<MyContext>(process.env.BOT_TOKEN || "")
 
 export default bot

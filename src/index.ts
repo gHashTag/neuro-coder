@@ -1,26 +1,26 @@
 require("dotenv").config()
 import { development, production } from "./utils/launch"
-import { Telegraf } from "telegraf"
+
 import { handleTextMessage } from "./handlers"
 import bot from "./core/bot"
 
 import { setBotCommands } from "./setCommands"
 import { myComposer, registerCommands } from "./registerCommands"
 import { handleCallback } from "./handlers/handleCallback"
-import { MyWizardContext } from "./interfaces"
+import { MyContext } from "./interfaces"
 
 if (process.env.NODE_ENV === "development") {
-  development(bot as Telegraf<MyWizardContext>).catch(console.error)
+  development(bot).catch(console.error)
 } else {
-  // В production только настраиваем webhook
-  production(bot as Telegraf<MyWizardContext>).catch(console.error)
+  production(bot).catch(console.error)
 }
+
 console.log(`Starting bot in ${process.env.NODE_ENV} mode`)
 
 bot.use(myComposer.middleware())
 
-setBotCommands(bot as Telegraf<MyWizardContext>)
-registerCommands(bot as Telegraf<MyWizardContext>)
+setBotCommands(bot)
+registerCommands(bot)
 
 bot.on("pre_checkout_query", async (ctx) => {
   await ctx.answerPreCheckoutQuery(true)
@@ -29,8 +29,8 @@ bot.on("pre_checkout_query", async (ctx) => {
 
 // bot.on("successful_payment", handleSuccessfulPayment)
 
-bot.on("text", (ctx: MyWizardContext) => handleTextMessage(ctx))
-bot.on("callback_query", (ctx: MyWizardContext) => handleCallback(ctx))
+bot.on("text", (ctx: MyContext) => handleTextMessage(ctx))
+bot.on("callback_query", (ctx: MyContext) => handleCallback(ctx))
 
 bot.catch((err) => {
   const error = err as Error
