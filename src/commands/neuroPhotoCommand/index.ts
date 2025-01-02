@@ -1,6 +1,6 @@
 import { generateNeuroImage } from "../../services/generateNeuroImage"
 
-import { MyContext, MyConversation } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { supabase } from "../../core/supabase"
 import { getUserBalance, imageNeuroGenerationCost, sendInsufficientStarsMessage, sendBalanceMessage } from "../../helpers/telegramStars/telegramStars"
 
@@ -36,7 +36,7 @@ async function getLatestUserModel(userId: number): Promise<UserModel | null> {
   return data as UserModel
 }
 
-export async function neuroPhotoCommand(conversation: MyConversation, ctx: MyContext) {
+export async function neuroPhotoCommand(ctx: MyContext) {
   console.log("CASE: neuroPhotoConversation")
   const isRu = ctx.from?.language_code === "ru"
   const userId = ctx.from?.id
@@ -73,7 +73,7 @@ export async function neuroPhotoCommand(conversation: MyConversation, ctx: MyCon
       },
     })
 
-    const promptMsg = await conversation.wait()
+    const promptMsg = await ctx.wait()
     console.log(promptMsg, "promptMsg")
     const promptText = promptMsg.message?.text
 

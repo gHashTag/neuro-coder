@@ -1,7 +1,7 @@
 import { setAspectRatio } from "../../core/supabase/ai"
 import { isRussian } from "../../utils/language"
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../../constants/messages"
-import { MyContextWithSession } from "../../utils/types"
+import { MyContextWithSession } from "../../interfaces"
 
 interface AspectRatioHandlerParams {
   ctx: MyContextWithSession

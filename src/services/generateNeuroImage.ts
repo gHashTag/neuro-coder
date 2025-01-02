@@ -2,7 +2,7 @@ import axios, { isAxiosError } from "axios"
 
 import { isDev } from "../helpers"
 import { isRussian } from "../utils/language"
-import { MyContext } from "../utils/types"
+import { MyContext } from "../interfaces"
 
 export async function generateNeuroImage(prompt: string, model_type: string, telegram_id: number, ctx: MyContext, numImages: number): Promise<null> {
   console.log("Starting generateNeuroImage with:", { prompt, model_type, telegram_id })

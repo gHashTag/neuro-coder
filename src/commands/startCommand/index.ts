@@ -1,8 +1,8 @@
-import { MyContext, MyConversation } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
-export async function startCommand(conversation: MyConversation, ctx: MyContext) {
+export async function startCommand(ctx: MyContext) {
+  console.log("CASE: startCommand")
   // Запускаем нейро-квест
-  console.log("CASE: start")
-  await ctx.conversation.enter("neuroQuest")
+  await ctx.scene.enter("neuroQuestCommand")
   return
 }

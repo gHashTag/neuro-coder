@@ -1,9 +1,8 @@
 import { getTriggerReel } from "../../helpers"
 
-import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
-const createTriggerReelCommand = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
+const createTriggerReelCommand = async (ctx: MyContext): Promise<void> => {
   try {
     const isRu = ctx.from?.language_code === "ru"
     await ctx.replyWithChatAction("typing")
@@ -18,7 +17,7 @@ const createTriggerReelCommand = async (conversation: Conversation<MyContext>, c
     // Проверяем, есть ли информация о пользователе
     if (!ctx.from) throw new Error("User not found")
 
-    const { message } = await conversation.wait()
+    const { message } = await ctx.wait()
 
     const triggerReel = await getTriggerReel({
       prompt: message?.text || "",

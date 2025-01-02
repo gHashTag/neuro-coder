@@ -1,5 +1,5 @@
 import { getUserBalance } from "../../helpers/telegramStars"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
 export async function balanceCommand(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"

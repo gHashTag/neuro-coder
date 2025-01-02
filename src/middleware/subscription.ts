@@ -1,26 +1,20 @@
-import { SessionFlavor, Context, InlineKeyboard } from "grammy"
+import { Markup } from "telegraf"
 import { createUser, getTelegramIdByUserId, getUid } from "../core/supabase"
-import { ChatMembersFlavor } from "@grammyjs/chat-members"
-import { MyContext, SessionData } from "../utils/types"
+import { MyContext } from "../interfaces"
 
-import { ConversationFlavor } from "@grammyjs/conversations"
 import { bot } from "../index"
 import { isRussian } from "../utils/language"
 import { getUserBalance, incrementBalance } from "../helpers/telegramStars"
 import { pulse } from "../helpers"
 
-// Обновляем тип контекста
-export type MyContextChatMembers = Context & SessionFlavor<SessionData> & ConversationFlavor & ChatMembersFlavor
-
-export type MyContextWithSession = MyContext & SessionFlavor<SessionData>
 // Проверка подписки с использованием chat-members
-async function checkSubscription(ctx: MyContextChatMembers): Promise<boolean> {
+async function checkSubscription(ctx: MyContext): Promise<boolean> {
   try {
     if (!ctx.from?.id) {
       console.error("User ID is undefined")
       throw new Error("User ID is undefined")
     }
-    const chatMember = await bot.api.getChatMember("@neuro_blogger_group", ctx.from?.id)
+    const chatMember = await bot.telegram.getChatMember("@neuro_blogger_group", ctx.from?.id)
     return ["member", "administrator", "creator"].includes(chatMember.status)
   } catch (error) {
     console.error("Error checking subscription:", error)
@@ -29,7 +23,7 @@ async function checkSubscription(ctx: MyContextChatMembers): Promise<boolean> {
 }
 
 // Основной middleware
-export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: () => Promise<void>) => {
+export const subscriptionMiddleware = async (ctx: MyContext, next: () => Promise<void>) => {
   const isRu = isRussian(ctx)
   try {
     // Проверяем, что команда /start
@@ -60,7 +54,7 @@ export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: ()
           ? "❗️ВНИМАНИЕ\nВы видите это сообщение потому что не подписаны на канал @neuro_blogger_group\n Группа нужна для того чтобы вы могли задать вопросы и получить помощь. Пожалуйста, подпишитесь на наш канал, чтобы продолжить использование бота."
           : "❗️ATTENTION\nYou see this message because you are not subscribed to the channel @neuro_blogger_group\nThe group is needed so that you can ask questions and get help. Please subscribe to our channel to continue using the bot.",
         {
-          reply_markup: new InlineKeyboard().url(language_code === "ru" ? "Подписаться" : "Subscribe", "https://t.me/neuro_blogger_group"),
+          reply_markup: Markup.inlineKeyboard([Markup.button.url(language_code === "ru" ? "Подписаться" : "Subscribe", "https://t.me/neuro_blogger_group")]),
         },
       )
     }
@@ -87,9 +81,10 @@ export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: ()
 
     if (inviter) {
       const inviterTelegramId = await getTelegramIdByUserId(inviter)
+      console.log("inviterTelegramId", inviterTelegramId)
       if (inviterTelegramId) {
         const balance = await getUserBalance(inviterTelegramId)
-        await bot.api.sendMessage(
+        await bot.telegram.sendMessage(
           inviterTelegramId,
           isRu
             ? `🔗 Новый пользователь зарегистрировался по вашей ссылке: @${finalUsername}. \n🎁 За каждого приглашенного друга вы получаете дополнительные 100 звезд для генерации!\n🤑 Ваш новый баланс: ${balance}⭐️ `
@@ -109,7 +104,7 @@ export const subscriptionMiddleware = async (ctx: MyContextChatMembers, next: ()
 async function getUserPhotoUrl(ctx: MyContextChatMembers, userId: number): Promise<string | null> {
   try {
     // Получаем массив фотографий профиля
-    const userPhotos = await ctx.api.getUserProfilePhotos(userId, {
+    const userPhotos = await ctx.telegram.getUserProfilePhotos(userId, {
       limit: 1,
       offset: 0,
     })
@@ -124,7 +119,7 @@ async function getUserPhotoUrl(ctx: MyContextChatMembers, userId: number): Promi
     const photoSizes = userPhotos.photos[0]
     const largestPhoto = photoSizes[photoSizes.length - 1]
 
-    const file = await ctx.api.getFile(largestPhoto.file_id)
+    const file = await ctx.telegram.getFile(largestPhoto.file_id)
 
     if (!file.file_path) {
       console.log("No file_path in response")
@@ -132,7 +127,7 @@ async function getUserPhotoUrl(ctx: MyContextChatMembers, userId: number): Promi
     }
 
     // Формируем URL фотографии
-    const photoUrl = `https://api.telegram.org/file/bot${ctx.api.token}/${file.file_path}`
+    const photoUrl = `https://api.telegram.org/file/bot${ctx.telegram.token}/${file.file_path}`
     console.log("Generated photo URL:", photoUrl)
 
     return photoUrl

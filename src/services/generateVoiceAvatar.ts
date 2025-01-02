@@ -1,6 +1,6 @@
 import axios, { isAxiosError } from "axios"
 import { isDev } from "../helpers"
-import { MyContext } from "../utils/types"
+import { MyContext } from "../interfaces"
 
 interface VoiceAvatarResponse {
   success: boolean

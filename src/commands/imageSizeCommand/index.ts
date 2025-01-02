@@ -1,16 +1,17 @@
-import { MyContext } from "../../utils/types"
-import { Conversation } from "@grammyjs/conversations"
-import { InlineKeyboard } from "grammy"
+import { MyContext } from "../../interfaces"
+import { Markup } from "telegraf"
 import { setAspectRatio } from "../../core/supabase/ai"
+import { isRussian } from "../../utils/language"
 
-async function imageSizeCommand(conversation: Conversation<MyContext>, ctx: MyContext) {
-  const keyboard = new InlineKeyboard().text("Отмена", "cancel")
+async function imageSizeCommand(ctx: MyContext) {
+  const isRus = isRussian(ctx)
+  const keyboard = Markup.keyboard([[Markup.button.text(isRus ? "Отмена" : "Cancel")]])
 
   await ctx.reply("Пожалуйста, введите соотношение сторон изображения (например, 9:16).", {
     reply_markup: keyboard,
   })
 
-  const { message, callbackQuery } = await conversation.wait()
+  const { message, callbackQuery } = await ctx.wait()
 
   if (callbackQuery?.data === "cancel") {
     await ctx.reply("Вы отменили операцию.")

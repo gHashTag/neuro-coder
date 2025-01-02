@@ -1,5 +1,5 @@
-import { InlineKeyboard } from "grammy"
-import { MyContext } from "../utils/types"
+import { InlineKeyboard } from "telegraf"
+import { MyContext } from "../interfaces"
 
 export async function buttonNeuroHandlers(ctx: MyContext, prompt_id: string) {
   console.log("buttonNeuroHandlers called with prompt_id:", prompt_id)

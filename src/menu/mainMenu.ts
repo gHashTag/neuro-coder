@@ -1,23 +1,14 @@
-import { Keyboard } from "grammy"
+import { Markup } from "telegraf"
 
 export function mainMenu(isRu: boolean) {
-  return new Keyboard()
-    .text(isRu ? "🆔 Создать аватар" : "🆔 Create Avatar")
-    .text(isRu ? "🌟 Выбор модели ИИ" : "🌟 Select AI Model")
-    .row()
-    .text(isRu ? "🎨 Обучить FLUX" : "🎨 Train FLUX")
-    .text(isRu ? "📸 Нейрофото" : "📸 NeuroPhoto")
-    .row()
-    .text(isRu ? "🖼️ Изображение из текста" : "🖼️ Text to Image")
-    .text(isRu ? "🔍 Описание из изображения" : "🔍 Image to Prompt")
-    .row()
-    .text(isRu ? "🎥 Видео из текста" : "🎥 Text to Video")
-    .text(isRu ? "🎥 Изображение в видео" : "🎥 Image to Video")
-    .row()
-    .text(isRu ? "🔊 Текст в речь" : "🔊 Text to Speech")
-    .text(isRu ? "🎤 Голос для аватара" : "🎤 Voice for Avatar")
-    .row()
-    .text(isRu ? "👥 Пригласить друга" : "👥 Invite a friend")
-    .text(isRu ? "❓ Помощь" : "❓ Help")
-    .resized()
+  return Markup.keyboard([
+    [Markup.button.text(isRu ? "🆔 Создать аватар" : "🆔 Create Avatar")],
+    [Markup.button.text(isRu ? "🌟 Выбор модели ИИ" : "🌟 Select AI Model")],
+    [Markup.button.text(isRu ? "🎨 Обучить FLUX" : "🎨 Train FLUX")],
+    [Markup.button.text(isRu ? "📸 Нейрофото" : "📸 NeuroPhoto")],
+    [Markup.button.text(isRu ? "🖼️ Изображение из текста" : "🖼️ Text to Image")],
+    [Markup.button.text(isRu ? "🔍 Описание из изображения" : "🔍 Image to Prompt")],
+    [Markup.button.text(isRu ? "🎥 Видео из текста" : "🎥 Text to Video")],
+    [Markup.button.text(isRu ? "🎥 Изображение в видео" : "🎥 Image to Video")],
+  ]).resize()
 }

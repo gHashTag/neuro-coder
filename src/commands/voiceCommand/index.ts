@@ -1,9 +1,9 @@
-import { MyContext, MyConversation } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { generateVoiceAvatar } from "../../services/generateVoiceAvatar"
 import { isRussian } from "../../utils/language"
 import { sendInsufficientStarsMessage, sendBalanceMessage, getUserBalance, voiceConversationCost } from "../../helpers/telegramStars/telegramStars"
 
-export async function voiceCommand(conversation: MyConversation, ctx: MyContext): Promise<void> {
+export async function voiceCommand(ctx: MyContext): Promise<void> {
   const isRu = isRussian(ctx)
 
   if (!ctx.from?.id) {

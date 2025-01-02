@@ -1,4 +1,4 @@
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { handleGenerateNeuroImproved } from "../handleNeuroActions/handleGenerateImproved"
 import { handleGenerate } from "./handleGenerate"
 import { handleGenerateImage } from "./handleGenerateImage"

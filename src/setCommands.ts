@@ -1,9 +1,13 @@
-import { Bot } from "grammy"
-import { MyContext } from "./utils/types"
+import { Telegraf } from "telegraf"
+import { MyContext } from "./interfaces"
 
-export function setBotCommands(bot: Bot<MyContext>) {
+export function setBotCommands(bot: Telegraf<MyContext>) {
   // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  bot.api.setMyCommands([
+  bot.telegram.setMyCommands([
+    {
+      command: "start",
+      description: "👤 Start / Начать",
+    },
     {
       command: "menu",
       description: "👤 Menu / Главное меню",

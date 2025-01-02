@@ -1,7 +1,7 @@
 import axios, { isAxiosError } from "axios"
 
 import { isDev } from "../helpers"
-import { MyContext } from "../utils/types"
+import { MyContext } from "../interfaces"
 
 export async function generateImageToPrompt(imageUrl: string, telegram_id: number, ctx: MyContext, isRu: boolean): Promise<null> {
   console.log("Starting generateImageToPrompt with:", { imageUrl, telegram_id })

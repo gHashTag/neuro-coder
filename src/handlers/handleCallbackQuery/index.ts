@@ -1,12 +1,12 @@
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { handleChangeSize } from "../handleChangeSize"
 import { handleGenerateImageActions } from "../handleGenerateImageActions"
 import { handleAspectRatioChange } from "../handleAspectRatioChange"
-import { buyRobokassa } from "../buy/buyRobokassa"
 import { handleModelCallback } from "../handleModelCallback"
 import { handleNeuroActions } from "../handleNeuroActions"
 import { handleImprove } from "../handleGenerateImageActions/handleImprove"
 import { handleLevelQuest } from "../handleLevelQuest"
+import { topUpBalanceCommand } from "commands/topUpBalanceCommand"
 
 export async function handleCallbackQuery(ctx: MyContext, data: string, isRu: boolean) {
   try {
@@ -35,7 +35,7 @@ export async function handleCallbackQuery(ctx: MyContext, data: string, isRu: bo
 
       case data === "top_up_balance":
         console.log("CASE: top_up_balance")
-        await buyRobokassa(ctx)
+        await topUpBalanceCommand(ctx)
         break
 
       case data.startsWith("select_model_"):

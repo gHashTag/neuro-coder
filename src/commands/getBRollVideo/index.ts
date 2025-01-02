@@ -1,16 +1,15 @@
-import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { generateLipSync } from "../../helpers/generateLipSync"
 
-export async function getBRollVideo(conversation: Conversation<MyContext>, ctx: MyContext) {
+export async function getBRollVideo(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   await ctx.replyWithChatAction("typing")
   try {
     await ctx.reply(isRu ? "Отправьте URL видео" : "Send video URL")
-    const videoUrl = (await conversation.wait()).message?.text
+    const videoUrl = (await ctx.wait()).message?.text
 
     await ctx.reply(isRu ? "Отправьте URL аудио" : "Send audio URL")
-    const audioUrl = (await conversation.wait()).message?.text
+    const audioUrl = (await ctx.wait()).message?.text
 
     if (!videoUrl || !audioUrl) {
       await ctx.reply(isRu ? "Ошибка: URL не предоставлены" : "Error: URLs not provided")

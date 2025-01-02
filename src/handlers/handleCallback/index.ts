@@ -1,6 +1,6 @@
 import { handleCallbackQuery } from "../../handlers/handleCallbackQuery"
 import { isRussian } from "../../utils/language"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
 export async function handleCallback(ctx: MyContext) {
   const isRu = isRussian(ctx)
@@ -11,18 +11,24 @@ export async function handleCallback(ctx: MyContext) {
       throw new Error("No callback query")
     }
 
-    const data = ctx.callbackQuery.data
-    await ctx.answerCallbackQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
-    if (!data) {
+    if (ctx.callbackQuery && "data" in ctx.callbackQuery) {
+      const data = ctx.callbackQuery.data
+      await ctx.answerCbQuery().catch((e) => console.error("Ошибка при ответе на callback query:", e))
+      if (!data) {
+        throw new Error("No callback query data")
+      }
+
+      // Ваша логика обработки callback-запроса
+      // Например, вызов функции handleCallbackQuery
+      await handleCallbackQuery(ctx, data, isRu)
+      return
+    } else {
       throw new Error("No callback query data")
     }
-
-    await handleCallbackQuery(ctx, data, isRu)
-    return
   } catch (error) {
     console.error("Ошибка при обработке callback query:", error)
     try {
-      await ctx.answerCallbackQuery()
+      await ctx.answerCbQuery()
     } catch (e) {
       console.error("Не удалось ответить на callback query:", e)
       await ctx.reply(isRu ? "Произошла ошибка. Пожалуйста, попробуйте позже." : "An error occurred. Please try again later.")

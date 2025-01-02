@@ -1,13 +1,12 @@
-import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { generateLipSync } from "../../helpers/generateLipSync"
 
-export async function lipSyncConversationCommand(conversation: Conversation<MyContext>, ctx: MyContext) {
+export async function lipSyncConversationCommand(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   await ctx.replyWithChatAction("typing")
   try {
     await ctx.reply(isRu ? "Отправьте видео или URL видео" : "Send a video or video URL")
-    const videoMsg = await conversation.wait()
+    const videoMsg = await ctx.wait()
     let videoUrl: string | undefined
 
     if (videoMsg.message?.video) {
@@ -18,7 +17,7 @@ export async function lipSyncConversationCommand(conversation: Conversation<MyCo
     }
 
     await ctx.reply(isRu ? "Отправьте аудио или URL аудио" : "Send an audio or audio URL")
-    const audioMsg = await conversation.wait()
+    const audioMsg = await ctx.wait()
     let audioUrl: string | undefined
 
     if (audioMsg.message?.audio) {

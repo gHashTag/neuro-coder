@@ -1,5 +1,5 @@
 import { isRussian } from "../../utils/language"
-import { MyContextWithSession } from "../../utils/types"
+import { MyContextWithSession } from "../../interfaces"
 
 interface AspectRatioHandlerParams {
   ctx: MyContextWithSession

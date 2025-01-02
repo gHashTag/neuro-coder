@@ -1,7 +1,7 @@
 import { getPrompt } from "../../core/supabase/ai"
 
 import { generateNeuroImage } from "../../services/generateNeuroImage"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { getUserBalance, imageNeuroGenerationCost, sendInsufficientStarsMessage } from "../../helpers/telegramStars"
 
 export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: boolean) {

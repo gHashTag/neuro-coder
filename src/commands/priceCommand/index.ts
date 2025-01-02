@@ -1,4 +1,4 @@
-import { MyContext, MyConversation } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import {
   trainingCostInStars,
   promptGenerationCost,
@@ -11,7 +11,7 @@ import {
   starCost,
 } from "../../helpers/telegramStars/telegramStars"
 
-export async function priceCommand(conversation: MyConversation, ctx: MyContext) {
+export async function priceCommand(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   const message = isRu
     ? `

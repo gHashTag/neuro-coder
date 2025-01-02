@@ -1,4 +1,4 @@
-import { MyContext } from "../utils/types"
+import { MyContext } from "../interfaces"
 
 export const buttonHandlers = async (ctx: MyContext, promptId: string) => {
   const isRu = ctx.from?.language_code === "ru"

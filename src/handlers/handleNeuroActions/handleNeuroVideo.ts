@@ -1,5 +1,5 @@
 import { getPrompt } from "../../core/supabase/ai"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
 export async function handleNeuroVideo(ctx: MyContext, data: string, isRu: boolean) {
   try {

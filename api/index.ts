@@ -1,7 +1,7 @@
 require("../src/index")
 
 import express from "express"
-import { webhookCallback } from "grammy"
+import { webhookCallback } from "telegraf"
 
 import bot from "../src/core/bot"
 import { supabase } from "../src/core/supabase"

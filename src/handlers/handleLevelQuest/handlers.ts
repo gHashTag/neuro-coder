@@ -1,15 +1,14 @@
-import { MyContext } from "../../utils/types"
-import { InlineKeyboard } from "grammy"
+import { MyContext } from "../../interfaces"
+import { Markup } from "telegraf"
 
 export async function handleLevel0(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
 
-    await ctx.reply(
-      isRu
-        ? `🌟 Создайте свой уникальный аватар! 🌟
+    const message = isRu
+      ? `🌟 Создайте свой уникальный аватар! 🌟
 
-      Хотите, чтобы ваш бот знал о вас больше? \n🤖 С помощью команды /avatar вы можете предоставить информацию о себе, чтобы улучшить взаимодействие с ботом! 🧠✨
+Хотите, чтобы ваш бот знал о вас больше? \n🤖 С помощью команды /avatar вы можете предоставить информацию о себе, чтобы улучшить взаимодействие с ботом! 🧠✨
 
 🔍 Что это значит?
 Создание аватара позволяет боту лучше понимать ваши потребности и предоставлять более персонализированные ответы. Это как создание цифрового профиля, который помогает боту лучше взаимодействовать с вами.
@@ -22,9 +21,8 @@ export async function handleLevel0(ctx: MyContext) {
 📈 Преимущества:
 Более точные и персонализированные ответы.
 Возможность улучшить взаимодействие с ботом.
-Создание уникального профиля, который помогает боту лучше понимать ваши запросы.
-`
-        : `🌟 Create your unique avatar! 🌟
+Создание уникального профиля, который помогает боту лучше понимать ваши запросы.`
+      : `🌟 Create your unique avatar! 🌟
 
 \nWant your bot to know more about you? \n🤖 With the /avatar command, you can provide information about yourself to improve your interactions with the bot! 🧠✨
 
@@ -39,12 +37,10 @@ Enjoy a more personalized interaction with the bot!
 📈 Benefits:
 More accurate and personalized answers.
 The ability to improve interactions with the bot.
-Create a unique profile that helps the bot better understand your requests.
-`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_1"),
-      },
-    )
+Create a unique profile that helps the bot better understand your requests.`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_1")]))
+
     return
   } catch (error) {
     console.error("Error in handleLevel0:", error)
@@ -55,9 +51,9 @@ Create a unique profile that helps the bot better understand your requests.
 export async function handleLevel1(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
-    await ctx.reply(
-      isRu
-        ? `🎨 Обучите модель FLUX для создания уникальных изображений с вашим лицом! 🎨
+
+    const message = isRu
+      ? `🎨 Обучите модель FLUX для создания уникальных изображений с вашим лицом! 🎨
 
 С помощью команды /train_flux_model вы можете обучить модель, чтобы она могла создавать фотографии с вашим лицом, отражающие вашу индивидуальность и стиль. Это первый шаг к созданию удивительных нейрофотографий! 🌟✨
 
@@ -75,7 +71,7 @@ export async function handleLevel1(ctx: MyContext) {
 Создайте уникальные аватары для социальных сетей.
 Визуализируйте свои мечты и цели.
 Используйте изображения для вдохновения и творчества.`
-        : `🎨 Train the FLUX model to create unique images with your face! 🎨
+      : `🎨 Train the FLUX model to create unique images with your face! 🎨
 
 With the /train_flux_model command, you can train the model to create photos with your face that reflect your personality and style. This is the first step to creating amazing neurophotographs! 🌟✨
 
@@ -92,11 +88,9 @@ This opens up new possibilities for visualizing your ideas.
 💡 Use cases:
 Create unique avatars for social networks.
 Visualize your dreams and goals.
-Use images for inspiration and creativity`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_2"),
-      },
-    )
+Use images for inspiration and creativity`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_2")]))
     return
   } catch (error) {
     console.error("Error in handleLevel1:", error)
@@ -108,9 +102,8 @@ export async function handleLevel2(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
 
-    await ctx.reply(
-      isRu
-        ? `📸 Создайте уникальные нейрофотографии! 📸
+    const message = isRu
+      ? `📸 Создайте уникальные нейрофотографии! 📸
       
 После обучения модели, вы можете создавать удивительные изображения с помощью команды /neuro_photo. Воплотите свои идеи в жизнь с помощью нейросетей! 🌟✨
 
@@ -128,7 +121,7 @@ export async function handleLevel2(ctx: MyContext) {
 Создайте аватар для социальных сетей.
 Визуализируйте свои мечты и цели.
 Поделитесь своими креативными идеями в социальных сетях.`
-        : `📸 Create unique neurophotographs! 📸
+      : `📸 Create unique neurophotographs! 📸
 After training the model, you can create amazing images with the /neuro_photo command. Bring your ideas to life with neural networks! 🌟✨
 
 🖌️ How does it work?
@@ -144,11 +137,9 @@ Use images for creativity and inspiration.
 💡 Use cases:
 Create an avatar for social networks.
 Visualize your dreams and goals.
-Share your creative ideas on social networks.`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_3"),
-      },
-    )
+Share your creative ideas on social networks.`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_3")]))
     return
   } catch (error) {
     console.error("Error in handleLevel2:", error)
@@ -160,9 +151,8 @@ export async function handleLevel3(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
 
-    await ctx.reply(
-      isRu
-        ? `🔍 Получите описание из изображения! 🔍
+    const message = isRu
+      ? `🔍 Получите описание из изображения! 🔍
 
 Хотите узнать, как ваш бот может описать изображение? С помощью команды /image_to_prompt вы можете получить текстовое описание любого изображения! 🖼️✨
 
@@ -180,7 +170,7 @@ export async function handleLevel3(ctx: MyContext) {
 Создайте текстовые описания для своих фотографий.
 Получите идеи для написания статей или постов.
 Используйте описания для улучшения SEO вашего контента.`
-        : `🔍 Get a description from an image! 🔍
+      : `🔍 Get a description from an image! 🔍
 
 Want to know how your bot can describe an image? With the /image_to_prompt command, you can get a text description of any image! �️✨
 
@@ -198,11 +188,9 @@ Share interesting discoveries with your friends.
 Create text descriptions for your photos.
 Get ideas for writing articles or posts.
 Use descriptions to improve the SEO of your content.
-      `,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_4"),
-      },
-    )
+      `
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_4")]))
     return
   } catch (error) {
     console.error("Error in handleLevel3:", error)
@@ -214,9 +202,8 @@ export async function handleLevel4(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
 
-    await ctx.reply(
-      isRu
-        ? `🖼️ Создайте изображение из текста! 🖼️
+    const message = isRu
+      ? `🖼️ Создайте изображение из текста! 🖼️
 
 Вы когда-нибудь хотели увидеть, как ваши слова превращаются в изображения? С нашим ботом это возможно! 
 Используйте команду /text_to_image, чтобы создать уникальные изображения из текстовых описаний! 🎨✨
@@ -235,7 +222,7 @@ export async function handleLevel4(ctx: MyContext) {
 Создайте обложку для своей книги.
 Визуализируйте свои мечты и цели.
 Поделитесь своими креативными идеями в социальных сетях.`
-        : `🖼️ Create an image from text! 🖼️
+      : `🖼️ Create an image from text! 🖼️
 
 Ever wanted to see your words turn into images? With our bot, it's possible! 
 Use the /text_to_image command to create unique images from text descriptions! 🎨✨
@@ -253,11 +240,9 @@ Use images for inspiration and creativity.
 📸 Examples of use:
 Create a cover for your book.
 Visualize your dreams and goals.
-Share your creative ideas on social media.`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_5"),
-      },
-    )
+Share your creative ideas on social media.`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_5")]))
     return
   } catch (error) {
     console.error("Error in handleLevel4:", error)
@@ -268,9 +253,8 @@ Share your creative ideas on social media.`,
 export async function handleLevel5(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
-    await ctx.reply(
-      isRu
-        ? `🎥 Создайте видео из текста! 🎥
+    const message = isRu
+      ? `🎥 Создайте видео из текста! 🎥
 
 Хотите увидеть, как ваши слова оживают в виде видео? С помощью команды /text_to_video вы можете создавать удивительные видеоролики, которые воплощают ваши идеи в жизнь! 🌟✨
 
@@ -288,7 +272,7 @@ export async function handleLevel5(ctx: MyContext) {
 Создайте трейлер для своей книги или проекта.
 Визуализируйте свои мечты и цели в формате видео.
 Поделитесь своими креативными идеями в социальных сетях.`
-        : `🎥 Create a video from text! 🎥
+      : `🎥 Create a video from text! 🎥
 
 Want to see your words come to life as a video? With the /text_to_video command, you can create amazing videos that bring your ideas to life! 🌟✨
 
@@ -305,11 +289,9 @@ Use videos for inspiration and creativity.
 💡 Use cases:
 Create a trailer for your book or project.
 Visualize your dreams and goals in video format.
-Share your creative ideas on social media.`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_6"),
-      },
-    )
+Share your creative ideas on social media.`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_6")]))
     return
   } catch (error) {
     console.error("Error in handleLevel5:", error)
@@ -320,9 +302,8 @@ Share your creative ideas on social media.`,
 export async function handleLevel6(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
-    await ctx.reply(
-      isRu
-        ? `🎥 Преобразуйте изображение в видео с движением! 🎥
+    const message = isRu
+      ? `🎥 Преобразуйте изображение в видео с движением! 🎥
 
 Хотите добавить динамики вашим фотографиям? С помощью команды /image_to_video вы можете превратить статические изображения в захватывающие видеоролики с движением! 🌟✨
 
@@ -340,7 +321,7 @@ export async function handleLevel6(ctx: MyContext) {
 Создайте анимацию для своих социальных сетей.
 Визуализируйте свои идеи и проекты в формате видео.
 Поделитесь своими креативными идеями в социальных сетях.`
-        : `🎥 Transform an image into a moving video! 🎥
+      : `🎥 Transform an image into a moving video! 🎥
 
 Want to add some action to your photos? With the /image_to_video command, you can turn static images into exciting moving videos! 🌟✨
 
@@ -357,11 +338,9 @@ Use videos for creativity and inspiration.
 💡 Use cases:
 Create animations for your social networks.
 Visualize your ideas and projects in video format.
-Share your creative ideas on social networks.`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_7"),
-      },
-    )
+Share your creative ideas on social networks.`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_7")]))
     return
   } catch (error) {
     console.error("Error in handleLevel6:", error)
@@ -372,9 +351,8 @@ Share your creative ideas on social networks.`,
 export async function handleLevel7(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
-    await ctx.reply(
-      isRu
-        ? `🎤 Добавьте голос к вашему аватару! 🎤
+    const message = isRu
+      ? `🎤 Добавьте голос к вашему аватару! 🎤
 
 Хотите, чтобы ваш аватар заговорил? С помощью команды /voice вы можете легко добавить голос к вашему аватару и сделать его более живым и выразительным! 🌟✨
 
@@ -392,7 +370,7 @@ export async function handleLevel7(ctx: MyContext) {
 Создайте анимацию с вашим аватаром для социальных сетей.
 Озвучьте вашего аватара для видеопроектов.
 Поделитесь своими креативными идеями в социальных сетях.`
-        : `🎤 Add voice to your avatar! 🎤
+      : `🎤 Add voice to your avatar! 🎤
 
 Want your avatar to speak? With the /voice command, you can easily add voice to your avatar and make it more lively and expressive! 🌟✨
 
@@ -409,11 +387,10 @@ Use avatars for presentations and entertainment.
 💡 Use cases:
 Create an animation with your avatar for social networks.
 Voice your avatar for video projects.
-Share your creative ideas on social media.`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_8"),
-      },
-    )
+Share your creative ideas on social media.`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_8")]))
+
     return
   } catch (error) {
     console.error("Error in handleLevel7:", error)
@@ -424,9 +401,8 @@ Share your creative ideas on social media.`,
 export async function handleLevel8(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
-    await ctx.reply(
-      isRu
-        ? `🔊 Преобразуйте текст в речь! 🔊
+    const message = isRu
+      ? `🔊 Преобразуйте текст в речь! 🔊
 
 Хотите услышать, как ваши слова оживают? С помощью команды /text_to_speech вы можете легко преобразовать текст в аудио и насладиться звучанием ваших идей! 🌟✨
 
@@ -444,7 +420,7 @@ export async function handleLevel8(ctx: MyContext) {
 Создайте аудиокнигу из ваших текстов.
 Озвучьте свои статьи или блоги.
 Поделитесь своими креативными идеями в социальных сетях.`
-        : `🔊 Convert text to speech! 🔊
+      : `🔊 Convert text to speech! 🔊
 
 Want to hear your words come to life? With the /text_to_speech command, you can easily convert text to audio and enjoy the sound of your ideas! 🌟✨
 
@@ -461,11 +437,9 @@ Use audio for presentations and learning.
 💡 Use cases:
 Create an audiobook from your texts.
 Voice your articles or blogs.
-Share your creative ideas on social media.`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_9"),
-      },
-    )
+Share your creative ideas on social media.`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_9")]))
     return
   } catch (error) {
     console.error("Error in handleLevel8:", error)
@@ -476,10 +450,8 @@ Share your creative ideas on social media.`,
 export async function handleLevel9(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
-
-    await ctx.reply(
-      isRu
-        ? `🌟 Выберите свою модель ИИ! 🌟
+    const message = isRu
+      ? `🌟 Выберите свою модель ИИ! 🌟
 
 Хотите, чтобы ваш бот стал еще умнее? \n🤖 С помощью команды /select_model вы можете выбрать модель ИИ, которая будет генерировать текст специально для вас! 🧠✨
 
@@ -496,7 +468,7 @@ export async function handleLevel9(ctx: MyContext) {
 Возможность экспериментировать с разными стилями и подходами.
 Улучшение взаимодействия с ботом.
 `
-        : `🌟 Select your AI model! 🌟
+      : `🌟 Select your AI model! 🌟
 
 Want your bot to become even smarter? \n🤖 With the /select_model command, you can choose an AI model that will generate text specifically for you! 🧠✨
 
@@ -511,11 +483,9 @@ An AI model is like a computer's brain that helps it understand and perform task
 📈 Benefits:
 More accurate and personalized texts.
 Ability to experiment with different styles and approaches.
-Improved interaction with the bot.`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_10"),
-      },
-    )
+Improved interaction with the bot.`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_10")]))
     return
   } catch (error) {
     console.error("Error in handleLevel9:", error)
@@ -573,9 +543,8 @@ Improved interaction with the bot.`,
 export async function handleLevel10(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
-    await ctx.reply(
-      isRu
-        ? `🎤 Синхронизируйте движение губ с аудио! 🎤
+    const message = isRu
+      ? `🎤 Синхронизируйте движение губ с аудио! 🎤
 
 Хотите добавить реалистичности вашим видео? С помощью команды /lipsync вы можете синхронизировать движение губ с аудио, создавая впечатляющие видеоролики! 🌟✨
 
@@ -593,7 +562,7 @@ export async function handleLevel10(ctx: MyContext) {
 Создайте музыкальное видео или караоке.
 Визуализируйте подкасты или аудиокниги.
 Поделитесь своими креативными идеями в социальных сетях.`
-        : `🎤 Synchronize lip movement with audio! 🎤
+      : `🎤 Synchronize lip movement with audio! 🎤
 
 Want to add realism to your videos? With the /lipsync command, you can synchronize lip movement with audio, creating impressive videos! 🌟✨
 
@@ -610,11 +579,9 @@ Use videos for creativity and inspiration.
 💡 Use cases:
 Create a music video or karaoke.
 Visualize podcasts or audiobooks.
-Share your creative ideas on social media.`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_11"),
-      },
-    )
+Share your creative ideas on social media.`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_11")]))
     return
   } catch (error) {
     console.error("Error in handleLevel10:", error)
@@ -625,10 +592,8 @@ Share your creative ideas on social media.`,
 export async function handleLevel11(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
-
-    await ctx.reply(
-      isRu
-        ? `🎉 Пригласите друга и получите бонусы! 🎉
+    const message = isRu
+      ? `🎉 Пригласите друга и получите бонусы! 🎉
 
 Хотите получить больше возможностей с нашим ботом? Теперь это проще простого! Используйте команду /invite, чтобы пригласить своих друзей и получить крутые бонусы! 🎁✨
 
@@ -646,7 +611,7 @@ export async function handleLevel11(ctx: MyContext) {
 Делитесь полезным инструментом с друзьями.
 Получайте награды за активность.
 Расширяйте сообщество пользователей и открывайте новые горизонты вместе!`
-        : `🎉 Invite friends and get bonuses! 🎉
+      : `🎉 Invite friends and get bonuses! 🎉
 
 Want to get more features with our bot? Now it's easier than ever! Use the /invite command to invite your friends and get cool bonuses! 🎁✨
 
@@ -663,11 +628,9 @@ Level up and access to new features.
 👥 Why is it great?
 Share a useful tool with your friends.
 Get rewards for activity.
-Expand the user community and open new horizons together!`,
-      {
-        reply_markup: new InlineKeyboard().text(isRu ? "➡️ Далее" : "➡️ Next", "level_complete"),
-      },
-    )
+Expand the user community and open new horizons together!`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "➡️ Далее" : "➡️ Next", "level_complete")]))
     return
   } catch (error) {
     console.error("Error in handleLevel11:", error)
@@ -678,10 +641,8 @@ Expand the user community and open new horizons together!`,
 export async function handleQuestComplete(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
-
-    await ctx.reply(
-      isRu
-        ? `🎉 НейроКвест завершен! 🎉
+    const message = isRu
+      ? `🎉 НейроКвест завершен! 🎉
 
 Вы успешно прошли все задания и достигли максимального уровня! 🌟✨
 
@@ -692,7 +653,7 @@ export async function handleQuestComplete(ctx: MyContext) {
 🍀 Удачи в прохождении! 🍀
 
 💵 На вашем балансе 100 ⭐️. Используйте его, чтобы открыть новые возможности!`
-        : `🎉 NeuroQuest completed! 🎉
+      : `🎉 NeuroQuest completed! 🎉
 
 You have successfully completed all tasks and reached the maximum level! 🌟✨
 
@@ -702,20 +663,9 @@ You have successfully completed all tasks and reached the maximum level! 🌟✨
 
 🍀 Good luck in the quest! 🍀
 
-💵 You have 100 ⭐️ on your balance. Use it to unlock new features!`,
-      {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              {
-                text: isRu ? "💎 Пополнить баланс" : "💎 Top up balance",
-                callback_data: "top_up_balance",
-              },
-            ],
-          ],
-        },
-      },
-    )
+💵 You have 100 ⭐️ on your balance. Use it to unlock new features!`
+
+    await ctx.reply(message, Markup.inlineKeyboard([Markup.button.callback(isRu ? "💎 Пополнить баланс" : "💎 Top up balance", "top_up_balance")]))
     return
   } catch (error) {
     console.error("Error in handleQuestComplete:", error)
@@ -726,10 +676,8 @@ You have successfully completed all tasks and reached the maximum level! 🌟✨
 export async function handleQuestRules(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
-
-    await ctx.reply(
-      isRu
-        ? `📜 Правила НейроКвеста:
+    const message = isRu
+      ? `📜 Правила НейроКвеста:
 
 1. Выполняйте задания последовательно
 2. За каждое выполненное задание вы получаете очки
@@ -738,7 +686,7 @@ export async function handleQuestRules(ctx: MyContext) {
 5. За особые достижения вы получаете бонусы
 
 Удачи в прохождении! 🍀`
-        : `📜 NeuroQuest Rules:
+      : `📜 NeuroQuest Rules:
 
 1. Complete tasks sequentially
 2. You get points for each completed task
@@ -746,8 +694,9 @@ export async function handleQuestRules(ctx: MyContext) {
 4. Some tasks have time limits
 5. You get bonuses for special achievements
 
-Good luck! 🍀`,
-    )
+Good luck! 🍀`
+
+    await ctx.reply(message)
     return
   } catch (error) {
     console.error("Error in handleQuestRules:", error)

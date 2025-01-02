@@ -1,7 +1,7 @@
 import axios from "axios"
 
 import { isDev } from "../helpers"
-import { MyContext } from "../utils/types"
+import { MyContext } from "../interfaces"
 
 export interface GenerationResult {
   image: string | Buffer

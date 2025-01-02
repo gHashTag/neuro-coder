@@ -1,5 +1,5 @@
-import { Context, InputFile } from "grammy"
-import type { InputMediaPhoto } from "grammy/types"
+import { Context } from "telegraf"
+
 import ffmpeg from "fluent-ffmpeg"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import { promises as fs } from "fs"
@@ -59,14 +59,14 @@ const leelaCommand = async (ctx: Context): Promise<void> => {
     if (images.length === 0) throw new Error("No images found")
 
     // Создаем группу медиа для отправки изображений
-    const mediaGroup: InputMediaPhoto[] = images.map((image) => ({
-      type: "photo",
-      media: new InputFile(image.imagePath),
-      caption: image.text,
-    }))
+    // const mediaGroup: InputMediaPhoto[] = images.map((image) => ({
+    //   type: "photo",
+    //   media: new InputFile(image.imagePath),
+    //   caption: image.text,
+    // }))
 
     // Отправляем группу изображений пользователю
-    await ctx.replyWithMediaGroup(mediaGroup)
+    // await ctx.replyWithMediaGroup(mediaGroup)
 
     // Получаем пути к изображениям
     const imagePaths = images.map((img) => img.imagePath)
@@ -80,9 +80,9 @@ const leelaCommand = async (ctx: Context): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Отправляем видео пользователю
-    await ctx.replyWithVideo(new InputFile(outputPath), {
-      caption: "Video meditation",
-    })
+    // await ctx.replyWithVideo(new InputFile(outputPath), {
+    //   caption: "Video meditation",
+    // })
 
     // Удаляем временные файлы
     await fs.unlink(outputPath)

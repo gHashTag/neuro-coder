@@ -1,12 +1,11 @@
-import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
 import { getVoiceId } from "../../core/supabase"
 import { textToSpeechCost, sendBalanceMessage, sendInsufficientStarsMessage, getUserBalance } from "../../helpers/telegramStars/telegramStars"
 import { generateTextToSpeech } from "../../services/generateTextToSpeech"
 import { isRussian } from "../../utils/language"
 
-const textToSpeechCommand = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
+const textToSpeechCommand = async (ctx: MyContext): Promise<void> => {
   const isRu = isRussian(ctx)
   console.log(isRu, "isRu")
   try {
@@ -24,7 +23,7 @@ const textToSpeechCommand = async (conversation: Conversation<MyContext>, ctx: M
     await sendBalanceMessage(currentBalance, price, ctx, isRu)
 
     const requestText = await ctx.reply(isRu ? "✍️ Отправьте текст, для преобразования его в голос" : "✍️ Send text, to convert it to voice")
-    const { message } = await conversation.wait()
+    const { message } = await ctx.wait()
     if (!message?.text) throw new Error("message is not found")
 
     const voice_id = await getVoiceId(ctx.from?.id?.toString() || "")

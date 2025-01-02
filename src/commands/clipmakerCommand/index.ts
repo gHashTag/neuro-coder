@@ -1,8 +1,7 @@
-import { InputFile } from "grammy"
 import { promises as fs } from "fs"
 import { createSlideshow, generateImagesForMeditation, getMeditationSteps, translateText } from "../../helpers"
-import type { InputMediaPhoto } from "grammy/types"
-import { MyContext, Step } from "../../utils/types"
+
+import { MyContext, Step } from "../../interfaces"
 
 export async function clipmakerCommand(ctx: MyContext) {
   try {
@@ -63,13 +62,13 @@ export async function clipmakerCommand(ctx: MyContext) {
     console.log(englishImages, "englishImages")
 
     // Создаем группу медиа для отправки изображений
-    const englishMediaGroup: InputMediaPhoto[] = englishImages.map((image) => ({
-      type: "photo",
-      media: new InputFile(image.imagePath),
-      caption: image.text,
-    }))
+    // const englishMediaGroup: InputMediaPhoto[] = englishImages.map((image) => ({
+    //   type: "photo",
+    //   media: new Input(image.imagePath),
+    //   caption: image.text,
+    // }))
     // Отправляем группу изображений пользователю
-    await ctx.replyWithMediaGroup(englishMediaGroup)
+    // await ctx.replyWithMediaGroup(englishMediaGroup)
 
     const numberTrack = 10
 
@@ -83,21 +82,21 @@ export async function clipmakerCommand(ctx: MyContext) {
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
     // Отправляем видео пользователю
-    await ctx.replyWithVideo(new InputFile(englishOutputPath), {
-      caption: "Video EN meditation",
-    })
+    // await ctx.replyWithVideo(new InputFile(englishOutputPath), {
+    //   caption: "Video EN meditation",
+    // })
 
     // Генерация испанской версии
     const spanishImages = await generateImagesForMeditation(stepsData, "es")
 
     // Создаем группу медиа для отправки изображений
-    const spanishMediaGroup: InputMediaPhoto[] = spanishImages.map((image) => ({
-      type: "photo",
-      media: new InputFile(image.imagePath),
-      caption: image.text,
-    }))
+    // const spanishMediaGroup: InputMediaPhoto[] = spanishImages.map((image) => ({
+    //   type: "photo",
+    //   media: new InputFile(image.imagePath),
+    //   caption: image.text,
+    // }))
 
-    await ctx.replyWithMediaGroup(spanishMediaGroup)
+    // await ctx.replyWithMediaGroup(spanishMediaGroup)
 
     const spanishOutputPath = await createSlideshow(
       spanishImages.map((img) => img.imagePath),
@@ -108,9 +107,9 @@ export async function clipmakerCommand(ctx: MyContext) {
     // Ждем 1 секунду после создания слайд-шоу
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    await ctx.replyWithVideo(new InputFile(spanishOutputPath), {
-      caption: "Video ES meditation",
-    })
+    // await ctx.replyWithVideo(new InputFile(spanishOutputPath), {
+    //   caption: "Video ES meditation",
+    // })
 
     // Удаляем временные файлы
     await fs.unlink(englishOutputPath)

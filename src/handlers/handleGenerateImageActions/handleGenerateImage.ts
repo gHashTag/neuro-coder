@@ -1,8 +1,9 @@
 import { generateImage } from "../../services/generateReplicateImage"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { sendInsufficientStarsMessage, getUserBalance, textToImageGenerationCost } from "../../helpers/telegramStars/telegramStars"
 
 export async function handleGenerateImage(ctx: MyContext, data: string, isRu: boolean) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let generatingMsg: any
   try {
     if (!ctx || !ctx.from) {
@@ -38,7 +39,7 @@ export async function handleGenerateImage(ctx: MyContext, data: string, isRu: bo
     } finally {
       // Удаляем сообщение о генерации
       if (generatingMsg) {
-        await ctx.api.deleteMessage(ctx.chat?.id || "", generatingMsg.message_id).catch(console.error)
+        await ctx.telegram.deleteMessage(ctx.chat?.id || "", generatingMsg.message_id).catch(console.error)
       }
     }
     return

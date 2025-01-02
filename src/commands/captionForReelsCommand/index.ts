@@ -1,8 +1,7 @@
-import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { getCaptionForNews } from "../../helpers"
 
-const captionForReelsCommand = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
+const captionForReelsCommand = async (ctx: MyContext): Promise<void> => {
   try {
     const isRu = ctx.from?.language_code === "ru"
     await ctx.replyWithChatAction("typing")
@@ -17,7 +16,7 @@ const captionForReelsCommand = async (conversation: Conversation<MyContext>, ctx
     // Проверяем, есть ли информация о пользователе
     if (!ctx.from) throw new Error("User not found")
 
-    const { message } = await conversation.wait()
+    const { message } = await ctx.wait()
 
     const caption = await getCaptionForNews({
       prompt: message?.text || "",

@@ -1,5 +1,4 @@
-import { Conversation, ConversationFlavor } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import * as fs from "fs/promises"
 import * as path from "path"
 import archiver from "archiver"
@@ -21,8 +20,6 @@ interface ApiError extends Error {
     status: number
   }
 }
-
-type MyConversation = Conversation<MyContext & ConversationFlavor>
 
 async function isValidImage(buffer: Buffer): Promise<boolean> {
   try {
@@ -306,7 +303,7 @@ async function ensureSupabaseAuth(): Promise<void> {
   }
 }
 
-export async function trainFluxModelCommand(conversation: MyConversation, ctx: MyContext) {
+export async function trainFluxModelCommand(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
 
   // Извлекаем аргументы команды
@@ -395,7 +392,7 @@ export async function trainFluxModelCommand(conversation: MyConversation, ctx: M
 
     // Вместо conversation.on используем проверку в цикле
     while (!isCancelled) {
-      const msg = await conversation.wait()
+      const msg = await ctx.wait()
 
       // Проверяем callback_query
       if (msg.callbackQuery?.data === "cancel_training") {

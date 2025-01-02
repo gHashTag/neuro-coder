@@ -1,8 +1,8 @@
+import { Markup } from "telegraf"
 import { getPrompt } from "../../core/supabase/ai"
 import { upgradePrompt } from "../../helpers"
 import { supabase } from "../../core/supabase"
-import { MyContext } from "../../utils/types"
-import { InlineKeyboard } from "grammy"
+import { MyContext } from "../../interfaces"
 
 export async function handleNeuroImprove(ctx: MyContext, data: string, isRu: boolean) {
   try {
@@ -50,10 +50,10 @@ export async function handleNeuroImprove(ctx: MyContext, data: string, isRu: boo
 
     // Показываем улучшенный промпт и спрашиваем подтверждение
     await ctx.reply(isRu ? `Улучшенный промпт:\n${improvedPrompt}\n\nСгенерировать изображение?` : `Improved prompt:\n${improvedPrompt}\n\nGenerate image?`, {
-      reply_markup: new InlineKeyboard()
-        .text(isRu ? "✅ Да" : "✅ Yes", `neuro_generate_improved_${savedPrompt.prompt_id}`)
-        .row()
-        .text(isRu ? "❌ Нет" : "❌ No", "neuro_cancel"),
+      reply_markup: Markup.inlineKeyboard([
+        Markup.button.callback(isRu ? "✅ Да" : "✅ Yes", `neuro_generate_improved_${savedPrompt.prompt_id}`),
+        Markup.button.callback(isRu ? "❌ Нет" : "❌ No", "neuro_cancel"),
+      ]),
     })
   } catch (error) {
     console.error("Error improving neuro prompt:", error)

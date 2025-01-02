@@ -1,6 +1,4 @@
-import { Conversation } from "@grammyjs/conversations"
-
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
 import { getUserBalance, imageToPromptCost, sendBalanceMessage } from "../../helpers/telegramStars/telegramStars"
 import { generateImageToPrompt } from "../../services/generateImageToPrompt"
@@ -9,7 +7,7 @@ if (!process.env.HUGGINGFACE_TOKEN) {
   throw new Error("HUGGINGFACE_TOKEN is not set")
 }
 
-export const imageToPromptCommand = async (conversation: Conversation<MyContext>, ctx: MyContext) => {
+export const imageToPromptCommand = async (ctx: MyContext) => {
   const isRu = ctx.from?.language_code === "ru"
   try {
     console.log("CASE: imageToPromptCommand")
@@ -28,7 +26,7 @@ export const imageToPromptCommand = async (conversation: Conversation<MyContext>
 
     // Ждем изображение от пользователя и проверяем его тип
     console.log("Waiting for photo message...")
-    const imageMsg = await conversation.waitFor("message:photo")
+    const imageMsg = await ctx.wait()
     console.log("Received photo message:", imageMsg.message?.photo)
 
     if (!imageMsg.message?.photo) {

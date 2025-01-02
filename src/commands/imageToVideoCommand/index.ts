@@ -1,7 +1,6 @@
-import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
-import { InlineKeyboard } from "grammy"
+import { Markup } from "telegraf"
 import axios from "axios"
 import { imageToVideoCost, sendInsufficientStarsMessage, getUserBalance, sendBalanceMessage } from "../../helpers/telegramStars/telegramStars"
 import { generateImageToVideo, VideoModel } from "../../services/generateImageToVideo"
@@ -21,7 +20,7 @@ export const retry = async <T>(fn: () => Promise<T>, attempts = 3, delay = 1000)
   }
 }
 
-export const imageToVideoCommand = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<string | undefined> => {
+export const imageToVideoCommand = async (ctx: MyContext): Promise<string | undefined> => {
   const isRu = ctx.from?.language_code === "ru"
   if (!ctx.from) {
     throw new Error("User not found")
@@ -35,10 +34,15 @@ export const imageToVideoCommand = async (conversation: Conversation<MyContext>,
   }
   await sendBalanceMessage(currentBalance, price, ctx, isRu)
 
-  const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper").text("Ray", "ray").text("I2VGen-XL", "i2vgen")
+  const keyboard = Markup.inlineKeyboard([
+    [Markup.button.callback("Minimax", "minimax")],
+    [Markup.button.callback("Haiper", "haiper")],
+    [Markup.button.callback("Ray", "ray")],
+    [Markup.button.callback("I2VGen-XL", "i2vgen")],
+  ])
   await ctx.reply(isRu ? "Выберите сервис для генерации видео:" : "Choose video generation service:", { reply_markup: keyboard })
 
-  const serviceMsg = await conversation.wait()
+  const serviceMsg = await ctx.wait()
   const model = serviceMsg.callbackQuery?.data
 
   if (!["minimax", "haiper", "ray", "i2vgen"].includes(model || "")) {
@@ -51,7 +55,7 @@ export const imageToVideoCommand = async (conversation: Conversation<MyContext>,
   }
 
   await ctx.reply(isRu ? "Пожалуйста, отправьте изображение" : "Please send an image")
-  const imageMsg = await conversation.wait()
+  const imageMsg = await ctx.wait()
 
   if (!imageMsg.message?.photo) {
     await ctx.reply(isRu ? "Пожалуйста, отправьте изображение" : "Please send an image")
@@ -59,7 +63,7 @@ export const imageToVideoCommand = async (conversation: Conversation<MyContext>,
   }
 
   await ctx.reply(isRu ? "Теперь опишите желаемое движение в видео" : "Now describe the desired movement in the video")
-  const promptMsg = await conversation.wait()
+  const promptMsg = await ctx.wait()
 
   if (!promptMsg.message?.text) {
     await ctx.reply(isRu ? "Пожалуйста, отправьте текстовое описание движения" : "Please send a text description of the movement")

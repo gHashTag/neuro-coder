@@ -1,6 +1,6 @@
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
-export async function buyRobokassa(ctx: MyContext) {
+export async function topUpBalanceCommand(ctx: MyContext) {
   try {
     const isRu = ctx.from?.language_code === "ru"
     await ctx.reply(

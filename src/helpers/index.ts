@@ -7,11 +7,10 @@ import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import path from "path"
 import RunwayML from "@runwayml/sdk"
 import { openai } from "../core/openai"
-import { MyContext, Step } from "../utils/types"
+import { MyContext, Step } from "../interfaces"
 
 import { createWriteStream, promises as fs } from "fs"
 
-import { InputFile } from "grammy"
 import { ElevenLabsClient } from "elevenlabs"
 import { v4 as uuid } from "uuid"
 
@@ -1314,13 +1313,13 @@ export const pulse = async (ctx: MyContext, image: string | null, prompt: string
       const imageBuffer = Buffer.from(imageToSend, "base64")
 
       // Отправляем как InputFile
-      await bot.api.sendPhoto("-4166575919", new InputFile(imageBuffer), { caption })
+      await bot.telegram.sendPhoto("-4166575919", { source: imageBuffer }, { caption })
     } else {
       // Отправляем текст, если изображения нет
       const textMessage = `@${ctx.from?.username || "Пользователь без username"} Telegram ID: ${
         ctx.from?.id
       } использовал команду: ${command} с промптом: ${truncatedPrompt}`
-      await bot.api.sendMessage("-4166575919", textMessage)
+      await bot.telegram.sendMessage("-4166575919", textMessage)
     }
     return
   } catch (error) {
@@ -1361,7 +1360,7 @@ export const sendPaymentNotification = async (amount: number, stars: number, tel
         ? `💸 Пользователь @${username || "Пользователь без username"} (Telegram ID: ${telegramId}) оплатил ${amount} рублей и получил ${stars} звезд.`
         : `💸 User @${username || "User without username"} (Telegram ID: ${telegramId}) paid ${amount} RUB and received ${stars} stars.`
 
-    await bot.api.sendMessage("-4166575919", caption)
+    await bot.telegram.sendMessage("-4166575919", caption)
   } catch (error) {
     console.error("Ошибка при отправке уведомления об оплате:", error)
     throw new Error("Ошибка при отправке уведомления об оплате")

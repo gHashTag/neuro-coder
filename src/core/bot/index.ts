@@ -1,6 +1,5 @@
-import { Bot } from "grammy"
-import { MyContext } from "../../utils/types"
+import { Telegraf, Scenes } from "telegraf"
 
-const bot = new Bot<MyContext>(process.env.BOT_TOKEN || "")
+const bot = new Telegraf<Scenes.WizardContext>(process.env.BOT_TOKEN || "")
 
 export default bot

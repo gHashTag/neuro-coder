@@ -1,7 +1,7 @@
 import { getPrompt } from "../../core/supabase/ai"
 import { generateNeuroImage } from "../../services/generateNeuroImage"
 
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
 export async function handleNeuroGenerateImproved(ctx: MyContext, data: string, isRu: boolean) {
   let generatingMessage: { message_id: number } | null = null

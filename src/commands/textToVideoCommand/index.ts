@@ -1,11 +1,10 @@
-import { Conversation } from "@grammyjs/conversations"
-import type { MyContext } from "../../utils/types"
+import type { MyContext } from "../../interfaces"
 import { textToVideoCost, sendBalanceMessage, getUserBalance, sendInsufficientStarsMessage } from "../../helpers/telegramStars/telegramStars"
 import { generateTextToVideo } from "../../services/generateTextToVideo"
-import { InlineKeyboard } from "grammy"
+import { Markup } from "telegraf"
 import { isRussian } from "../../utils/language"
 
-export const textToVideoCommand = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
+export const textToVideoCommand = async (ctx: MyContext): Promise<void> => {
   const isRu = isRussian(ctx)
   try {
     if (!ctx.from) {
@@ -27,13 +26,18 @@ export const textToVideoCommand = async (conversation: Conversation<MyContext>, 
     await sendBalanceMessage(currentBalance, price, ctx, isRu)
 
     // Создаем клавиатуру для выбора модели
-    const keyboard = new InlineKeyboard().text("Minimax", "minimax").text("Haiper", "haiper").text("Ray", "ray").text("I2VGen-XL", "i2vgen")
+    const keyboard = Markup.inlineKeyboard([
+      [Markup.button.callback("Minimax", "minimax")],
+      [Markup.button.callback("Haiper", "haiper")],
+      [Markup.button.callback("Ray", "ray")],
+      [Markup.button.callback("I2VGen-XL", "i2vgen")],
+    ])
 
     // Запрашиваем модель
     await ctx.reply(isRu ? "Выберите модель для генерации:" : "Choose generation model:", { reply_markup: keyboard })
 
     // Ждем выбор модели
-    const modelResponse = await conversation.waitFor("callback_query")
+    const modelResponse = await ctx.wait()
     const model = modelResponse.callbackQuery.data
     if (!model) {
       throw new Error(isRu ? "Не удалось определить модель" : "Could not identify model")
@@ -42,7 +46,7 @@ export const textToVideoCommand = async (conversation: Conversation<MyContext>, 
     // Запрашиваем промпт
     await ctx.reply(isRu ? "Опишите видео, которое хотите сгенерировать:" : "Describe the video you want to generate:")
 
-    const promptResponse = await conversation.waitFor(":text")
+    const promptResponse = await ctx.wait()
     const prompt = promptResponse.message?.text
 
     if (!promptResponse.message || !prompt) {

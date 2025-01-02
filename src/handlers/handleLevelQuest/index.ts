@@ -14,7 +14,7 @@ import {
   handleQuestComplete,
   handleQuestRules,
 } from "./handlers"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
 export async function handleLevelQuest(ctx: MyContext, data: string) {
   try {

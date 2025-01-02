@@ -1,7 +1,7 @@
-import { InlineKeyboard } from "grammy"
-import { MyContext, MyConversation } from "../../utils/types"
+import { MyContext } from "../../interfaces"
+import { startMenu } from "../../menu"
 
-export async function neuroQuestCommand(conversation: MyConversation, ctx: MyContext) {
+export async function neuroQuestCommand(ctx: MyContext) {
   console.log("CASE: neuroQuest")
   const isRu = ctx.from?.language_code === "ru"
   console.log("🎮 Starting Neuro Quest for user:", ctx.from?.id)
@@ -79,10 +79,6 @@ export async function neuroQuestCommand(conversation: MyConversation, ctx: MyCon
 💡 Each level will give you skills for creating professional content.
 
 Ready to become a content creation pro?`,
-    reply_markup: new InlineKeyboard()
-      .text(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "level_0")
-      .row()
-      .text(isRu ? "💎 Пополнить баланс" : "💎 Top up balance", "top_up_balance"),
   })
-  return
+  await startMenu(ctx, isRu)
 }

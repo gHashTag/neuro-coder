@@ -1,5 +1,5 @@
 import express from "express"
-import { webhookCallback } from "grammy"
+import { webhookCallback } from "telegraf"
 import { bot } from "./index"
 import { supabase } from "./core/supabase"
 

@@ -1,12 +1,10 @@
-import { InlineKeyboard } from "grammy"
-import { MyContext, MyConversation } from "../../utils/types"
-
-import { generateImage } from "../../services/generateReplicateImage"
-
+import { MyContext } from "../../interfaces"
 import { getUserBalance, sendBalanceMessage, sendInsufficientStarsMessage, textToImageGenerationCost } from "../../helpers/telegramStars/telegramStars"
+import { isRussian } from "../../utils/language"
+import { Markup } from "telegraf"
 
-export const textPromptToImageCommand = async (conversation: MyConversation, ctx: MyContext): Promise<void> => {
-  const isRu = ctx.from?.language_code === "ru"
+export const textPromptToImageCommand = async (ctx: MyContext): Promise<void> => {
+  const isRu = isRussian(ctx)
   try {
     console.log("CASE: textPromptToImageCommand")
 
@@ -32,7 +30,7 @@ export const textPromptToImageCommand = async (conversation: MyConversation, ctx
     const model_type = ctx.session.selectedModel
     console.log(model_type, "model_type")
 
-    const keyboard = new InlineKeyboard().text(isRu ? "Отменить генерацию" : "Cancel generation", "cancel")
+    const keyboard = Markup.keyboard([[Markup.button.text(isRu ? "Отменить генерацию" : "Cancel generation")]])
 
     const greetingMessage = await ctx.reply(
       isRu ? "👋 Напишите промпт на английском для генерации изображения." : "👋 Hello! Write a prompt in English to generate an image.",
@@ -41,7 +39,7 @@ export const textPromptToImageCommand = async (conversation: MyConversation, ctx
       },
     )
 
-    const { message, callbackQuery } = await conversation.wait()
+    const { message, callbackQuery } = await ctx.wait()
     if (callbackQuery?.data === "cancel") {
       await ctx.api.deleteMessage(ctx.chat?.id || "", greetingMessage.message_id)
       await ctx.reply(isRu ? "❌ Генерация отменена" : "❌ Generation cancelled")

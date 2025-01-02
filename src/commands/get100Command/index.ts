@@ -1,10 +1,9 @@
-import { MyContext } from "../../utils/types"
-import { Conversation } from "@grammyjs/conversations"
+import { MyContext } from "../../interfaces"
 
 import { generateNeuroImage } from "../../services/generateNeuroImage"
 import { models } from "../../core/replicate"
 
-async function get100Command(conversation: Conversation<MyContext>, ctx: MyContext) {
+async function get100Command(ctx: MyContext) {
   const model_type = models["neuro_coder"].key
   console.log(model_type)
 

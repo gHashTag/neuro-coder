@@ -1,5 +1,5 @@
 import { supabase } from "../../core/supabase"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
 const starCost = 0.016
 

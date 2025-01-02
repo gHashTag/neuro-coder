@@ -1,7 +1,7 @@
 import axios, { isAxiosError } from "axios"
 import { isDev } from "../helpers"
 
-import { InlineKeyboard } from "grammy"
+import { Markup } from "telegraf"
 
 export type VideoModel = "minimax" | "haiper" | "ray" | "i2vgen"
 
@@ -82,10 +82,10 @@ export async function generateImageToVideo(
 }
 
 export function createVideoModelKeyboard(isRu: boolean) {
-  return new InlineKeyboard()
-    .text(isRu ? "Minimax - Оптимальный" : "Minimax - Optimal", "video_model_minimax")
-    .text(isRu ? "Haiper - Качественный" : "Haiper - High Quality", "video_model_haiper")
-    .row()
-    .text(isRu ? "Ray - Реалистичный" : "Ray - Realistic", "video_model_ray")
-    .text(isRu ? "I2VGen-XL - Детальный" : "I2VGen-XL - Detailed", "video_model_i2vgen")
+  return Markup.inlineKeyboard([
+    [Markup.button.callback(isRu ? "Minimax - Оптимальный" : "Minimax - Optimal", "video_model_minimax")],
+    [Markup.button.callback(isRu ? "Haiper - Качественный" : "Haiper - High Quality", "video_model_haiper")],
+    [Markup.button.callback(isRu ? "Ray - Реалистичный" : "Ray - Realistic", "video_model_ray")],
+    [Markup.button.callback(isRu ? "I2VGen-XL - Детальный" : "I2VGen-XL - Detailed", "video_model_i2vgen")],
+  ])
 }

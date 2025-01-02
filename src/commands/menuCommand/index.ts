@@ -1,7 +1,7 @@
-import { MyContext, MyConversation } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { mainMenu } from "../../menu/mainMenu"
 
-export async function menuCommand(conversation: MyConversation, ctx: MyContext) {
+export async function menuCommand(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   try {
     console.log("CASE: menu")

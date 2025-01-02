@@ -1,33 +1,35 @@
-import { InlineKeyboard } from "grammy"
-import { MyContext, MyConversation } from "../../utils/types"
+import { Markup } from "telegraf"
+import { MyContext } from "../../interfaces"
 
 import { getAvailableModels } from "./getAvailableModels"
 
 // Функция для получения доступных моделей
-const selectModelCommand = async (conversation: MyConversation, ctx: MyContext) => {
+const selectModelCommand = async (ctx: MyContext) => {
   const isRu = ctx.from?.language_code === "ru"
 
   try {
     const models = await getAvailableModels()
-    const keyboard = new InlineKeyboard()
 
     // Создаем кнопки для каждой модели, по 2 в ряд
+    const buttons: ReturnType<typeof Markup.button.callback>[][] = []
     for (let i = 0; i < models.length; i += 2) {
+      const row: ReturnType<typeof Markup.button.callback>[] = []
       if (models[i]) {
-        keyboard.text(models[i], `select_model_${models[i]}`)
+        row.push(Markup.button.callback(models[i], `select_model_${models[i]}`))
       }
       if (models[i + 1]) {
-        keyboard.text(models[i + 1], `select_model_${models[i + 1]}`)
+        row.push(Markup.button.callback(models[i + 1], `select_model_${models[i + 1]}`))
       }
-      keyboard.row()
+      buttons.push(row)
     }
 
-    await ctx.reply(
-      isRu
-        ? "🧠 Выберите модель ИИ\n\nМодель ИИ — это как мозг компьютера, который помогает ему понимать и выполнять задачи. Выберите одну из доступных моделей, чтобы бот мог лучше выполнять ваши запросы. Доступные модели:"
-        : "🧠 Select AI Model\n\nAn AI model is like a computer's brain that helps it understand and perform tasks. Choose one of the available models so the bot can better handle your requests. Available models:",
-      { reply_markup: keyboard },
-    )
+    // Добавляем кнопку для выбора модели ИИ
+    buttons.unshift([Markup.button.callback(isRu ? "🧠 Выберите модель ИИ" : "🧠 Select AI Model", "select_model")])
+
+    const keyboard = Markup.inlineKeyboard(buttons)
+
+    await ctx.reply("Выберите модель:", keyboard)
+
     return
   } catch (error) {
     console.error("Error creating model selection menu:", error)

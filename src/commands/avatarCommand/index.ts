@@ -1,8 +1,7 @@
 import { updateUserSoul } from "../../core/supabase"
-import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
-export async function avatarCommand(conversation: Conversation<MyContext>, ctx: MyContext) {
+export async function avatarCommand(ctx: MyContext) {
   const lang = ctx.from?.language_code || "en"
   const messageIds: number[] = []
 
@@ -10,7 +9,7 @@ export async function avatarCommand(conversation: Conversation<MyContext>, ctx: 
 
   //   await ctx.reply(ctx.i18n.t("ask_work"));
   const nameMessage = await ctx.reply(lang === "ru" ? "👋 Привет, как называется ваша компания?" : "👋 Hello, what is your company name?")
-  const company = (await conversation.wait()).message
+  const company = (await ctx.wait()).message
   if (!company || !company.text) {
     await ctx.reply(lang === "ru" ? "❌ Ошибка: вы не предоставили все необходимые данные" : "❌ Error: you did not provide all the required information")
     return
@@ -19,7 +18,7 @@ export async function avatarCommand(conversation: Conversation<MyContext>, ctx: 
 
   //   await ctx.reply(ctx.i18n.t("ask_position"));
   const positionMessage = await ctx.reply(lang === "ru" ? "💼 Какая у вас должность?" : "💼 What is your position?")
-  const position = (await conversation.wait()).message
+  const position = (await ctx.wait()).message
   if (!position || !position.text) {
     await ctx.reply(lang === "ru" ? "❌ Ошибка: вы не предоставили все необходимые данные" : "❌ Error: you did not provide all the required information")
     return
@@ -28,7 +27,7 @@ export async function avatarCommand(conversation: Conversation<MyContext>, ctx: 
 
   //   await ctx.reply(ctx.i18n.t("ask_skills"));
   const skillsMessage = await ctx.reply(lang === "ru" ? "🛠️ Какие у тебя навыки?" : "🛠️ What are your skills?")
-  const designation = (await conversation.wait()).message
+  const designation = (await ctx.wait()).message
   if (!designation || !designation.text) {
     await ctx.reply(lang === "ru" ? "❌ Ошибка: вы не предоставили все необходимые данные" : "❌ Error: you did not provide all the required information")
     return

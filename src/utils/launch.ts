@@ -1,16 +1,16 @@
-import { Bot } from "grammy"
-import { MyContextWithSession } from "./types"
+import { Telegraf } from "telegraf"
+import { MyContextWithSession } from "../interfaces"
 
-const production = async (bot: Bot<MyContextWithSession>): Promise<void> => {
+const production = async (bot: Telegraf<MyContextWithSession>): Promise<void> => {
   try {
-    await bot.api.deleteWebhook({ drop_pending_updates: true })
+    await bot.telegram.deleteWebhook({ drop_pending_updates: true })
     console.log("Old webhook deleted")
 
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
     const webhookUrl = `${process.env.VERCEL_URL}/api/index`
 
-    const success = await bot.api.setWebhook(webhookUrl)
+    const success = await bot.telegram.setWebhook(webhookUrl)
 
     if (success) {
       console.log(`Webhook successfully set to ${webhookUrl}`)
@@ -25,19 +25,14 @@ const production = async (bot: Bot<MyContextWithSession>): Promise<void> => {
   }
 }
 
-const development = async (bot: Bot<MyContextWithSession>): Promise<void> => {
+const development = async (bot: Telegraf<MyContextWithSession>): Promise<void> => {
   try {
-    await bot.api.deleteWebhook({ drop_pending_updates: true })
+    await bot.telegram.deleteWebhook({ drop_pending_updates: true })
     console.log("[SERVER] Webhook deleted, starting polling...")
 
     await new Promise((resolve) => setTimeout(resolve, 1000))
 
-    await bot.start({
-      drop_pending_updates: true,
-      onStart: () => {
-        console.log("[SERVER] Bot started polling")
-      },
-    })
+    await bot.launch()
   } catch (e) {
     console.error("Error in development setup:", e)
     throw e

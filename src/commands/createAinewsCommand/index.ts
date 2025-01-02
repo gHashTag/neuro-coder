@@ -1,8 +1,7 @@
 import { getAinews } from "../../helpers"
-import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
-const createAinewsCommand = async (conversation: Conversation<MyContext>, ctx: MyContext): Promise<void> => {
+const createAinewsCommand = async (ctx: MyContext): Promise<void> => {
   try {
     const isRu = ctx.from?.language_code === "ru"
     await ctx.replyWithChatAction("typing")
@@ -12,10 +11,10 @@ const createAinewsCommand = async (conversation: Conversation<MyContext>, ctx: M
     // Проверяем, есть ли информация о пользователе
     if (!ctx.from) throw new Error("User not found")
 
-    const { message } = await conversation.wait()
+    const msg = await ctx.wait()
 
     const caption = await getAinews({
-      prompt: message?.text || "",
+      prompt: msg.message?.text || "",
     })
     await ctx.reply(caption)
 

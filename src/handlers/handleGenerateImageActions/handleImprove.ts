@@ -1,6 +1,6 @@
 import { upgradePrompt } from "../../helpers"
 import { getPrompt } from "../../core/supabase/ai"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { supabase } from "../../core/supabase"
 
 export async function handleImprove(ctx: MyContext, data: string, isRu: boolean) {

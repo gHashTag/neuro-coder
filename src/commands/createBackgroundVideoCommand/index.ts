@@ -1,10 +1,9 @@
-import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { createClient } from "pexels"
 import axios from "axios"
 import fs from "fs"
 import path from "path"
-import { InputFile } from "grammy"
+
 import ffmpeg from "fluent-ffmpeg"
 import ffmpegInstaller from "@ffmpeg-installer/ffmpeg"
 import ffprobeInstaller from "@ffprobe-installer/ffprobe"
@@ -121,7 +120,7 @@ const resizeVideo = async (inputPath: string, outputPath: string): Promise<void>
   })
 }
 
-export async function createBackgroundVideoCommand(conversation: Conversation<MyContext>, ctx: MyContext) {
+export async function createBackgroundVideoCommand(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
   await ctx.replyWithChatAction("typing")
 
@@ -131,7 +130,7 @@ export async function createBackgroundVideoCommand(conversation: Conversation<My
         force_reply: true,
       },
     })
-    const query = (await conversation.wait()).message?.text
+    const query = (await ctx.wait()).message?.text
 
     if (!query) {
       await ctx.reply(isRu ? "Ошибка: Поисковый запрос не предоставлен" : "Error: Search query not provided")
@@ -168,7 +167,7 @@ export async function createBackgroundVideoCommand(conversation: Conversation<My
         await resizeVideo(tempFile, bgVideoPath)
 
         // Отправляем видео
-        const video = new InputFile(bgVideoPath)
+        const video = fs.createReadStream(bgVideoPath)
         console.log(video, "video")
         await ctx.replyWithVideo(video)
 

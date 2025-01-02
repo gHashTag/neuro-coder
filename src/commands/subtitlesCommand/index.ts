@@ -1,20 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Conversation } from "@grammyjs/conversations"
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 import { createRender } from "../../helpers"
-import { InputFile } from "grammy"
+
 import axios from "axios"
 import fs from "fs"
 import path from "path"
 import os from "os"
+import { isRussian } from "../../utils/language"
 
-export async function subtitlesCommand(conversation: Conversation<MyContext>, ctx: MyContext) {
-  const isRu = ctx.from?.language_code === "ru"
+export async function subtitlesCommand(ctx: MyContext) {
+  const isRu = isRussian(ctx)
 
   try {
     await ctx.reply(isRu ? "Отправьте URL видео для создания субтитров" : "Send video URL for subtitles creation", { reply_markup: { force_reply: true } })
 
-    const videoUrlMsg = await conversation.wait()
+    const videoUrlMsg = await ctx.wait()
     const videoUrl = videoUrlMsg.message?.text
 
     if (!videoUrl) {
@@ -58,7 +58,7 @@ export async function subtitlesCommand(conversation: Conversation<MyContext>, ct
 
     // Отправляем видео в чат
     await ctx.replyWithChatAction("upload_video")
-    await ctx.replyWithVideo(new InputFile(tempFilePath), {
+    await ctx.replyWithVideo(tempFilePath, {
       caption: isRu
         ? `✅ Видео с субтитрами готово!\nДлительность: ${result[0].duration} сек\nРазмер: ${
             Math.round((result[0].fileSize / 1024 / 1024) * 100) / 100

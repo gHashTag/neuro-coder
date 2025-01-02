@@ -1,10 +1,10 @@
 import { getReferalsCount } from "../../core/supabase"
-import { MyContext, MyConversation } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
-export async function inviteCommand(conversation: MyConversation, ctx: MyContext) {
+export async function inviteCommand(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
 
-  const botUsername = ctx.me.username
+  const botUsername = ctx.botInfo.username
   const telegram_id = ctx.from?.id?.toString() || ""
 
   const inviteCount = await getReferalsCount(telegram_id)

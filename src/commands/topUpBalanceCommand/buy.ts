@@ -1,4 +1,4 @@
-import { MyContext } from "../../utils/types"
+import { MyContext } from "../../interfaces"
 
 export async function buy(ctx: MyContext) {
   try {
