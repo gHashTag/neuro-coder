@@ -4,7 +4,7 @@ import { MyContext } from "../../interfaces"
 import { getAvailableModels } from "./getAvailableModels"
 
 // Функция для получения доступных моделей
-const selectModelCommand = async (ctx: MyContext) => {
+export async function selectModelCommand(ctx: MyContext) {
   const isRu = ctx.from?.language_code === "ru"
 
   try {
@@ -36,5 +36,3 @@ const selectModelCommand = async (ctx: MyContext) => {
     await ctx.reply(isRu ? "❌ Ошибка при получении списка моделей" : "❌ Error fetching models list")
   }
 }
-
-export { selectModelCommand }

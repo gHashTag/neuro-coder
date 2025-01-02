@@ -37,6 +37,7 @@ import { imageModelMenu } from "./menu/imageModelMenu"
 
 import { setupLevelHandlers } from "handlers/setupLevelHandlers"
 import { menuCommand } from "commands/menuCommand"
+import { isRussian } from "utils/language"
 
 export const myComposer = new Composer<MyContext>()
 
@@ -243,7 +244,7 @@ export function registerCommands(bot: Telegraf<MyContext>) {
 
   myComposer.hears(["🌟 Выбор модели ИИ", "🌟 Select AI Model"], async (ctx) => {
     console.log("CASE: Выбор модели ИИ")
-    await ctx.scene.enter("selectModelCommand")
+    await selectModelCommand(ctx)
   })
 
   myComposer.hears(["🎨 Обучить FLUX", "🎨 Train FLUX"], async (ctx) => {
@@ -309,6 +310,11 @@ export function registerCommands(bot: Telegraf<MyContext>) {
   myComposer.hears(["🤑 Баланс", "🤑 Balance"], async (ctx) => {
     console.log("CASE: Баланс")
     await balanceCommand(ctx)
+  })
+
+  myComposer.hears(["🏠 Главное меню", "🏠 Main menu"], async (ctx) => {
+    console.log("CASE: Главное меню")
+    await menuCommand(ctx)
   })
 
   myComposer.hears(["Flux 1.1Pro Ultra", "SDXL", "SD 3.5 Turbo", "Recraft v3", "Photon"], async (ctx) => {

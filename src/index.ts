@@ -1,7 +1,7 @@
 require("dotenv").config()
 import { development, production } from "./utils/launch"
 
-import { handleTextMessage } from "./handlers"
+import { handleModelCallback, handleTextMessage } from "./handlers"
 import bot from "./core/bot"
 
 import { setBotCommands } from "./setCommands"
@@ -30,6 +30,14 @@ bot.on("pre_checkout_query", async (ctx) => {
 
 // bot.on("successful_payment", handleSuccessfulPayment)
 bot.action("callback_query", (ctx: MyContext) => handleCallback(ctx))
+
+bot.action(/^select_model_/, async (ctx) => {
+  console.log("CASE: select_model_", ctx.match)
+  const model = ctx.match.input.replace("select_model_", "")
+  console.log("Selected model:", model)
+  await handleModelCallback(ctx, model)
+})
+
 bot.on("text", (ctx: MyTextMessageContext) => handleTextMessage(ctx))
 
 bot.catch((err) => {

@@ -38,13 +38,6 @@ export async function handleCallbackQuery(ctx: MyContext, data: string, isRu: bo
         await topUpBalanceCommand(ctx)
         break
 
-      case data.startsWith("select_model_"):
-        console.log("CASE: select_model_")
-        const model = data.replace("select_model_", "")
-        console.log("model", model)
-        await handleModelCallback(model, ctx)
-        break
-
       case data.startsWith("neuro_"):
         console.log("CASE: neuro_")
         await handleNeuroActions(ctx, data, isRu)

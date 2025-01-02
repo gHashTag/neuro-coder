@@ -6,10 +6,9 @@ export async function startMenu(ctx: MyContext, isRu: boolean) {
     await ctx.reply(
       isRu ? "Выберите действие в меню:" : "Choose an action in the menu:",
       Markup.keyboard([
-        [Markup.button.callback(isRu ? "🎮 Начать обучение" : "🎮 Start learning", "level_0")],
-        [Markup.button.callback(isRu ? "💎 Пополнить баланс" : "💎 Top up balance", "top_up_balance")],
-        [Markup.button.callback(isRu ? "🤑 Баланс" : "🤑 Balance", "balance")],
-      ]),
+        [Markup.button.text(isRu ? "🎮 Начать обучение" : "🎮 Start learning"), Markup.button.text(isRu ? "🏠 Главное меню" : "🏠 Main menu")],
+        [Markup.button.text(isRu ? "💎 Пополнить баланс" : "💎 Top up balance"), Markup.button.text(isRu ? "🤑 Баланс" : "🤑 Balance")],
+      ]).resize(),
     )
   } catch (error) {
     console.error("Error sending inline keyboard:", error)

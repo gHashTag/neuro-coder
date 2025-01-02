@@ -2,7 +2,7 @@
 import { MyContext } from "../../interfaces"
 import { setModel } from "../../core/supabase/ai"
 
-export async function handleModelCallback(model: string, ctx: MyContext) {
+export async function handleModelCallback(ctx: MyContext, model: string) {
   try {
     if (!ctx.from) {
       console.log("ctx.from is undefined")
