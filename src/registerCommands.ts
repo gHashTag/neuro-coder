@@ -28,18 +28,19 @@ import { neuroPhotoCommand } from "./commands/neuroPhotoCommand"
 import { emailCommand } from "./commands/emailCommand"
 import { priceCommand } from "./commands/priceCommand"
 import { inviteCommand } from "./commands/inviteCommand"
-import { createMainMenu } from "menu"
+import { mainMenu } from "./menu/mainMenu"
 import { bot } from "./index"
 
 import { chatMembers } from "@grammyjs/chat-members"
 import { createAinewsCommand } from "./commands/createAinewsCommand"
 import { subscriptionMiddleware } from "./middleware/subscription"
 import { freeStorage } from "@grammyjs/storage-free"
+import { showModelMenu } from "./menu/imageModelMenu"
 
 export const composer = new Composer<MyContext>()
 
 function initial(): SessionData {
-  return { melimi00: { videos: [], texts: [] }, text: "" }
+  return { selectedModel: "", text: "" }
 }
 
 bot.use(session({ initial, storage: freeStorage<SessionData>(bot.token) }))
@@ -80,8 +81,8 @@ export function registerCommands() {
 
   composer.command("menu", async (ctx) => {
     const isRu = ctx.from?.language_code === "ru"
-    const mainMenu = createMainMenu(isRu)
-    await ctx.reply(isRu ? "🏠 Главное меню\nВыберите нужный раздел 👇" : "🏠 Main menu\nChoose the section 👇", { reply_markup: mainMenu })
+    const menu = mainMenu(isRu)
+    await ctx.reply(isRu ? "🏠 Главное меню\nВыберите нужный раздел 👇" : "🏠 Main menu\nChoose the section 👇", { reply_markup: menu })
   })
 
   composer.command("start", async (ctx) => {
@@ -188,51 +189,89 @@ export function registerCommands() {
     await ctx.conversation.enter("selectModelCommand")
   })
 
-  composer.hears(["🌟 Создать аватар", "🌟 Create Avatar"], async (ctx) => {
+  composer.hears(["🆔 Создать аватар", "🆔 Create Avatar"], async (ctx) => {
+    console.log("CASE: Создать аватар")
     await ctx.conversation.enter("avatarCommand")
   })
 
   composer.hears(["🌟 Выбор модели ИИ", "🌟 Select AI Model"], async (ctx) => {
+    console.log("CASE: Выбор модели ИИ")
     await ctx.conversation.enter("selectModelCommand")
   })
 
   composer.hears(["🎨 Обучить FLUX", "🎨 Train FLUX"], async (ctx) => {
+    console.log("CASE: Обучить FLUX")
     await ctx.conversation.enter("trainFluxModelCommand")
   })
 
   composer.hears(["📸 Нейрофото", "📸 NeuroPhoto"], async (ctx) => {
+    console.log("CASE: Нейрофото")
     await ctx.conversation.enter("neuroPhotoCommand")
   })
 
   composer.hears(["🎥 Видео из текста", "🎥 Text to Video"], async (ctx) => {
+    console.log("CASE: Видео из текста")
     await ctx.conversation.enter("textToVideoCommand")
   })
 
   composer.hears(["🎥 Изображение в видео", "🎥 Image to Video"], async (ctx) => {
+    console.log("CASE: Изображение в видео")
     await ctx.conversation.enter("imageToVideoCommand")
   })
 
   composer.hears(["🔊 Текст в речь", "🔊 Text to Speech"], async (ctx) => {
+    console.log("CASE: Текст в речь")
     await ctx.conversation.enter("textToSpeechCommand")
   })
 
   composer.hears(["🎤 Голос для аватара", "🎤 Voice for Avatar"], async (ctx) => {
+    console.log("CASE: Голос для аватара")
     await ctx.conversation.enter("voiceCommand")
   })
 
   composer.hears(["🖼️ Изображение из текста", "🖼️ Text to Image"], async (ctx) => {
-    await ctx.conversation.enter("textToImageCommand")
+    console.log("CASE: Изображение из текста")
+    await showModelMenu(ctx)
+    return
   })
 
   composer.hears(["🔍 Описание из изображения", "🔍 Image to Prompt"], async (ctx) => {
+    console.log("CASE: Описание из изображения")
     await ctx.conversation.enter("imageToPromptCommand")
+    return
   })
 
   composer.hears(["👥 Пригласить друга", "👥 Invite a friend"], async (ctx) => {
+    console.log("CASE: Пригласить друга")
     await ctx.conversation.enter("inviteCommand")
   })
 
   composer.hears(["❓ Помощь", "❓ Help"], async (ctx) => {
+    console.log("CASE: Помощь")
     await ctx.conversation.enter("neuroQuestCommand")
+  })
+
+  composer.hears(["Flux 1.1Pro Ultra", "SDXL", "SD 3.5 Turbo", "Recraft v3", "Photon"], async (ctx) => {
+    console.log("CASE: Flux 1.1Pro Ultra", "SDXL", "SD 3.5 Turbo", "Recraft v3", "Photon")
+    if (!ctx.message) {
+      throw new Error("No message")
+    }
+    const isRu = ctx.from?.language_code === "ru"
+    const model = ctx.message.text
+
+    ctx.session.selectedModel = model
+
+    // Обработка выбора модели
+    await ctx.reply(isRu ? `Вы выбрали модель: ${model}` : `You selected model: ${model}`)
+    // Здесь можно добавить логику для работы с выбранной моделью
+    await ctx.conversation.enter("textToImageCommand")
+    return
+  })
+
+  composer.hears(["Вернуться в главное меню", "Return to main menu"], async (ctx) => {
+    const isRu = ctx.from?.language_code === "ru"
+    await ctx.reply(isRu ? "Возвращение в главное меню" : "Returning to main menu", {
+      reply_markup: mainMenu(isRu),
+    })
   })
 }

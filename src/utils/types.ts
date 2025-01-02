@@ -17,11 +17,8 @@ export interface Step {
 }
 
 export interface SessionData {
-  melimi00: {
-    videos: string[]
-    texts: string[]
-  }
-  text: string
+  selectedModel?: string
+  text?: string
 }
 
 // Определяем тип контекста

@@ -1,6 +1,6 @@
 import { Keyboard } from "grammy"
 
-export function createMainMenu(isRu: boolean) {
+export function mainMenu(isRu: boolean) {
   return new Keyboard()
     .text(isRu ? "🆔 Создать аватар" : "🆔 Create Avatar")
     .text(isRu ? "🌟 Выбор модели ИИ" : "🌟 Select AI Model")

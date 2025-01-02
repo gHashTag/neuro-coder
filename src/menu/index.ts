@@ -1,1 +1,2 @@
-export * from "./main-menu"
+export * from "./mainMenu"
+export * from "./imageModelMenu"
