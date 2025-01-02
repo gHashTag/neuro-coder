@@ -7,7 +7,7 @@ import { neuroQuestCommand } from "./commands/neuroQuestCommand"
 import { topUpBalanceCommand } from "./commands/topUpBalanceCommand"
 import { balanceCommand } from "./commands/balanceCommand"
 
-import { avatarWizard, emailWizard, imageToPromptWizard, improvePromptWizard, textPromptToImageWizard } from "./scenes"
+import { avatarWizard, emailWizard, imageToPromptWizard, improvePromptWizard, sizeWizard, textPromptToImageWizard } from "./scenes"
 // import { subscriptionMiddleware } from "./middleware/subscription"
 
 import { setupLevelHandlers } from "handlers/setupLevelHandlers"
@@ -35,6 +35,7 @@ export const stage = new Scenes.Stage<MyContext>([
   textPromptToImageWizard,
   menuScene,
   improvePromptWizard,
+  sizeWizard,
 ])
 
 export function registerCommands(bot: Telegraf<MyContext>) {
@@ -43,6 +44,7 @@ export function registerCommands(bot: Telegraf<MyContext>) {
       defaultSession: (): MySession => ({
         selectedModel: "",
         prompt: "",
+        selectedSize: "9:16",
       }),
     }),
   )

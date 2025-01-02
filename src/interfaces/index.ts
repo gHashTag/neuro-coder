@@ -22,15 +22,17 @@ export interface GenerationResult {
 export interface SessionData {
   selectedModel: string
   text: string
+  selectedSize: string
 }
 
 export interface MyWizardSession extends Scenes.WizardSessionData {
-  data: string // Ensure this is included
+  data: string
 }
 
 export interface MySession extends Scenes.WizardSession<MyWizardSession> {
   selectedModel: string
   prompt: string
+  selectedSize: string
 }
 
 export interface MyContext extends Context {

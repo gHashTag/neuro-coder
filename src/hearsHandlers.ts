@@ -8,6 +8,7 @@ import { balanceCommand } from "./commands/balanceCommand"
 import { menuCommand } from "./commands/menuCommand"
 import { generateImage } from "services/generateReplicateImage"
 import { isRussian } from "utils/language"
+import { setAspectRatio } from "core/supabase/ai"
 
 const myComposer = new Composer<MyContext>()
 
@@ -117,6 +118,17 @@ myComposer.hears(["1️⃣", "2️⃣", "3️⃣", "4️⃣"], async (ctx) => {
 myComposer.hears(["⬆️ Улучшить промпт", "⬆️ Improve prompt"], async (ctx) => {
   console.log("CASE: Улучшить промпт")
   await ctx.scene.enter("improvePromptWizard")
+})
+
+myComposer.hears(["📐 Изменить размер", "📐 Change size"], async (ctx) => {
+  console.log("CASE: Изменить размер")
+  await ctx.scene.enter("sizeWizard")
+})
+
+myComposer.hears(["21:9", "16:9", "3:2", "4:3", "5:4", "1:1", "4:5", "3:4", "2:3", "9:16", "9:21"], async (ctx) => {
+  console.log("CASE: Изменить размер")
+  ctx.session.selectedSize = ctx.message.text
+  await setAspectRatio(ctx.from.id, ctx.session.selectedSize)
 })
 
 myComposer.hears(["Flux 1.1Pro Ultra", "SDXL", "SD 3.5 Turbo", "Recraft v3", "Photon"], async (ctx) => {
