@@ -2,7 +2,7 @@ import { Composer } from "telegraf"
 import { MyContext } from "./interfaces"
 import { selectModelCommand } from "./commands/selectModelCommand"
 import { imageModelMenu } from "./menu/imageModelMenu"
-import { handleCallbackQuery } from "./handlers/handleCallbackQuery"
+
 import { topUpBalanceCommand } from "./commands/topUpBalanceCommand"
 import { balanceCommand } from "./commands/balanceCommand"
 import { menuCommand } from "./commands/menuCommand"
@@ -10,6 +10,8 @@ import { generateImage } from "services/generateReplicateImage"
 import { isRussian } from "utils/language"
 import { setAspectRatio } from "core/supabase/ai"
 import { generateNeuroImage } from "services/generateNeuroImage"
+
+import { handleLevelQuest } from "handlers/handleLevelQuest"
 
 const myComposer = new Composer<MyContext>()
 
@@ -75,7 +77,7 @@ myComposer.hears(["❓ Помощь", "❓ Help"], async (ctx) => {
 
 myComposer.hears(["🎮 Начать обучение", "🎮 Start learning"], async (ctx) => {
   console.log("CASE: Начать обучение")
-  await handleCallbackQuery(ctx, "level_0", true)
+  await handleLevelQuest(ctx, "level_0")
 })
 
 myComposer.hears(["💎 Пополнить баланс", "💎 Top up balance"], async (ctx) => {
@@ -128,8 +130,17 @@ myComposer.hears(["📐 Изменить размер", "📐 Change size"], asy
 
 myComposer.hears(["21:9", "16:9", "3:2", "4:3", "5:4", "1:1", "4:5", "3:4", "2:3", "9:16", "9:21"], async (ctx) => {
   console.log("CASE: Изменить размер")
-  ctx.session.selectedSize = ctx.message.text
-  await setAspectRatio(ctx.from.id, ctx.session.selectedSize)
+  const size = ctx.message.text
+  ctx.session.selectedSize = size
+  await setAspectRatio(ctx.from.id, size)
+  const isRu = isRussian(ctx)
+  await ctx.reply(isRu ? `✅ Вы выбрали размер: ${size}` : `✅ You selected size: ${size}`)
+  const mode = ctx.session.mode
+  if (mode === "neuro_photo") {
+    await ctx.scene.enter("neuroPhotoWizard")
+  } else {
+    await ctx.scene.enter("textPromptToImageWizard")
+  }
 })
 
 myComposer.hears(["Flux 1.1Pro Ultra", "SDXL", "SD 3.5 Turbo", "Recraft v3", "Photon"], async (ctx) => {

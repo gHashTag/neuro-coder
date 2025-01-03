@@ -1,4 +1,3 @@
-import { handleCallbackQuery } from "../../handlers/handleCallbackQuery"
 import { isRussian } from "../../utils/language"
 import { MyContext } from "../../interfaces"
 
@@ -18,9 +17,6 @@ export async function handleCallback(ctx: MyContext) {
         throw new Error("No callback query data")
       }
 
-      // Ваша логика обработки callback-запроса
-      // Например, вызов функции handleCallbackQuery
-      await handleCallbackQuery(ctx, data, isRu)
       return
     } else {
       throw new Error("No callback query data")
