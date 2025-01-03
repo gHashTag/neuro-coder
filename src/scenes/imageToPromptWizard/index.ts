@@ -1,6 +1,6 @@
 import { Scenes } from "telegraf"
 import { MyContext } from "../../interfaces"
-import { getUserBalance, imageToPromptCost, sendBalanceMessage } from "../../helpers/telegramStars/telegramStars"
+import { getUserBalance, imageToPromptCost, sendBalanceMessage } from "../../helpers/telegramStars"
 import { generateImageToPrompt } from "../../services/generateImageToPrompt"
 
 if (!process.env.HUGGINGFACE_TOKEN) {
@@ -41,6 +41,7 @@ export const imageToPromptWizard = new Scenes.WizardScene<MyContext>(
     const photoSize = imageMsg.photo[imageMsg.photo.length - 1]
     console.log("Getting file info for photo:", photoSize.file_id)
     const file = await ctx.telegram.getFile(photoSize.file_id)
+    ctx.session.mode = "image_to_prompt"
     const imageUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`
     if (ctx.from) {
       await generateImageToPrompt(imageUrl, ctx.from.id, ctx, isRu)

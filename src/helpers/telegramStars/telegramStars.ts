@@ -1,20 +1,30 @@
 import { supabase } from "../../core/supabase"
 import { MyContext } from "../../interfaces"
 
-const starCost = 0.016
+export async function refundUser(ctx: MyContext, paymentAmount: number) {
+  if (!ctx.from) {
+    throw new Error("User not found")
+  }
+  const balance = await getUserBalance(ctx.from.id)
+  console.log("balance", balance)
+  // Возвращаем средства пользователю
+  const newBalance = balance + paymentAmount
+  console.log("newBalance", newBalance)
+  await updateUserBalance(ctx.from.id, newBalance)
 
-const trainingCostInStars = 20 / starCost
-const promptGenerationCost = 0.048 / starCost
-const textToImageGenerationCost = 0.12 / starCost
-const imageNeuroGenerationCost = 0.12 / starCost
-const textToVideoGenerationCost = 0.99 / starCost
-const textToVideoCost = 0.99 / starCost
-const speechGenerationCost = 0.12 / starCost
-const textToSpeechCost = 0.12 / starCost
-const imageToVideoCost = 0.99 / starCost
-const imageToVideoGenerationCost = 0.99 / starCost
-const imageToPromptCost = 0.03 / starCost
-const voiceConversationCost = 0.99 / starCost
+  // Отправляем сообщение пользователю
+  const isRu = ctx.from.language_code === "ru"
+  await ctx.reply(
+    isRu
+      ? `Возвращено ${paymentAmount.toFixed(2)} ⭐️ на ваш счет.\nВаш баланс: ${newBalance.toFixed(2)} ⭐️`
+      : `${paymentAmount.toFixed(2)} ⭐️ have been refunded to your account.\nYour balance: ${newBalance.toFixed(2)} ⭐️`,
+    {
+      reply_markup: {
+        remove_keyboard: true,
+      },
+    },
+  )
+}
 
 async function incrementBalance({ telegram_id, amount }: { telegram_id: string; amount: number }) {
   const { data, error } = await supabase.from("users").select("balance").eq("telegram_id", telegram_id).single()
@@ -82,24 +92,4 @@ const sendBalanceMessage = async (newBalance: number, cost: number, ctx: MyConte
   )
 }
 
-export {
-  incrementBalance,
-  starCost,
-  getUserBalance,
-  updateUserBalance,
-  calculateStars,
-  trainingCostInStars,
-  sendInsufficientStarsMessage,
-  textToImageGenerationCost,
-  sendBalanceMessage,
-  textToVideoCost,
-  imageToVideoCost,
-  textToSpeechCost,
-  speechGenerationCost,
-  promptGenerationCost,
-  imageNeuroGenerationCost,
-  imageToPromptCost,
-  textToVideoGenerationCost,
-  imageToVideoGenerationCost,
-  voiceConversationCost,
-}
+export { incrementBalance, getUserBalance, updateUserBalance, calculateStars, sendInsufficientStarsMessage, sendBalanceMessage }

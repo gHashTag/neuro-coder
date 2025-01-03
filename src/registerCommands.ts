@@ -16,6 +16,8 @@ import {
   improvePromptWizard,
   sizeWizard,
   textPromptToImageWizard,
+  imageToVideoWizard,
+  cancelPredictionsWizard,
 } from "./scenes"
 // import { subscriptionMiddleware } from "./middleware/subscription"
 
@@ -47,6 +49,8 @@ export const stage = new Scenes.Stage<MyContext>([
   sizeWizard,
   neuroPhotoWizard,
   textToVideoWizard,
+  imageToVideoWizard,
+  cancelPredictionsWizard,
 ])
 
 export function registerCommands(bot: Telegraf<MyContext>) {
@@ -66,6 +70,8 @@ export function registerCommands(bot: Telegraf<MyContext>) {
         mode: "generate_image",
         attempts: 0,
         videoModel: "",
+        imageUrl: "",
+        paymentAmount: 0,
       }),
     }),
   )

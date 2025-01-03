@@ -4,6 +4,16 @@ import axios, { isAxiosError } from "axios"
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB - максимальный размер для Telegram
 
+export const retry = async <T>(fn: () => Promise<T>, attempts = 3, delay = 1000): Promise<T> => {
+  try {
+    return await fn()
+  } catch (error) {
+    if (attempts <= 1) throw error
+    await new Promise((resolve) => setTimeout(resolve, delay))
+    return retry(fn, attempts - 1, delay * 2)
+  }
+}
+
 async function downloadFile(url: string): Promise<Buffer> {
   try {
     console.log("Downloading from URL:", url)
@@ -53,7 +63,7 @@ export const generateVideo = async (prompt: string, model: string, userId: strin
     console.log("Starting video generation with model:", model)
     console.log("Prompt:", prompt)
 
-    let output: any
+    let output: unknown
 
     if (model === "haiper") {
       const input = {

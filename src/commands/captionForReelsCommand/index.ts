@@ -1,5 +1,5 @@
 import { MyContext } from "../../interfaces"
-import { getCaptionForNews } from "../../helpers"
+// import { getCaptionForNews } from "../../helpers"
 
 const captionForReelsCommand = async (ctx: MyContext): Promise<void> => {
   try {
@@ -16,12 +16,12 @@ const captionForReelsCommand = async (ctx: MyContext): Promise<void> => {
     // Проверяем, есть ли информация о пользователе
     if (!ctx.from) throw new Error("User not found")
 
-    const { message } = await ctx.wait()
+    // const { message } = await ctx.wait()
 
-    const caption = await getCaptionForNews({
-      prompt: message?.text || "",
-    })
-    await ctx.reply(caption)
+    // const caption = await getCaptionForNews({
+    //   prompt: message?.text || "",
+    // })
+    // await ctx.reply(caption)
 
     // const stepsData: Step[] = await Promise.all(
     //   meditationSteps.activities[0].steps.map(async (step, index) => ({

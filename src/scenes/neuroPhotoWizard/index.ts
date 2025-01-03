@@ -1,7 +1,7 @@
 import { Scenes } from "telegraf"
 import { ModelUrl, MyContext, UserModel } from "../../interfaces"
 
-import { getUserBalance, imageNeuroGenerationCost, sendInsufficientStarsMessage, sendBalanceMessage } from "../../helpers/telegramStars/telegramStars"
+import { getUserBalance, imageNeuroGenerationCost, sendInsufficientStarsMessage, sendBalanceMessage } from "../../helpers/telegramStars"
 import { generateNeuroImage } from "../../services/generateNeuroImage"
 import { getLatestUserModel } from "../../core/supabase"
 

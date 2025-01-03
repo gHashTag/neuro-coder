@@ -15,6 +15,7 @@ export const avatarWizard = new Scenes.WizardScene<MyContext>(
     await ctx.reply(isRu ? "👋 Привет, как называется ваша компания?" : "👋 Hello, what is your company name?")
     return ctx.wizard.next()
   },
+
   async (ctx) => {
     if (ctx.message && "text" in ctx.message) {
       ;(ctx.wizard.state as WizardSessionData).company = ctx.message.text

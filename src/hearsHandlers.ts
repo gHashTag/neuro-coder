@@ -42,7 +42,7 @@ myComposer.hears(["🎥 Видео из текста", "🎥 Text to Video"], as
 
 myComposer.hears(["🎥 Изображение в видео", "🎥 Image to Video"], async (ctx) => {
   console.log("CASE: Изображение в видео")
-  await ctx.scene.enter("imageToVideoCommand")
+  await ctx.scene.enter("imageToVideoWizard")
 })
 
 myComposer.hears(["🔊 Текст в речь", "🔊 Text to Speech"], async (ctx) => {
@@ -143,6 +143,17 @@ myComposer.hears(["21:9", "16:9", "3:2", "4:3", "5:4", "1:1", "4:5", "3:4", "2:3
   }
 })
 
+myComposer.hears(["🎥 Сгенерировать новое видео", "🎥 Generate new video"], async (ctx) => {
+  console.log("CASE: Сгенерировать новое видео")
+  if (ctx.session.mode === "image_to_video") {
+    await ctx.scene.enter("imageToVideoWizard")
+  } else if (ctx.session.mode === "text_to_video") {
+    await ctx.scene.enter("textToVideoWizard")
+  } else {
+    await ctx.reply("Вы не можете сгенерировать новое видео, так как не выбрали изображение")
+  }
+})
+
 myComposer.hears(["Flux 1.1Pro Ultra", "SDXL", "SD 3.5 Turbo", "Recraft v3", "Photon"], async (ctx) => {
   console.log("CASE: Flux 1.1Pro Ultra", "SDXL", "SD 3.5 Turbo", "Recraft v3", "Photon")
   if (!ctx.message) {
@@ -155,6 +166,11 @@ myComposer.hears(["Flux 1.1Pro Ultra", "SDXL", "SD 3.5 Turbo", "Recraft v3", "Ph
 
   await ctx.reply(isRu ? `Вы выбрали модель: ${model}` : `You selected model: ${model}`)
   await ctx.scene.enter("textPromptToImageWizard")
+})
+
+myComposer.hears(["Отмена", "Cancel"], async (ctx) => {
+  console.log("CASE: Отмена")
+  await ctx.scene.enter("cancelPredictionsWizard")
 })
 
 export default myComposer

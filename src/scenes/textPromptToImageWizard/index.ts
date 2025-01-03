@@ -1,6 +1,6 @@
 import { Scenes, Markup } from "telegraf"
 import { MyContext } from "../../interfaces"
-import { getUserBalance, sendBalanceMessage, sendInsufficientStarsMessage, textToImageGenerationCost } from "../../helpers/telegramStars/telegramStars"
+import { getUserBalance, sendBalanceMessage, sendInsufficientStarsMessage, textToImageGenerationCost } from "../../helpers/telegramStars"
 import { isRussian } from "../../utils/language"
 import { generateImage } from "services/generateReplicateImage"
 
@@ -14,6 +14,7 @@ export const textPromptToImageWizard = new Scenes.WizardScene<MyContext>(
       await ctx.reply(isRu ? "❌ Произошла ошибка" : "❌ An error occurred")
       return ctx.scene.leave()
     }
+    ctx.session.mode = "image_to_prompt"
 
     const currentBalance = await getUserBalance(ctx.from.id)
     const price = textToImageGenerationCost

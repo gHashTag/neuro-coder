@@ -1,50 +1,12 @@
 import axios, { isAxiosError } from "axios"
 import { isDev } from "../helpers"
-
-import { Markup } from "telegraf"
-
-export type VideoModel = "minimax" | "haiper" | "ray" | "i2vgen"
-
-interface ImageToVideoResponse {
-  success: boolean
-  videoUrl?: string
-  message?: string
-  prompt_id?: number
-}
-
-interface VideoModelConfig {
-  name: VideoModel
-  title: string
-  description: string
-}
-
-export const VIDEO_MODELS: VideoModelConfig[] = [
-  {
-    name: "minimax",
-    title: "Minimax",
-    description: "Оптимальное качество и скорость",
-  },
-  {
-    name: "haiper",
-    title: "Haiper",
-    description: "Высокое качество, длительность 6 секунд",
-  },
-  {
-    name: "ray",
-    title: "Ray",
-    description: "Реалистичная анимация",
-  },
-  {
-    name: "i2vgen",
-    title: "I2VGen-XL",
-    description: "Продвинутая модель для детальной анимации",
-  },
-]
+import { VideoModel, ImageToVideoResponse } from "../interfaces"
 
 export async function generateImageToVideo(
-  image: string,
+  imageUrl: string,
   prompt: string,
-  model: VideoModel,
+  videoModel: VideoModel,
+  paymentAmount: number,
   telegram_id: number,
   username: string,
   isRu: boolean,
@@ -52,12 +14,20 @@ export async function generateImageToVideo(
   try {
     const url = `${isDev ? "http://localhost:3000" : process.env.ELESTIO_URL}/generate/image-to-video`
 
+    if (!imageUrl) throw new Error("Image URL is required")
+    if (!prompt) throw new Error("Prompt is required")
+    if (!videoModel) throw new Error("Video model is required")
+    if (!telegram_id) throw new Error("Telegram ID is required")
+    if (!username) throw new Error("Username is required")
+    if (!isRu) throw new Error("Language is required")
+
     const response = await axios.post<ImageToVideoResponse>(
       url,
       {
-        image,
+        imageUrl,
         prompt,
-        model,
+        videoModel,
+        paymentAmount,
         telegram_id,
         username,
         is_ru: isRu,
@@ -79,13 +49,4 @@ export async function generateImageToVideo(
     console.error("Unexpected error:", error)
     throw error
   }
-}
-
-export function createVideoModelKeyboard(isRu: boolean) {
-  return Markup.inlineKeyboard([
-    [Markup.button.callback(isRu ? "Minimax - Оптимальный" : "Minimax - Optimal", "video_model_minimax")],
-    [Markup.button.callback(isRu ? "Haiper - Качественный" : "Haiper - High Quality", "video_model_haiper")],
-    [Markup.button.callback(isRu ? "Ray - Реалистичный" : "Ray - Realistic", "video_model_ray")],
-    [Markup.button.callback(isRu ? "I2VGen-XL - Детальный" : "I2VGen-XL - Detailed", "video_model_i2vgen")],
-  ])
 }

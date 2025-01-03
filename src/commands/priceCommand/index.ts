@@ -9,7 +9,7 @@ import {
   textToVideoCost,
   speechGenerationCost,
   starCost,
-} from "../../helpers/telegramStars/telegramStars"
+} from "../../helpers/telegramStars"
 
 export async function priceCommand(ctx: MyContext) {
   console.log("CASE: priceCommand")
