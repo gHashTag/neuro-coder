@@ -1,6 +1,6 @@
 import { MyContext } from "../../interfaces"
 import { handleChangeSize } from "../handleChangeSize"
-import { handleGenerateImageActions } from "../handleGenerateImageActions"
+
 import { handleAspectRatioChange } from "../handleAspectRatioChange"
 import { handleNeuroActions } from "../handleNeuroActions"
 import { handleImprove } from "../handleGenerateImageActions/handleImprove"
@@ -15,11 +15,6 @@ export async function handleCallbackQuery(ctx: MyContext, data: string, isRu: bo
       case data === "change_size":
         console.log("CASE: change_size")
         await handleChangeSize({ ctx })
-        break
-
-      case data.startsWith("generate_"):
-        console.log("CASE: generate_")
-        await handleGenerateImageActions(ctx, data, isRu)
         break
 
       case data === "request_email":

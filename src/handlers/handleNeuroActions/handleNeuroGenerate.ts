@@ -5,7 +5,7 @@ import { MyContext } from "../../interfaces"
 import { getUserBalance, imageNeuroGenerationCost, sendInsufficientStarsMessage } from "../../helpers/telegramStars"
 
 export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: boolean) {
-  let generatingMessage: { message_id: number } | null = null
+  console.log("CASE: handleNeuroGenerate")
 
   try {
     if (!ctx || !ctx.from) {
@@ -39,13 +39,11 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
       return
     }
 
-    generatingMessage = await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
-
     try {
       const numImages = parseInt(count)
       console.log("Generating", numImages, "images")
 
-      await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx, numImages)
+      await generateNeuroImage(promptData.prompt, promptData.model_type, numImages, ctx.from.id, ctx)
     } catch (error) {
       console.error("Error in generation loop:", error)
       throw error
@@ -57,9 +55,5 @@ export async function handleNeuroGenerate(ctx: MyContext, data: string, isRu: bo
         ? "Произошла ошибка при генерации изображения. Пожалуйста, попробуйте озже."
         : "An error occurred while generating the image. Please try again later.",
     )
-  } finally {
-    if (generatingMessage) {
-      await ctx.telegram.deleteMessage(ctx.chat?.id || "", generatingMessage.message_id).catch((e) => console.error("Error deleting message:", e))
-    }
   }
 }

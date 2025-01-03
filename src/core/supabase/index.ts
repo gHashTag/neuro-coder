@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js"
+import { UserModel } from "../../interfaces"
 
 if (!process.env.SUPABASE_URL) {
   throw new Error("SUPABASE_URL is not set")
@@ -208,6 +209,24 @@ export const getUserModel = async (telegram_id: string): Promise<string> => {
   }
 
   return data?.model || "gpt-4o"
+}
+
+export async function getLatestUserModel(userId: number): Promise<UserModel | null> {
+  const { data, error } = await supabase
+    .from("model_trainings")
+    .select("model_name, trigger_word, model_url")
+    .eq("user_id", userId)
+    .eq("status", "completed")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single()
+  console.log(data, "getLatestUserModel")
+  if (error) {
+    console.error("Error getting user model:", error)
+    return null
+  }
+
+  return data as UserModel
 }
 
 export const getTelegramIdByUserId = async (userId: string): Promise<number | null> => {

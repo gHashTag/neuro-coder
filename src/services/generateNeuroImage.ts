@@ -2,21 +2,40 @@ import axios, { isAxiosError } from "axios"
 
 import { isDev } from "../helpers"
 import { isRussian } from "../utils/language"
-import { MyContext } from "../interfaces"
+import { MyContext, ModelUrl } from "../interfaces"
 
-export async function generateNeuroImage(prompt: string, model_type: string, telegram_id: number, ctx: MyContext, numImages: number): Promise<null> {
-  console.log("Starting generateNeuroImage with:", { prompt, model_type, telegram_id })
+export async function generateNeuroImage(
+  prompt: string,
+  model_url: ModelUrl,
+  numImages: number,
+  telegram_id: number,
+  ctx: MyContext,
+): Promise<{ data: string } | null> {
+  if (!ctx.session.prompt) {
+    throw new Error("Prompt not found")
+  }
+
+  if (!ctx.session.userModel) {
+    throw new Error("User model not found")
+  }
+
+  if (!numImages) {
+    throw new Error("Num images not found")
+  }
+
+  console.log("Starting generateNeuroImage with:", { prompt, model_url, numImages, telegram_id })
 
   try {
     const url = `${isDev ? "http://localhost:3000" : process.env.ELESTIO_URL}/generate/neuro-photo`
 
-    await axios.post(
+    const response = await axios.post(
       url,
       {
         prompt,
+        model_url,
+        num_images: numImages || 1,
         telegram_id,
         username: ctx.from?.username,
-        num_images: numImages || 1,
         is_ru: isRussian(ctx),
       },
       {
@@ -25,7 +44,8 @@ export async function generateNeuroImage(prompt: string, model_type: string, tel
         },
       },
     )
-    return null
+    console.log(response.data, "response.data")
+    return response.data
   } catch (error) {
     if (isAxiosError(error)) {
       console.error("API Error:", error.response?.data || error.message)

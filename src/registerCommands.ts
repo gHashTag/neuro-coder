@@ -7,7 +7,7 @@ import { neuroQuestCommand } from "./commands/neuroQuestCommand"
 import { topUpBalanceCommand } from "./commands/topUpBalanceCommand"
 import { balanceCommand } from "./commands/balanceCommand"
 
-import { avatarWizard, emailWizard, imageToPromptWizard, improvePromptWizard, sizeWizard, textPromptToImageWizard } from "./scenes"
+import { avatarWizard, emailWizard, neuroPhotoWizard, imageToPromptWizard, improvePromptWizard, sizeWizard, textPromptToImageWizard } from "./scenes"
 // import { subscriptionMiddleware } from "./middleware/subscription"
 
 import { setupLevelHandlers } from "handlers/setupLevelHandlers"
@@ -36,6 +36,7 @@ export const stage = new Scenes.Stage<MyContext>([
   menuScene,
   improvePromptWizard,
   sizeWizard,
+  neuroPhotoWizard,
 ])
 
 export function registerCommands(bot: Telegraf<MyContext>) {
@@ -45,6 +46,15 @@ export function registerCommands(bot: Telegraf<MyContext>) {
         selectedModel: "",
         prompt: "",
         selectedSize: "9:16",
+        userModel: {
+          model_name: "",
+          trigger_word: "",
+          model_url: "i/i:i",
+        },
+        numImages: 0,
+        telegram_id: 0,
+        mode: "generate_image",
+        attempts: 0,
       }),
     }),
   )

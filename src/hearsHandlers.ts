@@ -9,6 +9,7 @@ import { menuCommand } from "./commands/menuCommand"
 import { generateImage } from "services/generateReplicateImage"
 import { isRussian } from "utils/language"
 import { setAspectRatio } from "core/supabase/ai"
+import { generateNeuroImage } from "services/generateNeuroImage"
 
 const myComposer = new Composer<MyContext>()
 
@@ -29,7 +30,7 @@ myComposer.hears(["🎨 Обучить FLUX", "🎨 Train FLUX"], async (ctx) =>
 
 myComposer.hears(["📸 Нейрофото", "📸 NeuroPhoto"], async (ctx) => {
   console.log("CASE: Нейрофото")
-  await ctx.scene.enter("neuroPhotoCommand")
+  await ctx.scene.enter("neuroPhotoWizard")
 })
 
 myComposer.hears(["🎥 Видео из текста", "🎥 Text to Video"], async (ctx) => {
@@ -97,21 +98,21 @@ myComposer.hears(["1️⃣", "2️⃣", "3️⃣", "4️⃣"], async (ctx) => {
   console.log(`CASE: Нажата кнопка ${text}`)
   const isRu = isRussian(ctx)
   const prompt = ctx.session.prompt
-  switch (text) {
-    case "1️⃣":
-      await generateImage(prompt, ctx.session.selectedModel || "", 1, ctx.from.id, isRu, ctx)
-      break
-    case "2️⃣":
-      await generateImage(prompt, ctx.session.selectedModel || "", 2, ctx.from.id, isRu, ctx)
-      break
-    case "3️⃣":
-      await generateImage(prompt, ctx.session.selectedModel || "", 3, ctx.from.id, isRu, ctx)
-      break
-    case "4️⃣":
-      await generateImage(prompt, ctx.session.selectedModel || "", 4, ctx.from.id, isRu, ctx)
-      break
-    default:
-      await ctx.reply("Неизвестная кнопка")
+  const userId = ctx.from.id
+  const numImages = parseInt(text[0]) // Извлекаем число из текста кнопки
+
+  const generate = async (num: number) => {
+    if (ctx.session.mode === "neuro_photo") {
+      await generateNeuroImage(prompt, ctx.session.userModel.model_url, num, userId, ctx)
+    } else {
+      await generateImage(prompt, ctx.session.selectedModel || "", num, userId, isRu, ctx)
+    }
+  }
+
+  if (numImages >= 1 && numImages <= 4) {
+    await generate(numImages)
+  } else {
+    await ctx.reply("Неизвестная кнопка")
   }
 })
 

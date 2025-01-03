@@ -1,6 +1,5 @@
 import { generateNeuroImage } from "../../services/generateNeuroImage"
 
-import { getPrompt } from "../../core/supabase/ai"
 import { MyContext } from "../../interfaces"
 
 export async function handleGenerateNeuroImproved(ctx: MyContext, data: string, isRu: boolean) {
@@ -9,14 +8,9 @@ export async function handleGenerateNeuroImproved(ctx: MyContext, data: string, 
       throw new Error("Context or user not found")
     }
 
-    console.log("Starting generate_improved_ handler")
-    const promptId = data.split("_")[2]
-    console.log("Prompt ID from callback:", promptId)
+    const model_url = ctx.session.userModel.model_url as `${string}/${string}:${string}`
 
-    const promptData = await getPrompt(promptId)
-    console.log("Prompt data:", promptData)
-
-    if (!promptData) {
+    if (!model_url) {
       console.log("No prompt data found")
       await ctx.reply(isRu ? "Не удалось найти информацию о промпте" : "Could not find prompt information")
       return
@@ -26,7 +20,7 @@ export async function handleGenerateNeuroImproved(ctx: MyContext, data: string, 
 
     console.log("Generating neuro image...")
 
-    await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx, 1)
+    await generateNeuroImage(ctx.session.prompt, model_url, 1, ctx.from.id, ctx)
     return
   } catch (error) {
     console.error("Error in generate_improved_ handler:", error)

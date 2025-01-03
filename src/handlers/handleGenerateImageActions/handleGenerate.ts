@@ -19,8 +19,6 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
       return
     }
 
-    await ctx.reply(isRu ? "⏳ Генерация..." : "⏳ Generating...")
-
     const numImages = parseInt(count)
     console.log("numImages", numImages)
 
@@ -30,7 +28,7 @@ export async function handleGenerate(ctx: MyContext, data: string, isRu: boolean
       await sendInsufficientStarsMessage(ctx, isRu)
       return
     } else {
-      await generateNeuroImage(promptData.prompt, promptData.model_type, ctx.from.id, ctx, numImages)
+      await generateNeuroImage(promptData.prompt, promptData.model_type, numImages, ctx.from.id, ctx)
       return
     }
     return
