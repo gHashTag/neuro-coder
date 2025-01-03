@@ -35,9 +35,10 @@ export interface SessionData {
   selectedSize: string
   userModel: UserModel
   mode: Mode
+  videoModel: string
 }
 
-export type Mode = "neuro_photo" | "generate_image"
+export type Mode = "neuro_photo" | "generate_image" | "text_to_video"
 
 export interface MyWizardSession extends Scenes.WizardSessionData {
   data: string
@@ -52,6 +53,7 @@ export interface MySession extends Scenes.WizardSession<MyWizardSession> {
   telegram_id: number
   mode: Mode
   attempts: number
+  videoModel: string
 }
 
 export interface MyContext extends Context {

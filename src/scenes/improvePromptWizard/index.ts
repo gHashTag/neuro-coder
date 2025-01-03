@@ -3,6 +3,7 @@ import { upgradePrompt } from "../../helpers"
 import { MyContext } from "../../interfaces"
 import { generateImage } from "services/generateReplicateImage"
 import { generateNeuroImage } from "services/generateNeuroImage"
+import { generateTextToVideo } from "services/generateTextToVideo"
 
 const MAX_ATTEMPTS = 10
 
@@ -34,7 +35,7 @@ export const improvePromptWizard = new Scenes.WizardScene<MyContext>(
 
     await ctx.reply(isRu ? "Улучшенный промпт:\n```\n" + improvedPrompt + "\n```" : "Improved prompt:\n```\n" + improvedPrompt + "\n```", {
       reply_markup: Markup.keyboard([
-        [Markup.button.text(isRu ? "✅ Да. Cгенерировать изображение?" : "✅ Yes. Generate image?")],
+        [Markup.button.text(isRu ? "✅ Да. Cгенерировать?" : "✅ Yes. Generate?")],
         [Markup.button.text(isRu ? "🔄 Еще раз улучшить" : "🔄 Improve again")],
         [Markup.button.text(isRu ? "❌ Отмена" : "❌ Cancel")],
       ]).resize().reply_markup,
@@ -56,14 +57,23 @@ export const improvePromptWizard = new Scenes.WizardScene<MyContext>(
         return ctx.scene.leave()
       }
 
-      if (text === (isRu ? "✅ Да. Cгенерировать изображение?" : "✅ Yes. Generate image?")) {
+      if (text === (isRu ? "✅ Да. Cгенерировать?" : "✅ Yes. Generate?")) {
         // Логика для генерации изображения
         const mode = ctx.session.mode
+        if (!mode) throw new Error(isRu ? "Не удалось определить режим" : "Could not identify mode")
+        if (!ctx.session.videoModel) throw new Error(isRu ? "Не удалось определить модель" : "Could not identify model")
+        if (!ctx.from.id) throw new Error(isRu ? "Не удалось определить telegram_id" : "Could not identify telegram_id")
+        if (!ctx.from.username) throw new Error(isRu ? "Не удалось определить username" : "Could not identify username")
+        if (!isRu) throw new Error(isRu ? "Не удалось определить isRu" : "Could not identify isRu")
 
         if (mode === "neuro_photo") {
           await generateNeuroImage(ctx.session.prompt, ctx.session.userModel.model_url, 1, ctx.from.id, ctx)
-        } else {
+        } else if (mode === "text_to_video") {
+          await generateTextToVideo(ctx.session.prompt, ctx.session.videoModel, ctx.from.id, ctx.from.username, isRu)
+        } else if (mode === "generate_image") {
           await generateImage(ctx.session.prompt, ctx.session.selectedModel, 1, ctx.from.id, isRu, ctx)
+        } else {
+          throw new Error(isRu ? "Неизвестный режим" : "Unknown mode")
         }
         return ctx.scene.leave()
       } else if (text === (isRu ? "🔄 Еще раз улучшить" : "🔄 Improve again")) {
@@ -86,7 +96,7 @@ export const improvePromptWizard = new Scenes.WizardScene<MyContext>(
 
         await ctx.reply(isRu ? "Улучшенный промпт:\n```\n" + improvedPrompt + "\n```" : "Improved prompt:\n```\n" + improvedPrompt + "\n```", {
           reply_markup: Markup.keyboard([
-            [Markup.button.text(isRu ? "✅ Да. Cгенерировать изображение?" : "✅ Yes. Generate image?")],
+            [Markup.button.text(isRu ? "✅ Да. Cгенерировать?" : "✅ Yes. Generate?")],
             [Markup.button.text(isRu ? "🔄 Еще раз улучшить" : "🔄 Improve again")],
             [Markup.button.text(isRu ? "❌ Отмена" : "❌ Cancel")],
           ]).resize().reply_markup,

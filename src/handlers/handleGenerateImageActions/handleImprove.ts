@@ -49,7 +49,7 @@ export async function handleImprove(ctx: MyContext, data: string, isRu: boolean)
     await ctx.reply(isRu ? "Улучшенный промпт:\n```\n" + improvedPrompt + "\n```" : "Improved prompt:\n```\n" + improvedPrompt + "\n```", {
       reply_markup: {
         inline_keyboard: [
-          [{ text: isRu ? "✅ Да. Cгенерировать изображение?" : "✅ Yes. Generate image?", callback_data: `generate_1_${savedPrompt.prompt_id}` }],
+          [{ text: isRu ? "✅ Да. Cгенерировать?" : "✅ Yes. Generate?", callback_data: `generate_1_${savedPrompt.prompt_id}` }],
           [{ text: isRu ? "❌ Нет" : "❌ No", callback_data: "cancel" }],
         ],
       },

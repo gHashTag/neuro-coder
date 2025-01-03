@@ -37,7 +37,7 @@ myComposer.hears(["📸 Нейрофото", "📸 NeuroPhoto"], async (ctx) => 
 
 myComposer.hears(["🎥 Видео из текста", "🎥 Text to Video"], async (ctx) => {
   console.log("CASE: Видео из текста")
-  await ctx.scene.enter("textToVideoCommand")
+  await ctx.scene.enter("textToVideoWizard")
 })
 
 myComposer.hears(["🎥 Изображение в видео", "🎥 Image to Video"], async (ctx) => {

@@ -8,15 +8,27 @@ interface TextToVideoResponse {
   prompt_id?: number
 }
 
-export async function generateTextToVideo(prompt: string, model: string, telegram_id: number, username: string, isRu: boolean): Promise<TextToVideoResponse> {
+export async function generateTextToVideo(
+  prompt: string,
+  videoModel: string,
+  telegram_id: number,
+  username: string,
+  isRu: boolean,
+): Promise<TextToVideoResponse> {
   try {
     const url = `${isDev ? "http://localhost:3000" : process.env.ELESTIO_URL}/generate/text-to-video`
+
+    if (!prompt) throw new Error(isRu ? "Не удалось определить промпт" : "Could not identify prompt")
+    if (!videoModel) throw new Error(isRu ? "Не удалось определить модель" : "Could not identify model")
+    if (!telegram_id) throw new Error(isRu ? "Не удалось определить telegram_id" : "Could not identify telegram_id")
+    if (!username) throw new Error(isRu ? "Не удалось определить username" : "Could not identify username")
+    if (!isRu) throw new Error(isRu ? "Не удалось определить isRu" : "Could not identify isRu")
 
     const response = await axios.post<TextToVideoResponse>(
       url,
       {
         prompt,
-        model,
+        videoModel,
         telegram_id,
         username,
         is_ru: isRu,
